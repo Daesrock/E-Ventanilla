@@ -36,6 +36,5 @@ Por decisión del usuario, los datos institucionales y las reglas operativas no 
 
 ## Referencias
 
-- Documento proporcionado por el usuario: `7J_AE2_Proyecto2.pdf`, 49 páginas. Fuente principal de requisitos, casos de uso y modelos.
 - [Figma: E-Ventanilla — Plantilla de Navegación](https://www.figma.com/design/Z0GxrbXj3gZEbtk9Oiqb7o)
 - [Diagrama de navegación móvil](C:/Users/Pardo/Downloads/Diagrama_Navegacion.pdf), una página. Referencia de recorridos, complementaria a los acuerdos de requisitos.
