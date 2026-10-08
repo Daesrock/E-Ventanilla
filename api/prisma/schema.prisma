@@ -1,0 +1,76 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ChallengePurpose {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+model User {
+  id              String   @id @default(uuid()) @db.Uuid
+  firstName       String   @db.VarChar(100)
+  lastName        String   @db.VarChar(150)
+  curp            String   @unique @db.VarChar(18)
+  email           String   @unique @db.VarChar(254)
+  passwordHash    String
+  municipality    String   @db.VarChar(150)
+  municipalityCode String? @db.VarChar(5)
+  phone           String?  @db.VarChar(25)
+  rfc             String?  @db.VarChar(13)
+  emailVerifiedAt DateTime?
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  challenges      AuthChallenge[]
+  sessions        Session[]
+}
+
+model AuthChallenge {
+  id         String           @id @default(uuid()) @db.Uuid
+  userId     String           @db.Uuid
+  purpose    ChallengePurpose
+  digest     String
+  attempts   Int              @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime         @default(now())
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mailJob    MailJob?
+
+  @@index([userId, purpose, createdAt])
+}
+
+model MailJob {
+  id           String        @id @default(uuid()) @db.Uuid
+  challengeId  String        @unique @db.Uuid
+  ciphertext   String
+  attempts     Int           @default(0)
+  availableAt  DateTime      @default(now())
+  lockedUntil  DateTime?
+  deliveredAt  DateTime?
+  abandonedAt  DateTime?
+  createdAt    DateTime      @default(now())
+  challenge    AuthChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@index([availableAt])
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  digest    String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}

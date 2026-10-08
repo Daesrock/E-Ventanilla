@@ -1,0 +1,516 @@
+{
+  "metadata": {
+    "publisher": "INEGI",
+    "catalog": "Catálogo Único de Claves de Áreas Geoestadísticas Estatales, Municipales y Localidades",
+    "sourceUrl": "https://www.inegi.org.mx/contenidos/app/ageeml/catun_municipio.zip",
+    "catalogUrl": "https://www.inegi.org.mx/app/ageeml/default.html",
+    "referenceDate": "2026-08",
+    "publishedAt": "2026-09-15",
+    "retrievedAt": "2026-10-08",
+    "entityCode": "07",
+    "entityName": "Chiapas",
+    "archiveMember": "AGEEML_20268211656753_utf8.csv",
+    "archiveSha256": "cb0f21fb4c53d2c0adca356ca669646372f9b81b2cdcbd51745c01acaec7204f",
+    "sourceCsvSha256": "2f2d08c8a13b037203b8fd6822983d242f79cf787b904a1f9df101635f557387",
+    "municipalitiesSha256": "864e6785e14435969777f74655f56cccda5c6cc7e18ca93507109bbb7960d74a",
+    "checksumEncoding": "SHA-256 of UTF-8 compact JSON municipalities array"
+  },
+  "municipalities": [
+    {
+      "code": "07001",
+      "name": "Acacoyagua"
+    },
+    {
+      "code": "07002",
+      "name": "Acala"
+    },
+    {
+      "code": "07003",
+      "name": "Acapetahua"
+    },
+    {
+      "code": "07113",
+      "name": "Aldama"
+    },
+    {
+      "code": "07004",
+      "name": "Altamirano"
+    },
+    {
+      "code": "07005",
+      "name": "Amatán"
+    },
+    {
+      "code": "07006",
+      "name": "Amatenango de la Frontera"
+    },
+    {
+      "code": "07007",
+      "name": "Amatenango del Valle"
+    },
+    {
+      "code": "07008",
+      "name": "Ángel Albino Corzo"
+    },
+    {
+      "code": "07009",
+      "name": "Arriaga"
+    },
+    {
+      "code": "07010",
+      "name": "Bejucal de Ocampo"
+    },
+    {
+      "code": "07011",
+      "name": "Bella Vista"
+    },
+    {
+      "code": "07114",
+      "name": "Benemérito de las Américas"
+    },
+    {
+      "code": "07012",
+      "name": "Berriozábal"
+    },
+    {
+      "code": "07013",
+      "name": "Bochil"
+    },
+    {
+      "code": "07015",
+      "name": "Cacahoatán"
+    },
+    {
+      "code": "07120",
+      "name": "Capitán Luis Ángel Vidal"
+    },
+    {
+      "code": "07016",
+      "name": "Catazajá"
+    },
+    {
+      "code": "07022",
+      "name": "Chalchihuitán"
+    },
+    {
+      "code": "07023",
+      "name": "Chamula"
+    },
+    {
+      "code": "07024",
+      "name": "Chanal"
+    },
+    {
+      "code": "07025",
+      "name": "Chapultenango"
+    },
+    {
+      "code": "07026",
+      "name": "Chenalhó"
+    },
+    {
+      "code": "07027",
+      "name": "Chiapa de Corzo"
+    },
+    {
+      "code": "07028",
+      "name": "Chiapilla"
+    },
+    {
+      "code": "07029",
+      "name": "Chicoasén"
+    },
+    {
+      "code": "07030",
+      "name": "Chicomuselo"
+    },
+    {
+      "code": "07031",
+      "name": "Chilón"
+    },
+    {
+      "code": "07017",
+      "name": "Cintalapa de Figueroa"
+    },
+    {
+      "code": "07018",
+      "name": "Coapilla"
+    },
+    {
+      "code": "07019",
+      "name": "Comitán de Domínguez"
+    },
+    {
+      "code": "07021",
+      "name": "Copainalá"
+    },
+    {
+      "code": "07014",
+      "name": "El Bosque"
+    },
+    {
+      "code": "07122",
+      "name": "El Parral"
+    },
+    {
+      "code": "07070",
+      "name": "El Porvenir"
+    },
+    {
+      "code": "07123",
+      "name": "Emiliano Zapata"
+    },
+    {
+      "code": "07032",
+      "name": "Escuintla"
+    },
+    {
+      "code": "07033",
+      "name": "Francisco León"
+    },
+    {
+      "code": "07034",
+      "name": "Frontera Comalapa"
+    },
+    {
+      "code": "07035",
+      "name": "Frontera Hidalgo"
+    },
+    {
+      "code": "07125",
+      "name": "Honduras de la Sierra"
+    },
+    {
+      "code": "07037",
+      "name": "Huehuetán"
+    },
+    {
+      "code": "07039",
+      "name": "Huitiupán"
+    },
+    {
+      "code": "07038",
+      "name": "Huixtán"
+    },
+    {
+      "code": "07040",
+      "name": "Huixtla"
+    },
+    {
+      "code": "07042",
+      "name": "Ixhuatán"
+    },
+    {
+      "code": "07043",
+      "name": "Ixtacomitán"
+    },
+    {
+      "code": "07044",
+      "name": "Ixtapa"
+    },
+    {
+      "code": "07045",
+      "name": "Ixtapangajoya"
+    },
+    {
+      "code": "07046",
+      "name": "Jiquipilas"
+    },
+    {
+      "code": "07047",
+      "name": "Jitotol"
+    },
+    {
+      "code": "07048",
+      "name": "Juárez"
+    },
+    {
+      "code": "07020",
+      "name": "La Concordia"
+    },
+    {
+      "code": "07036",
+      "name": "La Grandeza"
+    },
+    {
+      "code": "07041",
+      "name": "La Independencia"
+    },
+    {
+      "code": "07050",
+      "name": "La Libertad"
+    },
+    {
+      "code": "07099",
+      "name": "La Trinitaria"
+    },
+    {
+      "code": "07049",
+      "name": "Larráinzar"
+    },
+    {
+      "code": "07052",
+      "name": "Las Margaritas"
+    },
+    {
+      "code": "07075",
+      "name": "Las Rosas"
+    },
+    {
+      "code": "07051",
+      "name": "Mapastepec"
+    },
+    {
+      "code": "07115",
+      "name": "Maravilla Tenejapa"
+    },
+    {
+      "code": "07116",
+      "name": "Marqués de Comillas"
+    },
+    {
+      "code": "07053",
+      "name": "Mazapa de Madero"
+    },
+    {
+      "code": "07054",
+      "name": "Mazatán"
+    },
+    {
+      "code": "07055",
+      "name": "Metapa"
+    },
+    {
+      "code": "07124",
+      "name": "Mezcalapa"
+    },
+    {
+      "code": "07056",
+      "name": "Mitontic"
+    },
+    {
+      "code": "07117",
+      "name": "Montecristo de Guerrero"
+    },
+    {
+      "code": "07057",
+      "name": "Motozintla"
+    },
+    {
+      "code": "07058",
+      "name": "Nicolás Ruíz"
+    },
+    {
+      "code": "07059",
+      "name": "Ocosingo"
+    },
+    {
+      "code": "07060",
+      "name": "Ocotepec"
+    },
+    {
+      "code": "07061",
+      "name": "Ocozocoautla de Espinosa"
+    },
+    {
+      "code": "07062",
+      "name": "Ostuacán"
+    },
+    {
+      "code": "07063",
+      "name": "Osumacinta"
+    },
+    {
+      "code": "07064",
+      "name": "Oxchuc"
+    },
+    {
+      "code": "07065",
+      "name": "Palenque"
+    },
+    {
+      "code": "07066",
+      "name": "Pantelhó"
+    },
+    {
+      "code": "07067",
+      "name": "Pantepec"
+    },
+    {
+      "code": "07068",
+      "name": "Pichucalco"
+    },
+    {
+      "code": "07069",
+      "name": "Pijijiapan"
+    },
+    {
+      "code": "07072",
+      "name": "Pueblo Nuevo Solistahuacán"
+    },
+    {
+      "code": "07073",
+      "name": "Rayón"
+    },
+    {
+      "code": "07074",
+      "name": "Reforma"
+    },
+    {
+      "code": "07121",
+      "name": "Rincón Chamula San Pedro"
+    },
+    {
+      "code": "07076",
+      "name": "Sabanilla"
+    },
+    {
+      "code": "07077",
+      "name": "Salto de Agua"
+    },
+    {
+      "code": "07118",
+      "name": "San Andrés Duraznal"
+    },
+    {
+      "code": "07078",
+      "name": "San Cristóbal de las Casas"
+    },
+    {
+      "code": "07079",
+      "name": "San Fernando"
+    },
+    {
+      "code": "07112",
+      "name": "San Juan Cancuc"
+    },
+    {
+      "code": "07110",
+      "name": "San Lucas"
+    },
+    {
+      "code": "07119",
+      "name": "Santiago el Pinar"
+    },
+    {
+      "code": "07080",
+      "name": "Siltepec"
+    },
+    {
+      "code": "07081",
+      "name": "Simojovel"
+    },
+    {
+      "code": "07082",
+      "name": "Sitalá"
+    },
+    {
+      "code": "07083",
+      "name": "Socoltenango"
+    },
+    {
+      "code": "07084",
+      "name": "Solosuchiapa"
+    },
+    {
+      "code": "07085",
+      "name": "Soyaló"
+    },
+    {
+      "code": "07086",
+      "name": "Suchiapa"
+    },
+    {
+      "code": "07087",
+      "name": "Suchiate"
+    },
+    {
+      "code": "07088",
+      "name": "Sunuapa"
+    },
+    {
+      "code": "07089",
+      "name": "Tapachula"
+    },
+    {
+      "code": "07090",
+      "name": "Tapalapa"
+    },
+    {
+      "code": "07091",
+      "name": "Tapilula"
+    },
+    {
+      "code": "07092",
+      "name": "Tecpatán"
+    },
+    {
+      "code": "07093",
+      "name": "Tenejapa"
+    },
+    {
+      "code": "07094",
+      "name": "Teopisca"
+    },
+    {
+      "code": "07096",
+      "name": "Tila"
+    },
+    {
+      "code": "07097",
+      "name": "Tonalá"
+    },
+    {
+      "code": "07098",
+      "name": "Totolapa"
+    },
+    {
+      "code": "07100",
+      "name": "Tumbalá"
+    },
+    {
+      "code": "07102",
+      "name": "Tuxtla Chico"
+    },
+    {
+      "code": "07101",
+      "name": "Tuxtla Gutiérrez"
+    },
+    {
+      "code": "07103",
+      "name": "Tuzantán"
+    },
+    {
+      "code": "07104",
+      "name": "Tzimol"
+    },
+    {
+      "code": "07105",
+      "name": "Unión Juárez"
+    },
+    {
+      "code": "07106",
+      "name": "Venustiano Carranza"
+    },
+    {
+      "code": "07071",
+      "name": "Villa Comaltitlán"
+    },
+    {
+      "code": "07107",
+      "name": "Villa Corzo"
+    },
+    {
+      "code": "07108",
+      "name": "Villaflores"
+    },
+    {
+      "code": "07109",
+      "name": "Yajalón"
+    },
+    {
+      "code": "07111",
+      "name": "Zinacantán"
+    }
+  ]
+}
