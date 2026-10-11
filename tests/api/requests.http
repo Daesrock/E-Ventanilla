@@ -1,0 +1,106 @@
+# Plantillas manuales. Sustituye los valores vacíos con tus datos o tokens.
+# No ejecuta solicitudes por abrir este archivo. La colección Postman ofrece captura de tokens.
+@baseUrl = https://api-ventanilla.daesrock.dev/v1
+@sessionToken =
+@trackingToken =
+@identifier =
+@email =
+@password =
+@code =
+
+### Disponibilidad de PostgreSQL (sin sesión)
+GET {{baseUrl}}/ready
+
+### Catálogo oficial público
+GET {{baseUrl}}/catalog/municipalities
+
+### Login: crea sesión; no envía códigos
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "{{identifier}}",
+  "password": "{{password}}",
+  "allowPendingVerification": true
+}
+
+### Perfil: sesión, también pendiente de verificación
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{sessionToken}}
+
+### Seguimiento: solo el token temporal, no el de sesión
+GET {{baseUrl}}/auth/verification-status
+Authorization: Bearer {{trackingToken}}
+
+### Retomar seguimiento: sesión vigente, sin enviar código
+GET {{baseUrl}}/auth/verification-context
+Authorization: Bearer {{sessionToken}}
+
+### Comprobar acceso a citas: requiere correo verificado; no reserva
+GET {{baseUrl}}/auth/appointment-access
+Authorization: Bearer {{sessionToken}}
+
+### Verificar un código real: cambia el estado del correo
+POST {{baseUrl}}/auth/verify-email
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "code": "{{code}}"
+}
+
+### Reenvío real: envía un código si corresponde y se permite reenviar
+POST {{baseUrl}}/auth/resend-verification
+Content-Type: application/json
+
+{
+  "identifier": "{{identifier}}"
+}
+
+### Recuperación real: solicita código para una cuenta verificada
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "identifier": "{{identifier}}"
+}
+
+### Validar código antes de mostrar la nueva contraseña; no cambia la cuenta
+POST {{baseUrl}}/auth/verify-reset-code
+Content-Type: application/json
+
+{
+  "identifier": "{{identifier}}",
+  "code": "{{code}}"
+}
+
+### Restablecer contraseña real: vuelve a comprobar el código, lo consume y revoca sesiones
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "identifier": "{{identifier}}",
+  "code": "{{code}}",
+  "password": "{{password}}"
+}
+
+### Cerrar sesión real
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{sessionToken}}
+Content-Type: application/json
+
+{}
+
+### Registro real: completar tus datos; crea cuenta, sesión y solicita código
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "",
+  "paternalLastName": "",
+  "maternalLastName": "",
+  "curp": "",
+  "municipalityCode": "",
+  "email": "{{email}}",
+  "password": "{{password}}"
+}

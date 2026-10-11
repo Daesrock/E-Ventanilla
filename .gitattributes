@@ -4,5 +4,7 @@
 *.jar binary
 
 # Preservar las instantáneas públicas byte por byte para verificar sus SHA-256.
-api/resources/** -text
-android/app/src/main/assets/** -text
+apps/api/resources/** -text
+apps/android/app/src/main/assets/** -text
+# La licencia se conserva exactamente como fue publicada por su autor.
+apps/android/app/src/main/assets/Inter-OFL.txt whitespace=-blank-at-eol

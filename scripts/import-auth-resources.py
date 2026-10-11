@@ -10,8 +10,8 @@ import zipfile
 from datetime import date
 
 ROOT = Path(__file__).resolve().parents[1]
-RESOURCES = ROOT / 'api/resources'
-ASSETS = ROOT / 'android/app/src/main/assets'
+RESOURCES = ROOT / 'apps/api/resources'
+ASSETS = ROOT / 'apps/android/app/src/main/assets'
 CATALOG_URL = 'https://www.inegi.org.mx/contenidos/app/ageeml/catun_municipio.zip'
 
 def fetch(url):

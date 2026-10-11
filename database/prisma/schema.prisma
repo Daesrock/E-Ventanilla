@@ -1,0 +1,321 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../../apps/api/src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ChallengePurpose {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+model User {
+  id              String   @id @default(uuid()) @db.Uuid
+  firstName       String   @db.VarChar(100)
+  // Compatibilidad con registros anteriores; las altas nuevas guardan cada apellido.
+  lastName        String   @db.VarChar(201)
+  paternalLastName String? @db.VarChar(100)
+  maternalLastName String? @db.VarChar(100)
+  curp            String   @unique @db.VarChar(18)
+  email           String   @unique @db.VarChar(254)
+  passwordHash    String
+  municipality    String   @db.VarChar(150)
+  municipalityCode String? @db.VarChar(5)
+  phone           String?  @db.VarChar(25)
+  phoneCountryCode String? @db.VarChar(3)
+  rfc             String?  @unique @db.VarChar(13)
+  emailVerifiedAt DateTime?
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  challenges      AuthChallenge[]
+  sessions        Session[]
+  roleId          String @db.Uuid
+  role            Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  citizen         Citizen?
+  administrativeStaff AdministrativeStaff?
+
+  @@index([roleId])
+}
+
+model AuthChallenge {
+  id         String           @id @default(uuid()) @db.Uuid
+  userId     String           @db.Uuid
+  purpose    ChallengePurpose
+  digest     String
+  attempts   Int              @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime         @default(now())
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mailJob    MailJob?
+
+  @@index([userId, purpose, createdAt])
+}
+
+model MailJob {
+  id           String        @id @default(uuid()) @db.Uuid
+  challengeId  String        @unique @db.Uuid
+  ciphertext   String
+  attempts     Int           @default(0)
+  availableAt  DateTime      @default(now())
+  lockedUntil  DateTime?
+  deliveredAt  DateTime?
+  abandonedAt  DateTime?
+  createdAt    DateTime      @default(now())
+  challenge    AuthChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@index([availableAt])
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  digest    String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// Los perfiles comparten la identidad de User; nunca duplican credenciales.
+model Role {
+  id String @id @default(uuid()) @db.Uuid
+  code String @unique @db.VarChar(50)
+  name String @db.VarChar(100)
+  hierarchyLevel Int?
+  active Boolean @default(true)
+  users User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id String @id @default(uuid()) @db.Uuid
+  code String @unique @db.VarChar(100)
+  description String
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId String @db.Uuid
+  permissionId String @db.Uuid
+  role Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Restrict)
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+model Municipality {
+  id String @id @default(uuid()) @db.Uuid
+  code String @unique @db.VarChar(5)
+  name String @db.VarChar(150)
+  citizens Citizen[]
+  branches Branch[]
+}
+
+model Citizen {
+  userId String @id @db.Uuid
+  municipalityId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  municipality Municipality @relation(fields: [municipalityId], references: [id], onDelete: Restrict)
+  appointments Appointment[]
+  @@index([municipalityId])
+}
+
+model AdministrativeStaff {
+  userId String @id @db.Uuid
+  street String @db.VarChar(150)
+  exteriorNumber String @db.VarChar(20)
+  interiorNumber String? @db.VarChar(20)
+  neighborhood String @db.VarChar(150)
+  postalCode String @db.VarChar(5)
+  socialSecurityNumber String @unique @db.VarChar(11)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  counterStaff CounterStaff?
+  counterHead CounterHead?
+  departmentHead DepartmentHead?
+}
+
+model CounterStaff {
+  userId String @id @db.Uuid
+  staff AdministrativeStaff @relation(fields: [userId], references: [userId], onDelete: Restrict)
+  assignments StaffAssignment[]
+  attendances Attendance[]
+}
+
+model CounterHead {
+  userId String @id @db.Uuid
+  staff AdministrativeStaff @relation(fields: [userId], references: [userId], onDelete: Restrict)
+  branches Branch[]
+}
+
+model DepartmentHead {
+  userId String @id @db.Uuid
+  staff AdministrativeStaff @relation(fields: [userId], references: [userId], onDelete: Restrict)
+}
+
+model Branch {
+  id String @id @default(uuid()) @db.Uuid
+  municipalityId String @db.Uuid
+  counterHeadId String? @db.Uuid
+  name String @db.VarChar(150)
+  type String @db.VarChar(100)
+  street String @db.VarChar(150)
+  exteriorNumber String @db.VarChar(20)
+  interiorNumber String? @db.VarChar(20)
+  neighborhood String @db.VarChar(150)
+  postalCode String @db.VarChar(5)
+  latitude Decimal? @db.Decimal(9,6)
+  longitude Decimal? @db.Decimal(9,6)
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  municipality Municipality @relation(fields: [municipalityId], references: [id], onDelete: Restrict)
+  counterHead CounterHead? @relation(fields: [counterHeadId], references: [userId], onDelete: Restrict)
+  counters ServiceCounter[]
+  procedures BranchProcedure[]
+  slots TimeSlot[]
+  @@index([municipalityId])
+  @@index([counterHeadId])
+}
+
+model ServiceCounter {
+  id String @id @default(uuid()) @db.Uuid
+  branchId String @db.Uuid
+  number Int
+  active Boolean @default(true)
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  assignments StaffAssignment[]
+  appointments Appointment[]
+  attendances Attendance[]
+  @@unique([branchId, number])
+  @@unique([id, branchId])
+}
+
+model Procedure {
+  id String @id @default(uuid()) @db.Uuid
+  name String @db.VarChar(200)
+  category String @db.VarChar(150)
+  requirements String
+  cost Decimal? @db.Decimal(12,2)
+  estimatedMinutes Int?
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  branches BranchProcedure[]
+}
+
+// La oferta es una relaciÃ³n explÃ­cita; una cita no puede saltÃ¡rsela.
+model BranchProcedure {
+  branchId String @db.Uuid
+  procedureId String @db.Uuid
+  active Boolean @default(true)
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  procedure Procedure @relation(fields: [procedureId], references: [id], onDelete: Restrict)
+  appointments Appointment[]
+  @@id([branchId, procedureId])
+  @@index([procedureId])
+}
+
+model TimeSlot {
+  id String @id @default(uuid()) @db.Uuid
+  branchId String @db.Uuid
+  date DateTime @db.Date
+  startsAt DateTime @db.Time(0)
+  endsAt DateTime @db.Time(0)
+  capacity Int
+  occupied Int @default(0)
+  active Boolean @default(true)
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  appointments Appointment[]
+  @@unique([id, branchId])
+  @@unique([branchId, date, startsAt, endsAt])
+}
+
+model Appointment {
+  id String @id @default(uuid()) @db.Uuid
+  folio String @unique @db.VarChar(100)
+  citizenId String @db.Uuid
+  branchId String @db.Uuid
+  procedureId String @db.Uuid
+  slotId String @db.Uuid
+  counterId String? @db.Uuid
+  requestedAt DateTime @default(now())
+  scheduledAt DateTime
+  status String @db.VarChar(100)
+  qrToken String @unique
+  // Es control tÃ©cnico de capacidad, no un catÃ¡logo inventado de estados.
+  occupiesCapacity Boolean @default(true)
+  updatedAt DateTime @updatedAt
+  citizen Citizen @relation(fields: [citizenId], references: [userId], onDelete: Restrict)
+  offering BranchProcedure @relation(fields: [branchId, procedureId], references: [branchId, procedureId], onDelete: Restrict)
+  slot TimeSlot @relation(fields: [slotId, branchId], references: [id, branchId], onDelete: Restrict)
+  counter ServiceCounter? @relation(fields: [counterId, branchId], references: [id, branchId], onDelete: Restrict)
+  attendance Attendance?
+  notifications Notification[]
+  @@unique([id, branchId])
+  @@index([citizenId, scheduledAt])
+  @@index([branchId, procedureId])
+  @@index([slotId, branchId])
+  @@index([counterId, branchId])
+}
+
+model StaffAssignment {
+  id String @id @default(uuid()) @db.Uuid
+  staffId String @db.Uuid
+  counterId String @db.Uuid
+  startsAt DateTime
+  endsAt DateTime?
+  staff CounterStaff @relation(fields: [staffId], references: [userId], onDelete: Restrict)
+  counter ServiceCounter @relation(fields: [counterId], references: [id], onDelete: Restrict)
+  @@index([staffId, startsAt])
+  @@index([counterId, startsAt])
+}
+
+model Attendance {
+  id String @id @default(uuid()) @db.Uuid
+  appointmentId String @unique @db.Uuid
+  branchId String @db.Uuid
+  staffId String @db.Uuid
+  counterId String @db.Uuid
+  arrivedAt DateTime
+  qrValidatedAt DateTime?
+  startedAt DateTime?
+  endedAt DateTime?
+  late Boolean
+  appointment Appointment @relation(fields: [appointmentId, branchId], references: [id, branchId], onDelete: Restrict)
+  staff CounterStaff @relation(fields: [staffId], references: [userId], onDelete: Restrict)
+  counter ServiceCounter @relation(fields: [counterId, branchId], references: [id, branchId], onDelete: Restrict)
+  record ProcedureRecord?
+  @@unique([appointmentId, branchId])
+  @@index([staffId])
+  @@index([counterId, branchId])
+}
+
+model ProcedureRecord {
+  id String @id @default(uuid()) @db.Uuid
+  attendanceId String @unique @db.Uuid
+  registeredAt DateTime @default(now())
+  finalStatus String @db.VarChar(100)
+  observations String?
+  attendance Attendance @relation(fields: [attendanceId], references: [id], onDelete: Restrict)
+}
+
+model Notification {
+  id String @id @default(uuid()) @db.Uuid
+  appointmentId String @db.Uuid
+  type String @db.VarChar(100)
+  channel String @db.VarChar(100)
+  sentAt DateTime?
+  status String @db.VarChar(100)
+  createdAt DateTime @default(now())
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Restrict)
+  @@index([appointmentId, createdAt])
+}

@@ -1,32 +1,22 @@
-param([string]$NodeExecutable = '', [string]$PnpmExecutable = '')
+param([string]$BunExecutable = '')
 $ErrorActionPreference = 'Stop'
 $taskRoot = Split-Path -Parent $PSScriptRoot
-if (-not $NodeExecutable) {
-    $taskNodeCommand = Get-Command node -ErrorAction SilentlyContinue
-    $NodeExecutable = if ($taskNodeCommand) { $taskNodeCommand.Source } else {
-        Join-Path $env:USERPROFILE '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe'
-    }
+if (-not $BunExecutable) {
+    $taskBundledBun = Join-Path $taskRoot '.tools/bun-1.4.2/bun-windows-x64/bun.exe'
+    $taskBunCommand = Get-Command bun -ErrorAction SilentlyContinue
+    $BunExecutable = if (Test-Path -LiteralPath $taskBundledBun) { $taskBundledBun } elseif ($taskBunCommand) { $taskBunCommand.Source } else { '' }
 }
-if (-not $PnpmExecutable) {
-    $taskPnpmCommand = Get-Command pnpm -ErrorAction SilentlyContinue
-    $PnpmExecutable = if ($taskPnpmCommand) { $taskPnpmCommand.Source } else {
-        Join-Path $env:USERPROFILE '.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback/pnpm.cmd'
-    }
-}
-if (-not (Test-Path -LiteralPath $NodeExecutable) -or -not (Test-Path -LiteralPath $PnpmExecutable)) {
-    throw 'Instala Node.js 24 y pnpm o indica sus rutas con los parámetros del script.'
-}
-$env:Path = (Split-Path -Parent $NodeExecutable) + ';' + $env:Path
+if (-not $BunExecutable -or -not (Test-Path -LiteralPath $BunExecutable)) { throw 'Instala Bun 1.4.2 o indica su ruta con -BunExecutable.' }
+if ((& $BunExecutable --version) -ne '1.4.2') { throw 'El proyecto requiere Bun 1.4.2.' }
+$env:Path = (Split-Path -Parent $BunExecutable) + ';' + $env:Path
 Push-Location $taskRoot
 try {
-    & $NodeExecutable scripts/start-local-db.mjs
+    & $BunExecutable scripts/start-local-db.mjs
     if ($LASTEXITCODE -ne 0) { throw 'No se pudo preparar la base local.' }
-    Set-Location (Join-Path $taskRoot 'api')
-    if (-not (Test-Path -LiteralPath node_modules)) {
-        & $PnpmExecutable install --frozen-lockfile --store-dir ../.tools/pnpm-store
-        if ($LASTEXITCODE -ne 0) { throw 'No se pudieron instalar las dependencias.' }
-    }
-    & $PnpmExecutable db:migrate
+    Set-Location (Join-Path $taskRoot 'apps/api')
+    & $BunExecutable install --frozen-lockfile
+    if ($LASTEXITCODE -ne 0) { throw 'No se pudieron instalar las dependencias.' }
+    & $BunExecutable run db:migrate
     if ($LASTEXITCODE -ne 0) { throw 'No se pudieron aplicar las migraciones.' }
-    & $PnpmExecutable dev
+    & $BunExecutable run dev
 } finally { Pop-Location }

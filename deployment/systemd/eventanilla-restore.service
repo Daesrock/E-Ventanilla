@@ -1,0 +1,9 @@
+[Unit]
+Description=Verificación aislada de restauración de E-Ventanilla
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /home/ubuntu/e-ventanilla/app/deployment/run-restore-check.sh
+TimeoutStartSec=3600

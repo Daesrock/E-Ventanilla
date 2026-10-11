@@ -1,0 +1,181 @@
+name: eventanilla
+
+services:
+  database:
+    image: ${POSTGRES_IMAGE:-postgres:18-bookworm}
+    environment:
+      POSTGRES_USER: eventanilla_admin
+      POSTGRES_DB: eventanilla
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+    secrets: [postgres_password, migration_password, api_password, manager_password, backup_password]
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ../database/postgres/01-roles.sh:/docker-entrypoint-initdb.d/01-roles.sh:ro
+      - ../database/postgres/manager.sql:/project/manager.sql:ro
+    networks: [database_net]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U eventanilla_admin -d eventanilla"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    mem_limit: 2g
+
+  migrate:
+    build: {context: .., dockerfile: apps/api/Dockerfile, target: build}
+    environment:
+      DATABASE_URL_FILE: /run/secrets/migration_database_url
+    secrets: [migration_database_url]
+    command: [bun, deploy-migrate.mjs]
+    networks: [database_net]
+    depends_on:
+      database: {condition: service_healthy}
+    restart: "no"
+
+  api:
+    build: {context: .., dockerfile: apps/api/Dockerfile}
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      DATABASE_URL_FILE: /run/secrets/api_database_url
+      AUTH_CODE_SECRET_FILE: /run/secrets/auth_code_secret
+      RESEND_API_KEY_FILE: /run/secrets/resend_api_key
+      RESEND_FROM_FILE: /run/secrets/resend_from
+      TRUSTED_PROXY_IPS: ${TRUSTED_PROXY_IPS:?Configura TRUSTED_PROXY_IPS con la IP de Nginx}
+    secrets: [api_database_url, auth_code_secret, resend_api_key, resend_from]
+    networks:
+      database_net:
+      proxy_net:
+        aliases: [eventanilla_api]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, bun, -e, "fetch('http://127.0.0.1:3000/v1/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    mem_limit: 1g
+
+  pgadmin:
+    image: ${PGADMIN_IMAGE:-dpage/pgadmin4:9.18}
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:?Configura PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
+      PGPASSFILE: /var/lib/pgadmin/project.pgpass
+      PGADMIN_LISTEN_PORT: 8080
+      PGADMIN_DISABLE_POSTFIX: "true"
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
+      PGADMIN_CONFIG_SESSION_COOKIE_SECURE: "True"
+      PGADMIN_CONFIG_SESSION_COOKIE_SAMESITE: "'Lax'"
+      PGADMIN_CONFIG_PROXY_X_FOR_COUNT: "1"
+      PGADMIN_CONFIG_PROXY_X_PROTO_COUNT: "1"
+    secrets: [pgadmin_password, pgadmin_pgpass]
+    entrypoint: [/bin/sh, /project-start.sh]
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+      - ./pgadmin/start.sh:/project-start.sh:ro
+    networks: [database_net, administration_net]
+    depends_on:
+      database: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, /venv/bin/python3, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/misc/ping', timeout=4)"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 60s
+    restart: unless-stopped
+    mem_limit: 768m
+
+  tunnel:
+    image: ${CLOUDFLARED_IMAGE:-cloudflare/cloudflared:2026.10.0}
+    profiles: [published]
+    command: [tunnel, --no-autoupdate, run, --token-file, /run/secrets/cloudflared_token]
+    secrets: [cloudflared_token]
+    networks: [administration_net, tunnel_egress]
+    depends_on: [pgadmin]
+    restart: unless-stopped
+    mem_limit: 256m
+
+  backup:
+    build: {context: .., dockerfile: deployment/backup/Dockerfile}
+    profiles: [operations]
+    environment:
+      BACKUP_REMOTE: ${BACKUP_REMOTE:-crypt:eventanilla}
+      BACKUP_MODE: ${BACKUP_MODE:-daily}
+      TZ: America/Mexico_City
+    secrets: [backup_password, rclone_config]
+    networks: [database_net, backup_egress]
+    volumes: [backup_status:/status]
+    depends_on:
+      database: {condition: service_healthy}
+    restart: "no"
+    mem_limit: 512m
+
+  restore-db:
+    image: ${POSTGRES_IMAGE:-postgres:18-bookworm}
+    profiles: [restore]
+    environment:
+      POSTGRES_USER: eventanilla_admin
+      POSTGRES_DB: eventanilla
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+    secrets: [postgres_password, migration_password, api_password, manager_password, backup_password]
+    volumes:
+      - /var/lib/postgresql
+      - ../database/postgres/01-roles.sh:/docker-entrypoint-initdb.d/01-roles.sh:ro
+      - ../database/postgres/manager.sql:/project/manager.sql:ro
+    networks: [restore_net]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U eventanilla_admin -d eventanilla"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+    restart: "no"
+    mem_limit: 1g
+
+  restore-check:
+    build: {context: .., dockerfile: deployment/backup/Dockerfile}
+    profiles: [restore]
+    command: [bun, /work/restore-check.mjs]
+    environment:
+      BACKUP_REMOTE: ${BACKUP_REMOTE:-crypt:eventanilla}
+    secrets: [postgres_password, rclone_config]
+    networks: [restore_net, backup_egress]
+    volumes: [backup_status:/status]
+    depends_on:
+      restore-db: {condition: service_healthy}
+    restart: "no"
+    mem_limit: 512m
+
+networks:
+  database_net: {internal: true}
+  administration_net: {internal: true}
+  tunnel_egress:
+  backup_egress:
+  restore_net: {internal: true}
+  proxy_net: {external: true, name: proxy_net}
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  backup_status:
+
+secrets:
+  postgres_password: {file: "${SECRETS_DIR:?Configura SECRETS_DIR}/postgres_password"}
+  migration_password: {file: "${SECRETS_DIR}/migration_password"}
+  api_password: {file: "${SECRETS_DIR}/api_password"}
+  manager_password: {file: "${SECRETS_DIR}/manager_password"}
+  backup_password: {file: "${SECRETS_DIR}/backup_password"}
+  api_database_url: {file: "${SECRETS_DIR}/api_database_url"}
+  migration_database_url: {file: "${SECRETS_DIR}/migration_database_url"}
+  auth_code_secret: {file: "${SECRETS_DIR}/auth_code_secret"}
+  resend_api_key: {file: "${SECRETS_DIR}/resend_api_key"}
+  resend_from: {file: "${SECRETS_DIR}/resend_from"}
+  pgadmin_password: {file: "${SECRETS_DIR}/pgadmin_password"}
+  pgadmin_pgpass: {file: "${SECRETS_DIR}/pgadmin_pgpass"}
+  cloudflared_token: {file: "${SECRETS_DIR}/cloudflared_token"}
+  rclone_config: {file: "${SECRETS_DIR}/rclone.conf"}

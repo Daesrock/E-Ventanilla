@@ -1,0 +1,582 @@
+{
+  "info": {
+    "name": "E-Ventanilla · Plantillas de pruebas",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Consultas y operaciones individuales. Variables inicialmente vacías: sin ciudadanos ficticios ni credenciales. Login guarda sesión y seguimiento para reutilizarlos. Para modificar cuentas o enviar códigos, activar allowRealWrites=true antes de ejecutar la operación elegida; volver a false después. Los cuerpos se construyen con JSON.stringify para preservar contraseñas y caracteres Unicode."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api-ventanilla.daesrock.dev/v1",
+      "type": "string"
+    },
+    {
+      "key": "identifier",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "code",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "firstName",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "paternalLastName",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "maternalLastName",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "curp",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "municipalityCode",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "trackingToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "allowRealWrites",
+      "value": "false",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Consultas públicas",
+      "item": [
+        {
+          "name": "Salud",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health",
+            "description": "Ejecuta solo esta solicitud al pulsar Send."
+          }
+        },
+        {
+          "name": "Base disponible",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/ready",
+            "description": "Ejecuta solo esta solicitud al pulsar Send."
+          }
+        },
+        {
+          "name": "Municipios oficiales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/catalog/municipalities",
+            "description": "Ejecuta solo esta solicitud al pulsar Send."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sesión y seguimiento",
+      "item": [
+        {
+          "name": "Iniciar sesión (no envía correo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "description": "Ejecuta solo esta solicitud al pulsar Send.",
+            "body": {
+              "mode": "raw",
+              "raw": "{{requestBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const fields = [\"identifier\",\"password\"];",
+                  "const body = {};",
+                  "for (const key of fields) { const value = pm.variables.get(key); if (typeof value !== 'string' || !value.length) { pm.execution.skipRequest(); throw new Error('Falta configurar: ' + key); } body[key] = value; }",
+                  "Object.assign(body, {\"allowPendingVerification\":true});",
+                  "pm.variables.set('requestBody', JSON.stringify(body));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 401) { pm.collectionVariables.set('sessionToken', ''); pm.collectionVariables.set('trackingToken', ''); }",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 || pm.response.code === 403) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.token) { pm.collectionVariables.set('sessionToken', data.token); pm.collectionVariables.set('trackingToken', ''); }",
+                  "  else if (pm.response.code === 403) pm.collectionVariables.set('sessionToken', '');",
+                  "  if (data.verification && data.verification.trackingToken) pm.collectionVariables.set('trackingToken', data.verification.trackingToken);",
+                  "  if (data.email) pm.collectionVariables.set('email', data.email);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mi perfil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sessionToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/me",
+            "description": "Ejecuta solo esta solicitud al pulsar Send."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('sessionToken')) { pm.execution.skipRequest(); throw new Error('Falta sessionToken: inicia sesión o retoma seguimiento primero.'); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Retomar seguimiento sin envío",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sessionToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/verification-context",
+            "description": "Ejecuta solo esta solicitud al pulsar Send."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('sessionToken')) { pm.execution.skipRequest(); throw new Error('Falta sessionToken: inicia sesión o retoma seguimiento primero.'); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 401) { pm.collectionVariables.set('sessionToken', ''); pm.collectionVariables.set('trackingToken', ''); }",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 || pm.response.code === 403) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.token) { pm.collectionVariables.set('sessionToken', data.token); pm.collectionVariables.set('trackingToken', ''); }",
+                  "  else if (pm.response.code === 403) pm.collectionVariables.set('sessionToken', '');",
+                  "  if (data.verification && data.verification.trackingToken) pm.collectionVariables.set('trackingToken', data.verification.trackingToken);",
+                  "  if (data.email) pm.collectionVariables.set('email', data.email);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Estado del código",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{trackingToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/verification-status",
+            "description": "Ejecuta solo esta solicitud al pulsar Send."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('trackingToken')) { pm.execution.skipRequest(); throw new Error('Falta trackingToken: inicia sesión o retoma seguimiento primero.'); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Comprobar acceso a citas (no reserva)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sessionToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/appointment-access",
+            "description": "Ejecuta solo esta solicitud al pulsar Send."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('sessionToken')) { pm.execution.skipRequest(); throw new Error('Falta sessionToken: inicia sesión o retoma seguimiento primero.'); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Operaciones reales · elegir una solicitud",
+      "item": [
+        {
+          "name": "Registrar cuenta propia y solicitar código",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "description": "Operación real. Requiere allowRealWrites=true y los datos propios configurados. No se ejecuta al importar.",
+            "body": {
+              "mode": "raw",
+              "raw": "{{requestBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.variables.get('allowRealWrites') !== 'true') { pm.execution.skipRequest(); throw new Error('Activa allowRealWrites solo para una operación real elegida.'); }",
+                  "const fields = [\"firstName\",\"paternalLastName\",\"curp\",\"municipalityCode\",\"email\",\"password\"];",
+                  "const body = {};",
+                  "for (const key of fields) { const value = pm.variables.get(key); if (typeof value !== 'string' || !value.length) { pm.execution.skipRequest(); throw new Error('Falta configurar: ' + key); } body[key] = value; }",
+                  "const maternal = pm.variables.get('maternalLastName'); if (typeof maternal === 'string' && maternal.trim()) body.maternalLastName = maternal;",
+                  "pm.variables.set('requestBody', JSON.stringify(body));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 401) { pm.collectionVariables.set('sessionToken', ''); pm.collectionVariables.set('trackingToken', ''); }",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 || pm.response.code === 403) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.token) { pm.collectionVariables.set('sessionToken', data.token); pm.collectionVariables.set('trackingToken', ''); }",
+                  "  else if (pm.response.code === 403) pm.collectionVariables.set('sessionToken', '');",
+                  "  if (data.verification && data.verification.trackingToken) pm.collectionVariables.set('trackingToken', data.verification.trackingToken);",
+                  "  if (data.email) pm.collectionVariables.set('email', data.email);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verificar correo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/verify-email",
+            "description": "Operación real. Requiere allowRealWrites=true y los datos propios configurados. No se ejecuta al importar.",
+            "body": {
+              "mode": "raw",
+              "raw": "{{requestBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.variables.get('allowRealWrites') !== 'true') { pm.execution.skipRequest(); throw new Error('Activa allowRealWrites solo para una operación real elegida.'); }",
+                  "const fields = [\"email\",\"code\"];",
+                  "const body = {};",
+                  "for (const key of fields) { const value = pm.variables.get(key); if (typeof value !== 'string' || !value.length) { pm.execution.skipRequest(); throw new Error('Falta configurar: ' + key); } body[key] = value; }",
+                  "Object.assign(body, {});",
+                  "pm.variables.set('requestBody', JSON.stringify(body));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reenviar verificación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/resend-verification",
+            "description": "Operación real. Requiere allowRealWrites=true y los datos propios configurados. No se ejecuta al importar.",
+            "body": {
+              "mode": "raw",
+              "raw": "{{requestBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.variables.get('allowRealWrites') !== 'true') { pm.execution.skipRequest(); throw new Error('Activa allowRealWrites solo para una operación real elegida.'); }",
+                  "const fields = [\"identifier\"];",
+                  "const body = {};",
+                  "for (const key of fields) { const value = pm.variables.get(key); if (typeof value !== 'string' || !value.length) { pm.execution.skipRequest(); throw new Error('Falta configurar: ' + key); } body[key] = value; }",
+                  "Object.assign(body, {});",
+                  "pm.variables.set('requestBody', JSON.stringify(body));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Solicitar recuperación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/forgot-password",
+            "description": "Operación real. Requiere allowRealWrites=true y los datos propios configurados. No se ejecuta al importar.",
+            "body": {
+              "mode": "raw",
+              "raw": "{{requestBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.variables.get('allowRealWrites') !== 'true') { pm.execution.skipRequest(); throw new Error('Activa allowRealWrites solo para una operación real elegida.'); }",
+                  "const fields = [\"identifier\"];",
+                  "const body = {};",
+                  "for (const key of fields) { const value = pm.variables.get(key); if (typeof value !== 'string' || !value.length) { pm.execution.skipRequest(); throw new Error('Falta configurar: ' + key); } body[key] = value; }",
+                  "Object.assign(body, {});",
+                  "pm.variables.set('requestBody', JSON.stringify(body));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Validar código de recuperación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/verify-reset-code",
+            "description": "Operación real. Requiere allowRealWrites=true y los datos propios configurados. No se ejecuta al importar.",
+            "body": {
+              "mode": "raw",
+              "raw": "{{requestBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.variables.get('allowRealWrites') !== 'true') { pm.execution.skipRequest(); throw new Error('Activa allowRealWrites solo para una operación real elegida.'); }",
+                  "const fields = [\"identifier\",\"code\"];",
+                  "const body = {};",
+                  "for (const key of fields) { const value = pm.variables.get(key); if (typeof value !== 'string' || !value.length) { pm.execution.skipRequest(); throw new Error('Falta configurar: ' + key); } body[key] = value; }",
+                  "Object.assign(body, {});",
+                  "pm.variables.set('requestBody', JSON.stringify(body));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Restablecer contraseña y revocar sesiones",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/reset-password",
+            "description": "Operación real. Requiere allowRealWrites=true y los datos propios configurados. No se ejecuta al importar.",
+            "body": {
+              "mode": "raw",
+              "raw": "{{requestBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.variables.get('allowRealWrites') !== 'true') { pm.execution.skipRequest(); throw new Error('Activa allowRealWrites solo para una operación real elegida.'); }",
+                  "const fields = [\"identifier\",\"code\",\"password\"];",
+                  "const body = {};",
+                  "for (const key of fields) { const value = pm.variables.get(key); if (typeof value !== 'string' || !value.length) { pm.execution.skipRequest(); throw new Error('Falta configurar: ' + key); } body[key] = value; }",
+                  "Object.assign(body, {});",
+                  "pm.variables.set('requestBody', JSON.stringify(body));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cerrar sesión",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sessionToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/logout",
+            "description": "Operación real. Requiere allowRealWrites=true y los datos propios configurados. No se ejecuta al importar.",
+            "body": {
+              "mode": "raw",
+              "raw": "{{requestBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('sessionToken')) { pm.execution.skipRequest(); throw new Error('Falta sessionToken: inicia sesión o retoma seguimiento primero.'); }",
+                  "if (pm.variables.get('allowRealWrites') !== 'true') { pm.execution.skipRequest(); throw new Error('Activa allowRealWrites solo para una operación real elegida.'); }",
+                  "const fields = [];",
+                  "const body = {};",
+                  "for (const key of fields) { const value = pm.variables.get(key); if (typeof value !== 'string' || !value.length) { pm.execution.skipRequest(); throw new Error('Falta configurar: ' + key); } body[key] = value; }",
+                  "Object.assign(body, {});",
+                  "pm.variables.set('requestBody', JSON.stringify(body));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

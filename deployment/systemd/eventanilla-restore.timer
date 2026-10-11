@@ -1,0 +1,10 @@
+[Unit]
+Description=Verificación mensual de respaldos de E-Ventanilla
+
+[Timer]
+OnCalendar=*-*-01 04:00:00 America/Mexico_City
+Persistent=true
+Unit=eventanilla-restore.service
+
+[Install]
+WantedBy=timers.target

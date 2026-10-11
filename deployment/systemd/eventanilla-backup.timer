@@ -1,0 +1,10 @@
+[Unit]
+Description=Respaldo diario de E-Ventanilla
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 America/Mexico_City
+Persistent=true
+Unit=eventanilla-backup.service
+
+[Install]
+WantedBy=timers.target

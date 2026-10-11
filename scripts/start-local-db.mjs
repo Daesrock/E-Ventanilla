@@ -6,8 +6,8 @@ import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const vars = parseEnv(readFileSync(resolve(root, 'api/.env'), 'utf8'));
-const require = createRequire(resolve(root, 'api/package.json'));
+const vars = parseEnv(readFileSync(resolve(root, 'apps/api/.env'), 'utf8'));
+const require = createRequire(resolve(root, 'apps/api/package.json'));
 const { Client } = require('pg');
 const bin = process.env.POSTGRES_BIN || 'C:/Program Files/PostgreSQL/18/bin';
 const dir = resolve(root, '.tools/postgres-data');

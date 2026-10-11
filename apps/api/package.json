@@ -1,0 +1,49 @@
+{
+  "name": "e-ventanilla-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.4.2",
+  "engines": {
+    "bun": "1.4.2"
+  },
+  "scripts": {
+    "build": "bun check-bun.mjs && bun clean-dist.mjs && bun run db:generate && bun node_modules/typescript/bin/tsc -p tsconfig.json",
+    "start": "bun check-bun.mjs && bun dist/main.js",
+    "dev": "bun run build && bun --watch dist/main.js",
+    "build:watch": "bun node_modules/typescript/bin/tsc -p tsconfig.json --watch",
+    "db:generate": "bun node_modules/prisma/build/index.js generate",
+    "db:migrate": "bun node_modules/prisma/build/index.js migrate deploy",
+    "db:validate": "bun node_modules/prisma/build/index.js validate",
+    "test": "bun run build && bun test test",
+    "format": "bun node_modules/prettier/bin/prettier.cjs --write src test *.ts *.mjs",
+    "format:check": "bun node_modules/prettier/bin/prettier.cjs --check src test *.ts *.mjs"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.2.7",
+    "@nestjs/core": "11.2.7",
+    "@nestjs/platform-express": "11.2.7",
+    "@nestjs/throttler": "^6.4.0",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.14.3",
+    "dotenv": "^17.2.0",
+    "helmet": "^8.1.0",
+    "pg": "^8.16.3",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "trustedDependencies": [
+    "@prisma/engines",
+    "prisma"
+  ],
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.5",
+    "prettier": "3.6.2",
+    "prisma": "7.10.0",
+    "typescript": "~5.9.3"
+  }
+}

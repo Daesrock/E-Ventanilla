@@ -1,0 +1,84 @@
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { parseEnv } from 'node:util';
+import { randomUUID } from 'node:crypto';
+import assert from 'node:assert/strict';
+
+const root = new URL('../../', import.meta.url);
+const require = createRequire(new URL('apps/api/package.json', root));
+require('reflect-metadata');
+const { Client } = require('pg');
+const original = new URL(parseEnv(readFileSync(new URL('apps/api/.env', root), 'utf8')).DATABASE_URL);
+assert.ok(['localhost', '127.0.0.1'].includes(original.hostname) && original.port === '55432');
+const database = `ev_prisma_${randomUUID().replaceAll('-', '')}`;
+const admin = new Client({ connectionString: new URL('postgres', original).href });
+const url = new URL(database, original).href;
+let prisma;
+try {
+  await admin.connect();
+  await admin.query(`CREATE DATABASE "${database}"`);
+  const migration = Bun.spawnSync([process.execPath, 'node_modules/prisma/build/index.js', 'migrate', 'deploy'], {
+    cwd: new URL('apps/api/', root).pathname.replace(/^\/(\w:)/, '$1'),
+    env: { ...process.env, DATABASE_URL: url }, stdout: 'pipe', stderr: 'pipe',
+  });
+  if (migration.exitCode !== 0) throw new Error('La instalación Prisma en la base aislada falló.');
+  const { PrismaClient } = await import('../../apps/api/dist/generated/prisma/client.js');
+  const { PrismaPg } = require('@prisma/adapter-pg');
+  const { AuthService } = await import('../../apps/api/dist/features/auth/auth.service.js');
+  const { AppointmentRepository } = await import('../../apps/api/dist/features/appointments/appointment.repository.js');
+  const { decryptCode } = await import('../../apps/api/dist/core/security/crypto.js');
+  const { verifyPassword } = await import('../../apps/api/dist/core/security/crypto.js');
+  const { config } = await import('../../apps/api/dist/core/configuration/config.js');
+  prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
+  const auth = new AuthService(prisma, { ensureConfigured() {} });
+  const municipality = await prisma.municipality.findFirstOrThrow();
+  const session = await auth.register({ firstName: 'Fixture', paternalLastName: 'Apellido compuesto', maternalLastName: 'Segundo apellido', curp: 'AAAA000101HCSBBB09', email: 'fixture@example.invalid', municipalityCode: municipality.code, password: 'z'.repeat(12), phone: '0123456789' });
+  const citizen = await prisma.citizen.findUniqueOrThrow({ where: { userId: session.user.id }, include: { user: { include: { role: true } } } });
+  assert.equal(citizen.user.role.code, 'CITIZEN');
+  assert.equal(citizen.municipalityId, municipality.id);
+  assert.equal(citizen.user.paternalLastName, 'Apellido compuesto');
+  assert.equal(citizen.user.maternalLastName, 'Segundo apellido');
+  assert.equal(citizen.user.lastName, 'Apellido compuesto Segundo apellido');
+  assert.ok(session.token);
+  await assert.rejects(auth.authenticate(session.token), error => error.getStatus() === 403);
+  const challenge = await prisma.authChallenge.findFirstOrThrow({ where: { userId: citizen.userId }, include: { mailJob: true } });
+  await auth.verifyEmail({ email: session.user.email, code: decryptCode(config.codeSecret, challenge.mailJob.ciphertext) });
+  assert.equal((await auth.authenticate(session.token)).user.emailVerifiedAt instanceof Date, true);
+  const oldHash = (await prisma.user.findUniqueOrThrow({ where: { id: citizen.userId } })).passwordHash;
+  await auth.requestReset(session.user.email);
+  const resetChallenge = await prisma.authChallenge.findFirstOrThrow({ where: { userId: citizen.userId, purpose: 'RESET_PASSWORD' }, include: { mailJob: true } });
+  const resetCode = decryptCode(config.codeSecret, resetChallenge.mailJob.ciphertext);
+  const resetData = { identifier: session.user.email, code: resetCode, password: 'NuevaClavePrueba🪻' };
+  const checked = await auth.verifyResetCode(resetData);
+  assert.equal(checked.expiresAt, resetChallenge.expiresAt.toISOString());
+  assert.equal((await prisma.user.findUniqueOrThrow({ where: { id: citizen.userId } })).passwordHash, oldHash);
+  assert.equal(await prisma.session.count({ where: { userId: citizen.userId } }), 1);
+  assert.equal((await prisma.authChallenge.findUniqueOrThrow({ where: { id: resetChallenge.id } })).consumedAt, null);
+  const resets = await Promise.allSettled([auth.resetPassword(resetData), auth.resetPassword(resetData)]);
+  assert.equal(resets.filter(result => result.status === 'fulfilled').length, 1);
+  assert.equal(resets.filter(result => result.status === 'rejected').length, 1);
+  assert.equal(await prisma.session.count({ where: { userId: citizen.userId } }), 0);
+  const newHash = (await prisma.user.findUniqueOrThrow({ where: { id: citizen.userId } })).passwordHash;
+  assert.equal(await verifyPassword(resetData.password, newHash), true);
+  await assert.rejects(auth.verifyResetCode(resetData), error => error.getStatus() === 400);
+  const branch = await prisma.branch.create({ data: { municipalityId: municipality.id, name: 'Fixture', type: 'Fixture', street: 'Fixture', exteriorNumber: '1', neighborhood: 'Fixture', postalCode: '00000' } });
+  const procedure = await prisma.procedure.create({ data: { name: 'Fixture', category: 'Fixture', requirements: 'Fixture' } });
+  await prisma.branchProcedure.create({ data: { branchId: branch.id, procedureId: procedure.id } });
+  const slot = await prisma.timeSlot.create({ data: { branchId: branch.id, date: new Date('2099-01-01'), startsAt: new Date('1970-01-01T09:00:00Z'), endsAt: new Date('1970-01-01T10:00:00Z'), capacity: 1 } });
+  const repository = new AppointmentRepository(prisma);
+  const input = () => ({ citizenId: citizen.userId, branchId: branch.id, procedureId: procedure.id, slotId: slot.id, folio: randomUUID(), qrToken: randomUUID(), scheduledAt: new Date('2099-01-01T09:00:00Z'), status: 'ISOLATED_FIXTURE' });
+  const attempts = await Promise.allSettled([repository.reserve(input()), repository.reserve(input())]);
+  assert.equal(attempts.filter(result => result.status === 'fulfilled').length, 1);
+  assert.equal((await prisma.timeSlot.findUniqueOrThrow({ where: { id: slot.id } })).occupied, 1);
+  const reserved = attempts.find(result => result.status === 'fulfilled').value;
+  await repository.releaseCapacity(reserved.id, citizen.userId, 'ISOLATED_FIXTURE_RELEASED');
+  assert.equal((await prisma.timeSlot.findUniqueOrThrow({ where: { id: slot.id } })).occupied, 0);
+  const report = { result: 'passed', database: 'isolated-local', checks: ['Prisma migrate deploy desde base vacía', 'registro atómico con ciudadano, rol y municipio', 'sesión pendiente protegida y verificación sin nuevo login', 'código de recuperación comprobado antes de guardar, sin modificar cuenta ni sesión', 'restablecimiento concurrente de un solo uso y revocación de sesiones', 'reserva concurrente real mediante repositorio y Prisma', 'liberación transaccional de capacidad'] };
+  mkdirSync(new URL('.tools/test-results/', root), { recursive: true });
+  writeFileSync(new URL('.tools/test-results/prisma-tests.json', root), JSON.stringify(report, null, 2));
+  report.checks.forEach(check => console.log(`OK ${check}`));
+} finally {
+  await prisma?.$disconnect();
+  await admin.query(`DROP DATABASE IF EXISTS "${database}" WITH (FORCE)`).catch(() => {});
+  await admin.end();
+}

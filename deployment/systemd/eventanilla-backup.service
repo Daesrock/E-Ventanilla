@@ -1,0 +1,10 @@
+[Unit]
+Description=Respaldo cifrado de E-Ventanilla en R2
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/ubuntu/e-ventanilla/app/deployment
+ExecStart=/usr/bin/docker compose --env-file .env --profile operations run --rm backup
+TimeoutStartSec=1800
