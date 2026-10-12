@@ -24,6 +24,7 @@ import kotlinx.coroutines.withTimeout
 data class AccessState(
     val busy: Boolean = false,
     val message: String? = null,
+    val confirmation: String? = null,
     val error: Boolean = false,
     val citizen: Citizen? = null,
     val fieldErrors: Map<String, String> = emptyMap(),
@@ -65,7 +66,18 @@ class AccessCoordinator(private val repository: AuthRepository, val authResource
 
     fun clearMessage() {
         mutable.value =
-            mutable.value.copy(message = null, error = false, fieldErrors = emptyMap(), pendingVerificationEmail = null)
+            mutable.value.copy(
+                message = null,
+                confirmation = null,
+                error = false,
+                fieldErrors = emptyMap(),
+                pendingVerificationEmail = null
+            )
+    }
+    fun clearConfirmation(message: String) {
+        if (mutable.value.confirmation == message) {
+            mutable.value = mutable.value.copy(confirmation = null)
+        }
     }
     fun clearPendingVerification() {
         if (mutable.value.pendingVerificationEmail != null) clearMessage()
@@ -94,7 +106,14 @@ class AccessCoordinator(private val repository: AuthRepository, val authResource
     private fun execute(onSuccess: (() -> Unit)? = null, action: suspend () -> Unit) {
         if (mutable.value.busy) return
         mutable.value =
-            mutable.value.copy(busy = true, message = null, error = false, fieldErrors = emptyMap(), pendingVerificationEmail = null)
+            mutable.value.copy(
+                busy = true,
+                message = null,
+                confirmation = null,
+                error = false,
+                fieldErrors = emptyMap(),
+                pendingVerificationEmail = null
+            )
         viewModelScope.launch {
             var success = false
             try {
@@ -182,16 +201,7 @@ class AccessCoordinator(private val repository: AuthRepository, val authResource
 
     fun verify(code: String, done: () -> Unit) = execute(onSuccess = {
         done()
-        mutable.value =
-            mutable.value.copy(
-                message = if (sessionToken !=
-                    null
-                ) {
-                    "Correo verificado. Puedes continuar."
-                } else {
-                    "Correo verificado. Ya puedes iniciar sesión."
-                }
-            )
+        mutable.value = mutable.value.copy(confirmation = "Correo verificado")
     }) {
         val user = repository.verify(verificationEmail, code)
         polling?.cancel()

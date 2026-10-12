@@ -4,11 +4,13 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { DatabaseModule } from './core/persistence/database.module.js';
 import { AuthModule } from './features/auth/auth.module.js';
 import { StatusController } from './features/catalog/status.controller.js';
+import { PublicCatalogController } from './features/catalog/public-catalog.controller.js';
+import { PublicCatalogService } from './features/catalog/public-catalog.service.js';
 export { StatusController } from './features/catalog/status.controller.js';
 
 @Module({
   imports: [DatabaseModule, AuthModule, ThrottlerModule.forRoot([{ ttl: 60000, limit: 60 }])],
-  controllers: [StatusController],
-  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
+  controllers: [StatusController, PublicCatalogController],
+  providers: [PublicCatalogService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

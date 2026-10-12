@@ -1,0 +1,396 @@
+{
+  "sources": [
+    {
+      "name": "home",
+      "url": "https://coesa.chiapas.gob.mx/",
+      "sha256": "14d66ff368a48c2ea0d213bffa0f2b0286f406cdb60922c91f30239047caa51d",
+      "checkedOn": "2026-10-11"
+    },
+    {
+      "name": "directory",
+      "url": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "checkedOn": "2026-10-11"
+    },
+    {
+      "name": "services",
+      "url": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "checkedOn": "2026-10-11"
+    },
+    {
+      "name": "vim",
+      "url": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/456-vim",
+      "sha256": "20fc18995d2cac71e60b76c2a023dd7067daf7f829752ce06285a30accf3d56c",
+      "checkedOn": "2026-10-11"
+    }
+  ],
+  "branches": [
+    {
+      "sourceKey": "coesa:469:VUGE:07101",
+      "municipalityCode": "07101",
+      "name": "VUGE · Tuxtla Gutiérrez",
+      "type": "VUGE",
+      "address": "Boulevard Andrés Serra Rojas No. 1090. Edificio Anexo a la Torre Chiapas en el Nivel 1A. Col. Paso Limón C.P. 29045. Tuxtla Gutiérrez, Chiapas.",
+      "phone": "961.691.4722, ext. 66130, 66133 y 66150",
+      "email": "vuge.tuxtla@gmail.com",
+      "officeHours": "lunes a viernes de 09:00 a 15:00 horas.",
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VUGE:07019",
+      "municipalityCode": "07019",
+      "name": "VUGE · Comitán de Domínguez",
+      "type": "VUGE",
+      "address": "Benito Juárez # 22 – Calle Central Poniente Col. Centro. CP. 30000",
+      "phone": "963.6320082",
+      "email": "vuge.comitan@gmail.com",
+      "officeHours": "lunes a viernes de 09:00 a 15:00 horas.",
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VUGE:07065",
+      "municipalityCode": "07065",
+      "name": "VUGE · Palenque",
+      "type": "VUGE",
+      "address": "Av. Reforma # 25 (entre Independencia y Abasolo) Col. Centro. CP. 29960",
+      "phone": "916.345.1618",
+      "email": "vuge.palenque@gmail.com",
+      "officeHours": "lunes a viernes de 09:00 a 15:00 horas.",
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VUGE:07089",
+      "municipalityCode": "07089",
+      "name": "VUGE · Tapachula",
+      "type": "VUGE",
+      "address": "Secretaría de Economía Estatal, Planta baja. Blvd. Díaz Ordaz # 11 Col. Cedros de Erika. CP. 30779",
+      "phone": "962.255.1903",
+      "email": "vuge.tapachula@gmail.com",
+      "officeHours": "lunes a viernes de 09:00 a 15:00 horas.",
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07027",
+      "municipalityCode": "07027",
+      "name": "VIM · Chiapa de Corzo",
+      "type": "VIM",
+      "address": "Av. Francisco I. Madero No.365, Barrio San Jacinto C.P. 29160",
+      "phone": null,
+      "email": "vuge.chiapadecorzo@gmail.com",
+      "officeHours": "lunes a viernes de 09:00 a 15:00 horas.",
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07012",
+      "municipalityCode": "07012",
+      "name": "VIM · Berriozábal",
+      "type": "VIM",
+      "address": "2a norte y 2a oriente CEDECO segunda planta",
+      "phone": "961.386.1666",
+      "email": "vuge.berriozabal@gmail.com",
+      "officeHours": "lunes a viernes de 09:00 a 15:00 horas.",
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07089",
+      "municipalityCode": "07089",
+      "name": "VIM · Tapachula",
+      "type": "VIM",
+      "address": null,
+      "phone": null,
+      "email": null,
+      "officeHours": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07069",
+      "municipalityCode": "07069",
+      "name": "VIM · Pijijiapan",
+      "type": "VIM",
+      "address": null,
+      "phone": "9181020351",
+      "email": "dsepijijiapan@gmail.com",
+      "officeHours": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07099",
+      "municipalityCode": "07099",
+      "name": "VIM · La Trinitaria",
+      "type": "VIM",
+      "address": "Av. Central parque hundido, calle S/N C.P. 30160",
+      "phone": "963 634 5562",
+      "email": "vuge.trinitaria@gmail.com",
+      "officeHours": "lunes a viernes de 09:00 a 15:00 horas.",
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07078",
+      "municipalityCode": "07078",
+      "name": "VIM · San Cristóbal de las Casas",
+      "type": "VIM",
+      "address": null,
+      "phone": "967 6780730",
+      "email": null,
+      "officeHours": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07009",
+      "municipalityCode": "07009",
+      "name": "VIM · Arriaga",
+      "type": "VIM",
+      "address": null,
+      "phone": "966.6905304",
+      "email": null,
+      "officeHours": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07019",
+      "municipalityCode": "07019",
+      "name": "VIM · Comitán de Domínguez",
+      "type": "VIM",
+      "address": "3ª. calle norte poniente, No. 46. Barrio Guadalupe.",
+      "phone": null,
+      "email": "sarecomitan2427@gmail.com",
+      "officeHours": "lunes a viernes de 09:00 a 17:00 horas.",
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07046",
+      "municipalityCode": "07046",
+      "name": "VIM · Jiquipilas",
+      "type": "VIM",
+      "address": null,
+      "phone": "968.6810102",
+      "email": null,
+      "officeHours": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07061",
+      "municipalityCode": "07061",
+      "name": "VIM · Ocozocoautla de Espinosa",
+      "type": "VIM",
+      "address": "Central Oriente s/n, Palacio Municipal 0, Centro, 29140 Ocozocoautla de Espinosa, Chis",
+      "phone": "968.6880048",
+      "email": "economia.ocozocoautla@gmail.com",
+      "officeHours": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07059",
+      "municipalityCode": "07059",
+      "name": "VIM · Ocosingo",
+      "type": "VIM",
+      "address": "Palacio Municipal, Zona centro",
+      "phone": "919.6730500",
+      "email": "ocoturis24@gmail.com",
+      "officeHours": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07040",
+      "municipalityCode": "07040",
+      "name": "VIM · Huixtla",
+      "type": "VIM",
+      "address": "Iturbide Pte. #17, Col. Centro, 30640, Edif. Casa de la Cultura, Planta Alta Secretaría de Economía",
+      "phone": null,
+      "email": "presidenciahuixtla2024.2027@gmail.com",
+      "officeHours": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07017",
+      "municipalityCode": "07017",
+      "name": "VIM · Cintalapa de Figueroa",
+      "type": "VIM",
+      "address": "1a. Norte Oriente No.5, Colonia Centro C.P. 30400",
+      "phone": "968.6842010",
+      "email": "economiayturismo@cintalapa.gob.mx",
+      "officeHours": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "coesa:469:VIM:07101",
+      "municipalityCode": "07101",
+      "name": "VIM · Tuxtla Gutiérrez",
+      "type": "VIM",
+      "address": "Calle Central y 2ª Norte S/N, Palacio Municipal 2º Piso; Colonia Centro.",
+      "phone": "961.61 25511 ext. 2268",
+      "email": null,
+      "officeHours": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/transparencia-coesa/transparencia-reactiva/item/469-convocatoria-precio-diferencial-de-tarifas-marcas-para-el-bienestar-2026-iii-jovenes",
+      "sourceSha256": "d201eb1154e6e314f5368e46b5df8b578c657df2706a6abe008786d07f9355e7",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    }
+  ],
+  "procedures": [
+    {
+      "sourceKey": "COESMER-2021-1591-016-A",
+      "name": "Gestión para la Renovación de Código de Barras",
+      "description": null,
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-006-A",
+      "name": "Asesoría en Trámites Empresariales",
+      "description": "Orientación sobre trámites empresariales de instituciones públicas y organismos privados.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-014-A",
+      "name": "Liberación de Servicio Social en empresas",
+      "description": "Liberación del servicio social realizado en empresas con convenio.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-007-A",
+      "name": "Asignación de Código de Barras para productos",
+      "description": "Asignación de códigos de barras a productos de empresas con membresía.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-008-A",
+      "name": "Gestión de solicitud de aviso de uso de Denominación Social",
+      "description": "Gestión del aviso de uso de una denominación o razón social autorizada.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-011-A",
+      "name": "Gestión de Denominación o Razón Social",
+      "description": "Gestión de la autorización del nombre de una sociedad mercantil.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-003-A",
+      "name": "Solicitud de servicio Social y Prácticas Profesionales en Empresas",
+      "description": "Vinculación de estudiantes con empresas mediante convenios de servicio social y prácticas.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-001-A",
+      "name": "Gestión para la inscripción de código de Barras para productos",
+      "description": "Gestión de la inscripción para obtener códigos de barras de productos.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-009-A",
+      "name": "Gestión de la solicitud de desistimiento de Denominación o Razón Social",
+      "description": "Gestión para liberar una denominación o razón social reservada.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-010-A",
+      "name": "Constancia de Estratificación de Empresas",
+      "description": "Constancia del estrato de una empresa según sus trabajadores, sector y ventas.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-012-A",
+      "name": "Gestión para la renovación de Registro de marca",
+      "description": "Gestión de la renovación de un registro de marca.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-005-A",
+      "name": "Gestión para la solicitud de Registro de Marca",
+      "description": "Gestión de la solicitud de registro de una marca ante el IMPI.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    },
+    {
+      "sourceKey": "COESMER-2021-1591-002-A",
+      "name": "Búsqueda de Anterioridades de Marcas y Avisos Comerciales",
+      "description": "Búsqueda de antecedentes de marcas y avisos comerciales.",
+      "requirements": null,
+      "cost": null,
+      "sourceUrl": "https://coesa.chiapas.gob.mx/marco-juridico-y-normativo/manuales-y-reglamentos/item/299-ventanilla-unica-de-gestion-empresarial",
+      "sourceSha256": "d969d4e5bc5bd6fa616375e61d59784bf9aff06390560309916fd3309c75e349",
+      "sourceCheckedAt": "2026-10-11T00:00:00.000Z"
+    }
+  ]
+}

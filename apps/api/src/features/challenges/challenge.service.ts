@@ -1,7 +1,15 @@
 import { DatabaseService } from '../../core/persistence/database.service.js';
 import { config } from '../../core/configuration/config.js';
 import { ChallengePurpose, type User, Prisma } from '../../generated/prisma/client.js';
-import { createCode, codeDigest, encryptCode, equalDigest } from '../../core/security/crypto.js';
+import {
+  createCode,
+  codeDigest,
+  encryptCode,
+  equalDigest,
+  hashPassword,
+  verifyPassword,
+} from '../../core/security/crypto.js';
+import { fieldFailure } from '../../core/validation/validation.js';
 
 export class ChallengeService {
   constructor(private readonly db: DatabaseService) {}
@@ -88,11 +96,21 @@ export class ChallengeService {
     });
   }
 
-  async consumeCode(user: User, purpose: ChallengePurpose, code: string, passwordHash?: string) {
-    if (purpose === ChallengePurpose.RESET_PASSWORD && !passwordHash) return false;
+  async consumeCode(user: User, purpose: ChallengePurpose, code: string, newPassword?: string) {
+    if (purpose === ChallengePurpose.RESET_PASSWORD && !newPassword) return false;
     return this.db.$transaction(async (tx) => {
       const challenge = await this.validCode(tx, user, purpose, code);
       if (!challenge) return false;
+      let passwordHash: string | undefined;
+      if (purpose === ChallengePurpose.RESET_PASSWORD) {
+        if (!newPassword) return false;
+        // La cuenta sigue bloqueada: compara la credencial vigente antes de consumir el código.
+        const current = await tx.user.findUniqueOrThrow({ where: { id: user.id } });
+        if (await verifyPassword(newPassword, current.passwordHash)) {
+          throw fieldFailure({ password: 'La nueva contraseña debe ser diferente de la actual.' });
+        }
+        passwordHash = await hashPassword(newPassword);
+      }
       await tx.authChallenge.update({
         where: { id: challenge.id },
         data: { consumedAt: new Date() },

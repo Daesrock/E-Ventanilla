@@ -25,7 +25,6 @@ fun ProfileScreen(citizen: Citizen, busy: Boolean, logout: () -> Unit, verify: (
                 HorizontalDivider()
             }
         }
-        Text(if (citizen.emailVerified) "Correo verificado" else "Correo pendiente de verificación")
         if (!citizen.emailVerified) {
             TextButton(onClick = verify, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) {
                 Text("Verificar correo")

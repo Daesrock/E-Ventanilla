@@ -9,13 +9,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.daesrock.eventanilla.core.data.ApiClient
 import dev.daesrock.eventanilla.core.data.AuthRepository
 import dev.daesrock.eventanilla.core.data.AuthResources
+import dev.daesrock.eventanilla.feature.catalog.data.CatalogRepository
 
 /** Dependencias explícitas: un repositorio compartido y credenciales solo en memoria. */
 class AppContainer(application: Application) {
-    private val authentication = AuthRepository(ApiClient())
+    private val api = ApiClient()
+    private val authentication = AuthRepository(api)
+    val catalog = CatalogRepository(api)
     private val resources = AuthResources(application)
 
     fun createAccessCoordinator(): AccessCoordinator = AccessCoordinator(authentication, resources)
+}
+
+@Composable
+internal fun applicationCatalogRepository(): CatalogRepository {
+    val application = LocalContext.current.applicationContext as EVentanillaApplication
+    return application.container.catalog
 }
 
 class EVentanillaApplication : Application() {

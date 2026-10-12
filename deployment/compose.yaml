@@ -64,7 +64,6 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:?Configura PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
-      PGPASSFILE: /var/lib/pgadmin/project.pgpass
       PGADMIN_LISTEN_PORT: 8080
       PGADMIN_DISABLE_POSTFIX: "true"
       PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
@@ -72,12 +71,10 @@ services:
       PGADMIN_CONFIG_SESSION_COOKIE_SAMESITE: "'Lax'"
       PGADMIN_CONFIG_PROXY_X_FOR_COUNT: "1"
       PGADMIN_CONFIG_PROXY_X_PROTO_COUNT: "1"
-    secrets: [pgadmin_password, pgadmin_pgpass]
-    entrypoint: [/bin/sh, /project-start.sh]
+    secrets: [pgadmin_password]
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
-      - ./pgadmin/start.sh:/project-start.sh:ro
     networks: [database_net, administration_net]
     depends_on:
       database: {condition: service_healthy}
@@ -176,6 +173,5 @@ secrets:
   resend_api_key: {file: "${SECRETS_DIR}/resend_api_key"}
   resend_from: {file: "${SECRETS_DIR}/resend_from"}
   pgadmin_password: {file: "${SECRETS_DIR}/pgadmin_password"}
-  pgadmin_pgpass: {file: "${SECRETS_DIR}/pgadmin_pgpass"}
   cloudflared_token: {file: "${SECRETS_DIR}/cloudflared_token"}
   rclone_config: {file: "${SECRETS_DIR}/rclone.conf"}

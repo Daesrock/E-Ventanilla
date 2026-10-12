@@ -1,7 +1,8 @@
 package dev.daesrock.eventanilla.ui
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import dev.daesrock.eventanilla.app.*
 import dev.daesrock.eventanilla.core.data.ApiFailure
@@ -10,6 +11,7 @@ import dev.daesrock.eventanilla.core.data.AuthRepository
 import dev.daesrock.eventanilla.core.data.AuthResources
 import dev.daesrock.eventanilla.core.design.*
 import dev.daesrock.eventanilla.feature.auth.presentation.*
+import dev.daesrock.eventanilla.feature.catalog.data.CatalogRepository
 import java.io.IOException
 import java.time.Instant
 import org.json.JSONObject
@@ -19,7 +21,7 @@ import org.junit.Test
 
 /** Servicios sustituidos en memoria; no realiza solicitudes a la API ni crea ciudadanos. */
 class AccessFlowTest {
-    @get:Rule val compose = createComposeRule()
+    @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private class Gateway : ApiGateway {
         val calls = mutableListOf<Pair<String, String?>>()
         val session = "s".repeat(43)
@@ -108,7 +110,7 @@ class AccessFlowTest {
         val gateway = Gateway()
         val vm = model(gateway)
         registered(vm)
-        compose.setContent { EVentanillaTheme { EVentanillaApp(vm) } }
+        compose.setContent { EVentanillaTheme { EVentanillaApp(vm, catalogRepository = CatalogRepository(gateway)) } }
         compose.onNodeWithTag("rail_home").assertIsSelected().assertIsDisplayed()
         assertNotNull(vm.state.value.citizen)
         assertFalse(vm.state.value.citizen!!.emailVerified)
@@ -117,12 +119,8 @@ class AccessFlowTest {
         compose.onNodeWithText("Revisa tu correo").assertIsDisplayed()
         compose.onNodeWithText("Verificar más tarde").assertDoesNotExist()
         compose.onNodeWithContentDescription("Volver").performClick()
-        compose.onNodeWithText("Correo pendiente de verificación").assertIsDisplayed()
-        assertTrue(
-            InstrumentationRegistry.getInstrumentation().uiAutomation.performGlobalAction(
-                android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK
-            )
-        )
+        compose.onNodeWithText("Verificar correo").assertIsDisplayed()
+        compose.runOnUiThread { compose.activity.onBackPressedDispatcher.onBackPressed() }
         compose.waitUntil(5000) {
             compose.onAllNodes(hasTestTag("rail_home") and isSelected()).fetchSemanticsNodes().isNotEmpty()
         }
@@ -139,7 +137,9 @@ class AccessFlowTest {
         val vm = model(gateway)
         registered(vm)
         gateway.expiredTracking = true
-        compose.setContent { EVentanillaTheme { EVentanillaApp(vm, initialRoute = "verify") } }
+        compose.setContent {
+            EVentanillaTheme { EVentanillaApp(vm, catalogRepository = CatalogRepository(gateway), initialRoute = "verify") }
+        }
         compose.waitUntil(5000) { vm.state.value.trackingExpired && !vm.state.value.deliveryChecking }
         assertNotNull(vm.state.value.citizen)
         compose.onNodeWithText("Retomar verificación").performScrollTo().performClick()
@@ -155,12 +155,12 @@ class AccessFlowTest {
         val vm = model(gateway)
         registered(vm)
         gateway.pending = true
-        compose.setContent { EVentanillaTheme { EVentanillaApp(vm) } }
+        compose.setContent { EVentanillaTheme { EVentanillaApp(vm, catalogRepository = CatalogRepository(gateway)) } }
         compose.onNodeWithTag("rail_profile").performScrollTo().performClick()
         compose.onNodeWithText("Verificar correo").performScrollTo().performClick()
         compose.waitUntil(5000) { vm.state.value.delivery != null }
         compose.onNodeWithContentDescription("Volver").performClick()
-        compose.onNodeWithText("Correo pendiente de verificación").assertIsDisplayed()
+        compose.onNodeWithText("Verificar correo").assertIsDisplayed()
         val calls = gateway.calls.count { it.first == "auth/verification-status" }
         android.os.SystemClock.sleep(3200)
         assertEquals(calls, gateway.calls.count { it.first == "auth/verification-status" })
@@ -172,7 +172,9 @@ class AccessFlowTest {
         val gateway = Gateway()
         val vm = model(gateway)
         registered(vm)
-        compose.setContent { EVentanillaTheme { EVentanillaApp(vm, initialRoute = "appointments") } }
+        compose.setContent {
+            EVentanillaTheme { EVentanillaApp(vm, catalogRepository = CatalogRepository(gateway), initialRoute = "appointments") }
+        }
         compose.onNodeWithText("Preparar una cita").performClick()
         compose.onNodeWithText("Revisa tu correo").assertIsDisplayed()
         compose.waitUntil(5000) { vm.state.value.delivery != null }
@@ -188,10 +190,33 @@ class AccessFlowTest {
         vm.stopVerificationPolling()
     }
 
+    @Test fun verificationConfirmationDisappearsWithoutLeavingTheProfile() {
+        val gateway = Gateway()
+        val vm = model(gateway)
+        registered(vm)
+        compose.setContent {
+            EVentanillaTheme { EVentanillaApp(vm, catalogRepository = CatalogRepository(gateway), initialRoute = "profile") }
+        }
+        compose.onNodeWithText("Verificar correo").performScrollTo().performClick()
+        compose.waitUntil(5000) { vm.state.value.delivery != null }
+        compose.onNode(hasSetTextAction() and hasText("Código (8 dígitos)")).performTextInput("00001234")
+        compose.onNode(hasText("Verificar correo") and hasClickAction()).performScrollTo().performClick()
+        compose.onNode(hasText("Mi perfil") and !hasClickAction()).assertIsDisplayed()
+        compose.onNodeWithText("Correo verificado").assertIsDisplayed()
+        compose.onNodeWithText("Correo verificado. Puedes continuar.").assertDoesNotExist()
+        assertNull(vm.state.value.message)
+        compose.waitUntil(10000) { vm.state.value.confirmation == null }
+        compose.onNodeWithText("Correo verificado").assertDoesNotExist()
+        compose.onNode(hasText("Mi perfil") and !hasClickAction()).assertIsDisplayed()
+        assertTrue(vm.state.value.citizen!!.emailVerified)
+    }
+
     @Test fun anonymousAppointmentRequiresLoginBeforeVerification() {
         val gateway = Gateway()
         val vm = model(gateway)
-        compose.setContent { EVentanillaTheme { EVentanillaApp(vm, initialRoute = "appointments") } }
+        compose.setContent {
+            EVentanillaTheme { EVentanillaApp(vm, catalogRepository = CatalogRepository(gateway), initialRoute = "appointments") }
+        }
         compose.onNodeWithText("Preparar una cita").performClick()
         compose.onNode(hasSetTextAction() and hasText("CURP o correo")).assertIsDisplayed().performTextInput("fixture@invalid.test")
         compose.onNode(hasSetTextAction() and hasText("Contraseña")).performTextInput("ClaveDePrueba🪻")
@@ -207,7 +232,9 @@ class AccessFlowTest {
         val vm = model(gateway)
         registered(vm)
         gateway.offline = true
-        compose.setContent { EVentanillaTheme { EVentanillaApp(vm, initialRoute = "verify") } }
+        compose.setContent {
+            EVentanillaTheme { EVentanillaApp(vm, catalogRepository = CatalogRepository(gateway), initialRoute = "verify") }
+        }
         compose.waitUntil(5000) { vm.state.value.deliveryRefreshAvailable }
         compose.onNodeWithText(
             "No pudimos comprobar el envío. Revisa tu conexión y actualiza el estado.",

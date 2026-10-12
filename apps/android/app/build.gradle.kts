@@ -12,7 +12,7 @@ val localSettings = Properties().apply {
     val localFile = rootProject.file("local.properties")
     if (localFile.exists()) localFile.inputStream().use { load(it) }
 }
-val apiEnvironment = providers.gradleProperty("apiEnvironment").orElse("local").get()
+val apiEnvironment = providers.gradleProperty("apiEnvironment").orElse("vps").get()
 require(apiEnvironment in setOf("local", "vps")) { "apiEnvironment debe ser local o vps." }
 val apiUrl = providers.gradleProperty("apiBaseUrl").orNull
     ?: if (apiEnvironment == "vps") {

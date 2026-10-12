@@ -1,19 +1,17 @@
 package dev.daesrock.eventanilla.ui
 
 import android.graphics.Bitmap
-import android.os.SystemClock
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
@@ -21,6 +19,7 @@ import dev.daesrock.eventanilla.app.*
 import dev.daesrock.eventanilla.core.data.*
 import dev.daesrock.eventanilla.core.design.EVentanillaTheme
 import dev.daesrock.eventanilla.core.design.institutional.PRIVACY_URL
+import dev.daesrock.eventanilla.feature.catalog.data.CatalogRepository
 import java.io.File
 import org.json.JSONObject
 import org.junit.Assert.*
@@ -58,7 +57,7 @@ class InstitutionalUiTest {
                             }
                         ).then(if (height != null) Modifier.height(height.dp) else Modifier)
                     ) {
-                        EVentanillaApp(vm, initialMenuOpen = menu)
+                        EVentanillaApp(vm, initialMenuOpen = menu, catalogRepository = CatalogRepository(gateway))
                     }
                 }
             }
@@ -66,16 +65,10 @@ class InstitutionalUiTest {
     }
     private fun capture(name: String) {
         compose.waitForIdle()
-        val instrumentation = InstrumentationRegistry.getInstrumentation()
-        instrumentation.waitForIdleSync()
-        SystemClock.sleep(350)
-        compose.waitUntil(5000) {
-            instrumentation.uiAutomation.rootInActiveWindow?.packageName == instrumentation.targetContext.packageName
-        }
-        val directory = File(instrumentation.targetContext.getExternalFilesDir(null), "ui-captures").apply { mkdirs() }
-        val bitmap = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val directory = File(context.getExternalFilesDir(null), "ui-captures").apply { mkdirs() }
+        val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
         File(directory, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-        bitmap.recycle()
     }
 
     @Test fun minimalHomeAndFooterPrivacyAction() {
@@ -83,6 +76,7 @@ class InstitutionalUiTest {
         compose.onNodeWithTag("rail_home").assertIsDisplayed()
         compose.onNodeWithText("ATENCIÓN PRESENCIAL").assertDoesNotExist()
         compose.onNodeWithTag("rail_home").assertIsSelected()
+        compose.onNodeWithTag("institutional_footer").assertIsNotDisplayed()
         capture("01-inicio")
         compose.onNodeWithContentDescription("Abrir avisos de privacidad de COESA").performScrollTo().assertIsDisplayed().performClick()
         assertEquals(PRIVACY_URL, openedUrl)
@@ -102,23 +96,14 @@ class InstitutionalUiTest {
         compose.onNodeWithTag("rail_directory").assertIsDisplayed()
     }
 
-    @Test fun searchSupportsAccentsEmptyResultsAndKeyboardAction() {
+    @Test fun headerHasNoSectionSearchAndMenuStillNavigates() {
         show()
-        val search = compose.onNodeWithContentDescription("Buscar sección")
-        search.performTextInput("TRAMITES")
-        compose.onNodeWithTag("search_procedures").assertIsDisplayed()
-        capture("04-buscador")
-        search.performImeAction()
+        compose.onNodeWithContentDescription("Buscar sección").assertDoesNotExist()
+        compose.onNodeWithContentDescription("Abrir menú").performClick()
+        compose.onNodeWithText("Trámites y servicios").performClick()
         compose.onNodeWithTag("rail_procedures").assertIsSelected()
-        search.assert(SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("")))
-        search.performTextInput("ninguna coincidencia")
-        compose.onNodeWithText("Sin resultados").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Limpiar búsqueda").performClick()
-        compose.onNodeWithText("Sin resultados").assertDoesNotExist()
-        search.performTextInput("perfil")
-        compose.onNodeWithTag("search_profile").performClick()
-        compose.onNodeWithTag("rail_profile").assertIsSelected()
-        compose.onNodeWithText("Crear cuenta").assertIsDisplayed()
+        compose.onNodeWithText("Buscar trámite").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithContentDescription("Buscar sección").assertDoesNotExist()
     }
 
     @Test fun allMainDestinationsKeepFooterAndAccessibleRail() {
@@ -134,7 +119,7 @@ class InstitutionalUiTest {
 
     @Test fun narrowScreenAndLargeTextRemainScrollable() {
         show(width = 320, fontScale = 2f)
-        compose.onNodeWithContentDescription("Buscar sección").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Buscar sección").assertDoesNotExist()
         compose.onNodeWithTag("rail_profile").performClick()
         compose.onNodeWithText("Crear cuenta").performScrollTo().assertIsDisplayed()
         compose.onNodeWithContentDescription("Abrir avisos de privacidad de COESA").performScrollTo().assertIsDisplayed()

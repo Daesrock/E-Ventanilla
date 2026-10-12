@@ -167,11 +167,20 @@ model Branch {
   counterHeadId String? @db.Uuid
   name String @db.VarChar(150)
   type String @db.VarChar(100)
-  street String @db.VarChar(150)
-  exteriorNumber String @db.VarChar(20)
+  street String? @db.VarChar(150)
+  exteriorNumber String? @db.VarChar(20)
   interiorNumber String? @db.VarChar(20)
-  neighborhood String @db.VarChar(150)
-  postalCode String @db.VarChar(5)
+  neighborhood String? @db.VarChar(150)
+  postalCode String? @db.VarChar(5)
+  address String?
+  phone String? @db.VarChar(150)
+  email String? @db.VarChar(254)
+  officeHours String? @db.VarChar(200)
+  sourceKey String? @unique @db.VarChar(100)
+  sourceUrl String?
+  sourceSha256 String? @db.Char(64)
+  sourceCheckedAt DateTime?
+  published Boolean @default(false)
   latitude Decimal? @db.Decimal(9,6)
   longitude Decimal? @db.Decimal(9,6)
   active Boolean @default(true)
@@ -202,8 +211,14 @@ model ServiceCounter {
 model Procedure {
   id String @id @default(uuid()) @db.Uuid
   name String @db.VarChar(200)
-  category String @db.VarChar(150)
-  requirements String
+  category String? @db.VarChar(150)
+  requirements String?
+  description String?
+  sourceKey String? @unique @db.VarChar(100)
+  sourceUrl String?
+  sourceSha256 String? @db.Char(64)
+  sourceCheckedAt DateTime?
+  published Boolean @default(false)
   cost Decimal? @db.Decimal(12,2)
   estimatedMinutes Int?
   active Boolean @default(true)

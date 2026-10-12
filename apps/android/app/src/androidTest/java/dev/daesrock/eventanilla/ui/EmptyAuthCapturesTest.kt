@@ -9,6 +9,7 @@ import dev.daesrock.eventanilla.app.*
 import dev.daesrock.eventanilla.core.data.*
 import dev.daesrock.eventanilla.core.design.*
 import dev.daesrock.eventanilla.feature.auth.presentation.*
+import dev.daesrock.eventanilla.feature.catalog.data.CatalogRepository
 import java.io.File
 import org.json.JSONObject
 import org.junit.Rule
@@ -24,7 +25,7 @@ class EmptyAuthCapturesTest {
                 JSONObject().put("message", "Fixture aislado").put("expiresAt", "2099-01-01T00:00:00Z")
         }
         val vm = AccessCoordinator(AuthRepository(gateway), AuthResources(instrumentation.targetContext))
-        compose.setContent { EVentanillaTheme { EVentanillaApp(vm, initialRoute = route) } }
+        compose.setContent { EVentanillaTheme { EVentanillaApp(vm, catalogRepository = CatalogRepository(gateway), initialRoute = route) } }
         compose.waitForIdle()
         compose.onNodeWithContentDescription("Notificaciones").assertDoesNotExist()
         compose.onNodeWithContentDescription("Volver").assertExists()

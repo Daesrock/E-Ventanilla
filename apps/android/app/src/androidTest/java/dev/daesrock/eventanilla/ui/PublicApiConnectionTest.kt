@@ -10,6 +10,22 @@ import org.junit.Test
 
 /** Comprobación opcional contra la API configurada: solo GET públicos y un rechazo sin sesión. */
 class PublicApiConnectionTest {
+    @Test fun androidReadsPublishedBranchesAndProceduresWithoutSession() = runBlocking {
+        val api = ApiClient()
+        for (path in listOf("branches", "procedures")) {
+            val items = api.request("catalog/$path").getJSONArray("items")
+            assertTrue(items.length() > 0)
+            for (index in 0 until items.length()) {
+                val item = items.getJSONObject(index)
+                assertTrue(item.getString("sourceUrl").startsWith("https://coesa.chiapas.gob.mx/"))
+                assertFalse(item.has("passwordHash"))
+            }
+            val first = items.getJSONObject(0)
+            val detail = api.request("catalog/$path/${first.getString("id")}")
+            assertEquals(first.getString("name"), detail.getString("name"))
+        }
+    }
+
     @Test fun androidConnectsToPublicCatalogAndCannotPrepareAppointmentsAnonymously() = runBlocking {
         val api = ApiClient()
         api.request("ready")

@@ -17,7 +17,6 @@ for (const name of ['postgres_password', 'migration_password', 'api_password', '
 const password = name => readFileSync(resolve(dir, name), 'utf8').trim();
 save('api_database_url', `postgresql://eventanilla_api:${password('api_password')}@database:5432/eventanilla`);
 save('migration_database_url', `postgresql://eventanilla_migrator:${password('migration_password')}@database:5432/eventanilla`);
-save('pgadmin_pgpass', `database:5432:eventanilla:eventanilla_manager:${password('manager_password')}`);
 const local = existsSync(resolve(root, 'apps/api/.env')) ? parseEnv(readFileSync(resolve(root, 'apps/api/.env'), 'utf8')) : {};
 save('resend_api_key', local.RESEND_API_KEY || '');
 save('resend_from', local.RESEND_FROM || 'E-Ventanilla <notificaciones@daesrock.dev>');

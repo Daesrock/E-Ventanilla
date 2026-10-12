@@ -14,7 +14,7 @@ import dev.daesrock.eventanilla.core.data.AuthResources
 fun ForgotScreen(state: AccessState, submit: (String) -> Unit) {
     val form = fields(state, "forgot") { ForgotPasswordViewModel() }
     val send = { if (form.validate()) submit(form.value(AuthField.IDENTIFIER)) }
-    Form("Recuperar contraseña", "Enviaremos un código al correo verificado de tu cuenta.") {
+    Form("Recuperar contraseña") {
         Input(form, AuthField.IDENTIFIER, "CURP o correo", !state.busy, autofill = ContentType.Username, done = send)
         Submit("Solicitar código", state.busy, send)
     }
@@ -24,7 +24,7 @@ fun ForgotScreen(state: AccessState, submit: (String) -> Unit) {
 fun RecoveryCodeScreen(state: AccessState, submit: (String) -> Unit, requestNew: () -> Unit) {
     val form = fields(state, "reset-code") { VerificationViewModel() }
     val send = { if (form.validate()) submit(form.value(AuthField.CODE)) }
-    Form("Introduce el código", "Revisa el correo registrado en tu cuenta.") {
+    Form("Introduce el código", "Si existe una cuenta con ese correo o CURP, enviaremos un código al correo registrado.") {
         Input(
             form,
             AuthField.CODE,

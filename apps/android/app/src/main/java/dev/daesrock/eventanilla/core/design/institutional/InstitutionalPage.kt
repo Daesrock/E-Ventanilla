@@ -1,32 +1,38 @@
 package dev.daesrock.eventanilla.core.design.institutional
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 
 /** Un único desplazamiento reúne el área de trabajo y el footer. */
 @Composable
 fun InstitutionalPage(route: String, go: (String) -> Unit, content: @Composable ColumnScope.() -> Unit) {
     InstitutionalStyle {
         BoxWithConstraints(Modifier.fillMaxSize()) {
-            val workspaceHeight = maxOf(420.dp, maxHeight - 220.dp)
+            // El footer queda después del área de trabajo, sin restarle altura.
+            val workspaceHeight = maxHeight
             Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-                Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-                    InstitutionalRail(route, go, Modifier.fillMaxHeight())
+                Box(Modifier.fillMaxWidth()) {
                     Surface(
-                        modifier = Modifier.weight(1f).padding(start = 10.dp, end = 12.dp, top = 10.dp, bottom = 10.dp),
-                        shape = RoundedCornerShape(5.dp),
-                        color = Color.White,
-                        border = BorderStroke(1.dp, Color.Black)
+                        modifier = Modifier.fillMaxWidth().padding(start = NavigationRailWidth),
+                        color = if (route in
+                            setOf("procedures", "directory", "appointments", "notifications")
+                        ) {
+                            WorkspaceBackground
+                        } else {
+                            Color.White
+                        }
                     ) {
                         Column(Modifier.fillMaxWidth().heightIn(min = workspaceHeight), content = content)
+                    }
+                    // El contenido define la altura. La barra la ocupa sin medir
+                    // de forma intrínseca cuadrículas, menús o pestañas de Compose.
+                    Box(Modifier.matchParentSize()) {
+                        InstitutionalRail(route, go, Modifier.fillMaxHeight())
                     }
                 }
                 InstitutionalFooter()

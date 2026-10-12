@@ -6,6 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import dev.daesrock.eventanilla.app.*
 import dev.daesrock.eventanilla.core.data.*
 import dev.daesrock.eventanilla.core.design.EVentanillaTheme
+import dev.daesrock.eventanilla.feature.catalog.data.CatalogRepository
 import java.io.IOException
 import kotlinx.coroutines.CompletableDeferred
 import org.json.JSONObject
@@ -20,6 +21,7 @@ class RecoveryFlowTest {
         val calls = mutableListOf<String>()
         var offline = false
         var expired = false
+        var currentPassword: String? = null
         var pendingVerification: CompletableDeferred<Unit>? = null
         override suspend fun request(path: String, body: JSONObject?, token: String?): JSONObject {
             calls.add(path)
@@ -41,6 +43,13 @@ class RecoveryFlowTest {
                     assertEquals("00001234", body!!.getString("code"))
                     assertEquals("fixture@example.invalid", body.getString("identifier"))
                     if (expired) throw ApiFailure(400, "Revisa los campos indicados.", fieldErrors = mapOf("code" to "El código venció."))
+                    if (body.getString("password") == currentPassword) {
+                        throw ApiFailure(
+                            400,
+                            "Revisa los campos indicados.",
+                            fieldErrors = mapOf("password" to "La nueva contraseña debe ser diferente de la actual.")
+                        )
+                    }
                     JSONObject().put("message", "Contraseña actualizada.")
                 }
                 else -> error("Solicitud inesperada: $path")
@@ -49,7 +58,7 @@ class RecoveryFlowTest {
     }
     private fun show(gateway: Gateway, initialRoute: String = "forgot"): AccessCoordinator {
         val vm = AccessCoordinator(AuthRepository(gateway), AuthResources(InstrumentationRegistry.getInstrumentation().targetContext))
-        compose.setContent { EVentanillaTheme { EVentanillaApp(vm, initialRoute) } }
+        compose.setContent { EVentanillaTheme { EVentanillaApp(vm, initialRoute, catalogRepository = CatalogRepository(gateway)) } }
         return vm
     }
     private fun requestCode() {
@@ -62,10 +71,27 @@ class RecoveryFlowTest {
         compose.onNodeWithText("Continuar").performClick()
         compose.onNode(hasSetTextAction() and hasText("Nueva contraseña")).assertIsDisplayed()
     }
-    private fun password() {
-        compose.onNode(hasSetTextAction() and hasText("Nueva contraseña")).performTextReplacement("ClaveDePrueba🪻")
-        compose.onNode(hasSetTextAction() and hasText("Confirmar contraseña")).performTextReplacement("ClaveDePrueba🪻")
+    private fun password(value: String = "ClaveDePrueba🪻") {
+        compose.onNode(hasSetTextAction() and hasText("Nueva contraseña")).performTextReplacement(value)
+        compose.onNode(hasSetTextAction() and hasText("Confirmar contraseña")).performTextReplacement(value)
         compose.onNodeWithText("Guardar contraseña").performScrollTo().performClick()
+    }
+
+    @Test fun currentPasswordErrorKeepsTheValidatedCodeAndAllowsCorrection() {
+        val gateway = Gateway().apply { currentPassword = "ClaveDePrueba🪻" }
+        val vm = show(gateway)
+        requestCode()
+        validateCode()
+        password()
+        compose.onNodeWithText("La nueva contraseña debe ser diferente de la actual.").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasSetTextAction() and hasText("Nueva contraseña")).assertIsFocused()
+        assertTrue(vm.state.value.recoveryCodeVerified)
+        compose.onNodeWithText("Introduce el código").assertDoesNotExist()
+        password("OtraClaveNueva🪻")
+        compose.waitUntil(5000) { !vm.state.value.busy && vm.state.value.message == "Contraseña actualizada." }
+        assertEquals(1, gateway.calls.count { it == "auth/verify-reset-code" })
+        assertEquals(2, gateway.calls.count { it == "auth/reset-password" })
+        assertFalse(vm.state.value.recoveryCodeVerified)
     }
 
     @Test fun validatesCodeBeforeShowingPasswordAndCompletesWithoutLogin() {

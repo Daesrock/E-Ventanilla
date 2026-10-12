@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -25,7 +26,7 @@ const val PRIVACY_URL = "https://coesa.chiapas.gob.mx/proteccion-de-datos-person
 @Composable
 fun InstitutionalFooter(openPrivacy: (() -> Unit)? = null) {
     val uriHandler = LocalUriHandler.current
-    BoxWithConstraints(Modifier.fillMaxWidth().background(Ink)) {
+    BoxWithConstraints(Modifier.fillMaxWidth().background(Ink).testTag("institutional_footer")) {
         val stackContact = maxWidth < 360.dp || LocalDensity.current.fontScale > 1.3f
         Image(
             painterResource(R.drawable.institutional_pattern),
@@ -34,9 +35,9 @@ fun InstitutionalFooter(openPrivacy: (() -> Unit)? = null) {
             alpha = 0.05f,
             contentScale = ContentScale.Fit
         )
-        Column(Modifier.fillMaxWidth().padding(18.dp)) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
             HorizontalDivider(color = Color(0xFF404A4D))
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
             val open = { if (openPrivacy != null) openPrivacy() else uriHandler.openUri(PRIVACY_URL) }
             if (stackContact) {
                 ContactText(Modifier.fillMaxWidth())
@@ -64,7 +65,7 @@ private fun ContactText(modifier: Modifier) {
 
 @Composable
 private fun FooterMarks(open: () -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Image(painterResource(R.drawable.chiapas_shield), null, Modifier.size(53.dp, 65.dp), alpha = 0.45f, contentScale = ContentScale.Fit)
         Image(
             painterResource(R.drawable.privacy_qr),

@@ -38,8 +38,8 @@ export class AuthService {
     return this.challenges.issueCode(user, purpose);
   }
 
-  private consumeCode(user: User, purpose: ChallengePurpose, code: string, passwordHash?: string) {
-    return this.challenges.consumeCode(user, purpose, code, passwordHash);
+  private consumeCode(user: User, purpose: ChallengePurpose, code: string, newPassword?: string) {
+    return this.challenges.consumeCode(user, purpose, code, newPassword);
   }
 
   private createSession(user: User, allowPendingVerification: boolean) {
@@ -155,11 +155,10 @@ export class AuthService {
 
   async resetPassword(data: ResetDto) {
     requireNewPassword(data.password);
-    const passwordHash = await hashPassword(data.password);
     const user = await this.findUser(data.identifier);
     if (
       !user ||
-      !(await this.consumeCode(user, ChallengePurpose.RESET_PASSWORD, data.code, passwordHash))
+      !(await this.consumeCode(user, ChallengePurpose.RESET_PASSWORD, data.code, data.password))
     ) {
       throw fieldFailure({ code: 'El código no es válido, ya fue utilizado o venció.' });
     }

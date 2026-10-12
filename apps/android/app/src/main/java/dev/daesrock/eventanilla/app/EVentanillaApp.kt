@@ -22,8 +22,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.daesrock.eventanilla.core.design.*
 import dev.daesrock.eventanilla.core.design.institutional.*
+import dev.daesrock.eventanilla.feature.appointments.presentation.AppointmentsScreen
 import dev.daesrock.eventanilla.feature.auth.presentation.*
+import dev.daesrock.eventanilla.feature.catalog.data.CatalogRepository
+import dev.daesrock.eventanilla.feature.catalog.presentation.CatalogDetailScreen
+import dev.daesrock.eventanilla.feature.catalog.presentation.CatalogListScreen
 import dev.daesrock.eventanilla.feature.home.presentation.HomeScreen
+import dev.daesrock.eventanilla.feature.notifications.presentation.NotificationsScreen
 import dev.daesrock.eventanilla.ui.DeveloperToolsEntry
 import kotlinx.coroutines.launch
 
@@ -32,7 +37,8 @@ import kotlinx.coroutines.launch
 fun EVentanillaApp(
     vm: AccessCoordinator = applicationAccessCoordinator(),
     initialRoute: String = "home",
-    initialMenuOpen: Boolean = false
+    initialMenuOpen: Boolean = false,
+    catalogRepository: CatalogRepository = applicationCatalogRepository()
 ) {
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
@@ -42,6 +48,13 @@ fun EVentanillaApp(
     val scope = rememberCoroutineScope()
     val primary = mainDestinations.any { it.route == route }
     val keyboard = LocalSoftwareKeyboardController.current
+    val snackbar = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.confirmation) {
+        val message = state.confirmation ?: return@LaunchedEffect
+        snackbar.showSnackbar(message, duration = SnackbarDuration.Short)
+        vm.clearConfirmation(message)
+    }
 
     LaunchedEffect(Unit) { if (initialMenuOpen) drawer.open() }
 
@@ -53,7 +66,8 @@ fun EVentanillaApp(
         keyboard?.hide()
         vm.clearMessage()
         nav.navigate(destination) {
-            if (destination !in setOf("login", "register", "verify", "forgot", "reset-code", "reset")) popUpTo("home")
+            val detail = destination.startsWith("branch/") || destination.startsWith("procedure/")
+            if (!detail && destination !in setOf("login", "register", "verify", "forgot", "reset-code", "reset")) popUpTo("home")
             launchSingleTop = true
         }
     }
@@ -66,7 +80,7 @@ fun EVentanillaApp(
     ModalNavigationDrawer(drawerState = drawer, drawerContent = {
         InstitutionalMenu(route, { scope.launch { drawer.close() } }, ::go) { DeveloperToolsEntry() }
     }) {
-        Scaffold(topBar = {
+        Scaffold(snackbarHost = { SnackbarHost(snackbar) }, topBar = {
             InstitutionalHeader(
                 primary = primary,
                 notifications = route !in setOf("login", "register", "verify", "forgot", "reset-code", "reset"),
@@ -76,8 +90,7 @@ fun EVentanillaApp(
                     vm.clearMessage()
                     nav.popBackStack()
                 },
-                go = ::go,
-                searchKey = route
+                go = ::go
             )
         }) { padding ->
             Column(Modifier.fillMaxSize().padding(padding)) {
@@ -97,38 +110,40 @@ fun EVentanillaApp(
                     composable("home") { InstitutionalPage("home", ::go) { HomeScreen() } }
                     composable("procedures") {
                         InstitutionalPage("procedures", ::go) {
-                            PendingScreen(
-                                "Trámites y servicios",
-                                "Consulta pública",
-                                "El catálogo de trámites, requisitos, costos y tiempos está pendiente de corroboración.",
-                                scrollable = false
+                            CatalogListScreen(
+                                "procedures",
+                                catalogRepository,
+                                { go("procedure/$it") },
+                                citizenName = state.citizen?.firstName,
+                                openProfile = { go("profile") },
+                                openDirectory = { go("directory") }
                             )
                         }
                     }
                     composable("directory") {
                         InstitutionalPage("directory", ::go) {
-                            PendingScreen(
-                                "Directorio de sedes",
-                                "Consulta pública",
-                                "Las ubicaciones, contactos y horarios vigentes de las sedes están pendientes de corroboración.",
-                                scrollable = false
+                            CatalogListScreen(
+                                "branches",
+                                catalogRepository,
+                                { go("branch/$it") },
+                                citizenName = state.citizen?.firstName,
+                                openProfile = { go("profile") }
                             )
+                        }
+                    }
+                    composable("branch/{id}") { details ->
+                        InstitutionalPage("directory", ::go) {
+                            CatalogDetailScreen("branches", checkNotNull(details.arguments?.getString("id")), catalogRepository)
+                        }
+                    }
+                    composable("procedure/{id}") { details ->
+                        InstitutionalPage("procedures", ::go) {
+                            CatalogDetailScreen("procedures", checkNotNull(details.arguments?.getString("id")), catalogRepository)
                         }
                     }
                     composable("appointments") {
                         InstitutionalPage("appointments", ::go) {
-                            PendingScreen(
-                                "Mis citas",
-                                "Atención presencial",
-                                "Las citas se habilitarán cuando se confirmen los horarios, la disponibilidad y las reglas de atención de las sedes.",
-                                scrollable = false
-                            ) {
-                                Button(onClick = {
-                                    requestAppointment()
-                                }, enabled = !state.busy, modifier = Modifier.heightIn(min = 48.dp)) {
-                                    Text("Preparar una cita")
-                                }
-                            }
+                            AppointmentsScreen(state.citizen?.firstName, state.busy, { go("profile") }, ::requestAppointment)
                         }
                     }
                     composable("appointment-entry") {
@@ -140,14 +155,7 @@ fun EVentanillaApp(
                     }
                     composable("notifications") {
                         InstitutionalPage("notifications", ::go) {
-                            PendingScreen(
-                                "Notificaciones",
-                                "Tus avisos",
-                                "Los avisos personales de citas estarán disponibles cuando se habilite la gestión de citas.",
-                                scrollable = false
-                            ) {
-                                if (state.citizen == null) Button(onClick = { go("login") }) { Text("Iniciar sesión") }
-                            }
+                            NotificationsScreen(state.citizen?.firstName, { go("profile") }, { go("login") })
                         }
                     }
                     composable("profile") {

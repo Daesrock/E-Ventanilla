@@ -32,6 +32,8 @@ import dev.daesrock.eventanilla.app.MainDestination
 import dev.daesrock.eventanilla.app.mainDestinations
 import dev.daesrock.eventanilla.core.design.*
 
+val NavigationRailWidth = 50.dp
+
 @Composable
 fun InstitutionalIcon(resource: Int, modifier: Modifier = Modifier, description: String? = null, tint: Color? = null) {
     val context = LocalContext.current
@@ -63,7 +65,7 @@ fun BrandLogo(modifier: Modifier = Modifier) {
 
 @Composable
 fun InstitutionalRail(route: String, go: (String) -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier.width(50.dp).background(RailTeal).padding(top = 12.dp)) {
+    Column(modifier.width(NavigationRailWidth).background(RailTeal).padding(top = 12.dp)) {
         mainDestinations.forEach { item ->
             val active = item.route == route
             IconButton(

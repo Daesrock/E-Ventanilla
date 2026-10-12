@@ -4,7 +4,12 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { AuthService } from '../dist/features/auth/auth.service.js';
 import { config } from '../dist/core/configuration/config.js';
-import { codeDigest, createCode } from '../dist/core/security/crypto.js';
+import {
+  codeDigest,
+  createCode,
+  hashPassword,
+  verifyPassword,
+} from '../dist/core/security/crypto.js';
 import { ChallengeService } from '../dist/features/challenges/challenge.service.js';
 
 // Almacenamiento de prueba aislado: no inserta ciudadanos ni datos en PostgreSQL.
@@ -77,10 +82,67 @@ test('la verificación consume el código y no permite reutilizarlo', async () =
 
 test('un restablecimiento válido actualiza la credencial y revoca las sesiones', async () => {
   const { auth, user, code, state } = fixture({ verified: true, purpose: 'RESET_PASSWORD' });
-  const digest = randomUUID();
-  assert.equal(await auth.consumeCode(user, 'RESET_PASSWORD', code, digest), true);
-  assert.equal(state.user.passwordHash, digest);
+  const password = 'ClaveDePrueba🪻';
+  assert.equal(await auth.consumeCode(user, 'RESET_PASSWORD', code, password), true);
+  assert.equal(await verifyPassword(password, state.user.passwordHash), true);
   assert.equal(state.sessions, 0);
+});
+
+test('rechazar la contraseña actual conserva el código, el hash y las sesiones; permite corregirla', async () => {
+  const { auth, code, state } = fixture({ verified: true, purpose: 'RESET_PASSWORD' });
+  const password = 'ClaveDePrueba🪻';
+  const previousHash = await hashPassword(password);
+  state.user.passwordHash = previousHash;
+  await assert.rejects(
+    auth.resetPassword({ identifier: 'isolated', code, password }),
+    (error) =>
+      error.getStatus() === 400 &&
+      error.getResponse().fieldErrors.password ===
+        'La nueva contraseña debe ser diferente de la actual.',
+  );
+  assert.equal(state.user.passwordHash, previousHash);
+  assert.equal(state.challenge.consumedAt, null);
+  assert.equal(state.challenge.attempts, 0);
+  assert.equal(state.sessions, 2);
+  const replacement = 'OtraClaveNueva🪻';
+  await auth.resetPassword({ identifier: 'isolated', code, password: replacement });
+  assert.equal(await verifyPassword(replacement, state.user.passwordHash), true);
+  assert.equal(await verifyPassword(password, state.user.passwordHash), false);
+  assert.ok(state.challenge.consumedAt);
+  assert.equal(state.sessions, 0);
+});
+
+test('un código incorrecto no revela si la contraseña coincide y conserva el intento fallido', async () => {
+  const { auth, code, state } = fixture({ verified: true, purpose: 'RESET_PASSWORD' });
+  const password = 'ClaveDePrueba🪻';
+  state.user.passwordHash = await hashPassword(password);
+  const previousHash = state.user.passwordHash;
+  const wrong = String((Number(code) + 1) % 100000000).padStart(8, '0');
+  await assert.rejects(
+    auth.resetPassword({ identifier: 'isolated', code: wrong, password }),
+    (error) =>
+      typeof error.getResponse().fieldErrors.code === 'string' &&
+      error.getResponse().fieldErrors.password === undefined,
+  );
+  assert.equal(state.challenge.attempts, 1);
+  assert.equal(state.challenge.consumedAt, null);
+  assert.equal(state.user.passwordHash, previousHash);
+  assert.equal(state.sessions, 2);
+});
+
+test('compara contra la contraseña vigente dentro de la transacción, no una lectura anterior', async () => {
+  const { challenges, user, code, state } = fixture({ verified: true, purpose: 'RESET_PASSWORD' });
+  const password = 'ClaveDePrueba🪻';
+  const previousRead = { ...user, passwordHash: await hashPassword('OtraClaveNueva🪻') };
+  const currentHash = await hashPassword(password);
+  state.user.passwordHash = currentHash;
+  await assert.rejects(
+    challenges.consumeCode(previousRead, 'RESET_PASSWORD', code, password),
+    (error) => typeof error.getResponse().fieldErrors.password === 'string',
+  );
+  assert.equal(state.user.passwordHash, currentHash);
+  assert.equal(state.challenge.consumedAt, null);
+  assert.equal(state.sessions, 2);
 });
 
 test('validar el código de recuperación no cambia contraseña ni sesiones; guardar lo consume', async () => {

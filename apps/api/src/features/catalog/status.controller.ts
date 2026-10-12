@@ -21,8 +21,9 @@ export class StatusController {
   }
   @Get('catalog/status') catalog() {
     return {
-      status: 'pending_verification',
-      message: 'La información institucional está pendiente de corroboración.',
+      status: 'partially_available',
+      message:
+        'Consulta las sedes y los servicios publicados. Los requisitos, costos y disponibilidad por sede siguen pendientes de corroboración.',
     };
   }
 }
