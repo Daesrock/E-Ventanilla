@@ -1,0 +1,7 @@
+# Recursos binarios y archivos mantenidos por herramientas, no por formato manual.
+node_modules/
+dist/
+test-results/
+playwright-report/
+coverage/
+package-lock.json

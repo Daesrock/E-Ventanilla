@@ -1,0 +1,9 @@
+<!-- Patrón decorativo propio de rombos escalonados inspirado en la referencia visual. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <g fill="none" stroke="white" stroke-width="6" opacity=".13">
+    <path d="M60 3 117 60 60 117 3 60Z"/>
+    <path d="M60 22 98 60 60 98 22 60Z"/>
+    <path d="M60 41 79 60 60 79 41 60Z"/>
+  </g>
+  <path fill="white" opacity=".16" d="m60 54 6 6-6 6-6-6Z"/>
+</svg>
