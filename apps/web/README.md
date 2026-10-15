@@ -4,7 +4,7 @@ Prototipo web de una sola dependencia: Departamento de Gestión Empresarial y Ve
 
 ## Ejecutar localmente
 
-Requisitos: **Node.js 22.12+ o 24+**, npm y acceso a Internet para instalar paquetes. Desarrollo verificado con Node 24.15.0. La web es un proyecto autónomo en `apps/web`; no cambia versiones, código ni despliegue de la API descrita en `info/`.
+Requisitos: **Node.js 22.12+ o 24+**, npm y acceso a Internet para instalar paquetes. Desarrollo verificado con Node 24.15.0. La web es un proyecto autónomo en `apps/web`; no cambia versiones, código ni despliegue de la API existente. El objetivo, las decisiones y el plan de integración viven en [docs/project-context.md](docs/project-context.md).
 
 Desde esta carpeta:
 
@@ -16,7 +16,7 @@ npm run dev
 
 Abrir **http://127.0.0.1:5173**. El comando inicia Vite y BFF local (`127.0.0.1:3001`). Elegir perfil de demostración: jefe de departamento, jefe de ventanilla o root.
 
-`npm run assets` copia el logo original de la raíz y genera su variante recortada. Los archivos preparados ya se incluyen en el árbol de trabajo. No se modifican colores ni contenido del logo.
+`npm run assets` regenera la variante de presentación recortada a partir de `public/assets/logos/dependencia-original.png` (copia intacta del logo entregado). Si colocas de nuevo `coesmerBACKGROUND.png` en la raíz del repositorio, el comando actualiza primero esa copia. No se modifican colores ni contenido del logo.
 
 ### Configuración opcional
 
@@ -70,6 +70,7 @@ Para comprobar conectividad real, `npm run check:api` consulta únicamente GET p
 
 ## Organización y documentación
 
+- [Contexto único](docs/project-context.md): objetivo, decisiones, cambios de BD aplicados y plan de integración con API.
 - [Arquitectura](docs/architecture.md): módulos, layouts, almacén y límites de integración.
 - [Rutas y perfiles](docs/routes-and-roles.md): alcance de cada vista y operación.
 - [Sistema visual](docs/design-system.md): paleta, patrón, logo y componentes.

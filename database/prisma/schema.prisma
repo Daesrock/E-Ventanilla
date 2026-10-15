@@ -39,6 +39,7 @@ model User {
   role            Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
   citizen         Citizen?
   administrativeStaff AdministrativeStaff?
+  administrativeAuditLogs AdministrativeAuditLog[]
 
   @@index([roleId])
 }
@@ -131,12 +132,14 @@ model Citizen {
 
 model AdministrativeStaff {
   userId String @id @db.Uuid
-  street String @db.VarChar(150)
-  exteriorNumber String @db.VarChar(20)
+  // Datos de domicilio y NSS opcionales: el alta administrativa de jefes no los exige.
+  // Las restricciones de formato siguen aplicándose cuando se proporcionan.
+  street String? @db.VarChar(150)
+  exteriorNumber String? @db.VarChar(20)
   interiorNumber String? @db.VarChar(20)
-  neighborhood String @db.VarChar(150)
-  postalCode String @db.VarChar(5)
-  socialSecurityNumber String @unique @db.VarChar(11)
+  neighborhood String? @db.VarChar(150)
+  postalCode String? @db.VarChar(5)
+  socialSecurityNumber String? @unique @db.VarChar(11)
   user User @relation(fields: [userId], references: [id], onDelete: Restrict)
   counterStaff CounterStaff?
   counterHead CounterHead?
@@ -191,6 +194,7 @@ model Branch {
   counters ServiceCounter[]
   procedures BranchProcedure[]
   slots TimeSlot[]
+  auditLogs AdministrativeAuditLog[]
   @@index([municipalityId])
   @@index([counterHeadId])
 }
@@ -278,6 +282,7 @@ model Appointment {
   @@unique([id, branchId])
   @@index([citizenId, scheduledAt])
   @@index([branchId, procedureId])
+  @@index([branchId, scheduledAt])
   @@index([slotId, branchId])
   @@index([counterId, branchId])
 }
@@ -312,6 +317,7 @@ model Attendance {
   @@unique([appointmentId, branchId])
   @@index([staffId])
   @@index([counterId, branchId])
+  @@index([branchId, arrivedAt])
 }
 
 model ProcedureRecord {
@@ -333,4 +339,23 @@ model Notification {
   createdAt DateTime @default(now())
   appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Restrict)
   @@index([appointmentId, createdAt])
+}
+
+// Registro inmutable de operaciones administrativas: actor, acción, recurso y resultado.
+// Nunca guarda credenciales, códigos ni tokens; metadata solo lleva detalles controlados.
+model AdministrativeAuditLog {
+  id String @id @default(uuid()) @db.Uuid
+  actorUserId String @db.Uuid
+  action String @db.VarChar(100)
+  resourceType String @db.VarChar(50)
+  resourceId String? @db.Uuid
+  branchId String? @db.Uuid
+  outcome String @default("completed") @db.VarChar(20)
+  metadata Json?
+  createdAt DateTime @default(now())
+  actor User @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
+  branch Branch? @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  @@index([actorUserId, createdAt])
+  @@index([branchId, createdAt])
+  @@index([createdAt])
 }

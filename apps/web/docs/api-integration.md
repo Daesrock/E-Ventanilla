@@ -1,6 +1,6 @@
 # Integración con API vigente
 
-Fuente de contrato: `info/desarrollador-panel-web.md`, confirmado como vigente por el equipo. URL configurada por defecto: `https://api-ventanilla.daesrock.dev/v1/`.
+Fuente de contrato: documentación de la API entregada por el equipo, confirmada como vigente. URL configurada por defecto: `https://api-ventanilla.daesrock.dev/v1/`.
 
 ## Endpoints conectados
 

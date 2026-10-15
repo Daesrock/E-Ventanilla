@@ -19,7 +19,7 @@ Inventario de responsabilidad de cada archivo de la aplicación. Los fuentes con
 | `playwright.config.ts` | Navegador Chromium, servidor local y artefactos de pruebas                        |
 | `README.md`            | Instalación, comandos, alcance funcional, datos ficticios y enlaces documentales  |
 
-En raíz del proyecto: `../../README.md` orienta a esta aplicación y `../../.gitignore` excluye dependencias, secretos y artefactos. `../../info/` y `../../coesmerBACKGROUND.png` son insumos recibidos y conservados.
+En raíz del proyecto: `../../.gitignore` excluye dependencias, secretos y artefactos. El logo entregado se conserva en `public/assets/logos/dependencia-original.png`; los insumos de contexto recibidos están resumidos en `docs/project-context.md`.
 
 ## App y layouts
 
@@ -132,6 +132,8 @@ En raíz del proyecto: `../../README.md` orienta a esta aplicación y `../../.gi
 | `docs/routes-and-roles.md`    | Rutas y matriz de capacidades demostrativas                                    |
 | `docs/design-system.md`       | Identidad, paleta, recursos, componentes y responsive                          |
 | `docs/api-integration.md`     | Contrato vigente, sesiones reales y definición de reportes                     |
+| `docs/project-context.md`     | Contexto único: objetivo, decisiones, cambios de BD y plan de integración      |
+| `docs/pending-work.md`        | Trabajo pendiente en orden: BD en VPS, etapas API y conexión web               |
 | `docs/file-map.md`            | Este inventario y criterio de documentación por archivo                        |
 
 ## Generados y privados excluidos

@@ -1,0 +1,998 @@
+{
+  ".prettierrc.json": {
+    "mtime": 1791865837.141373,
+    "seen": 1792039909.652901,
+    "ast_hash": "d68b05400d039802253ea458066b4c7b",
+    "semantic_hash": "d68b05400d039802253ea458066b4c7b"
+  },
+  "apps/android/app/build.gradle.kts": {
+    "mtime": 1791865837.1433735,
+    "seen": 1792039909.6529052,
+    "ast_hash": "786b40a92790c2e541939ec09b711d14",
+    "semantic_hash": "786b40a92790c2e541939ec09b711d14"
+  },
+  "apps/android/app/src/androidTest/java/dev/daesrock/eventanilla/ui/AccessFlowTest.kt": {
+    "mtime": 1791865837.1485722,
+    "seen": 1792039909.6529074,
+    "ast_hash": "4eec7aa16dc344088031f15c17a0c8d6",
+    "semantic_hash": "4eec7aa16dc344088031f15c17a0c8d6"
+  },
+  "apps/android/app/src/androidTest/java/dev/daesrock/eventanilla/ui/AuthLabTest.kt": {
+    "mtime": 1791865837.1485722,
+    "seen": 1792039909.6529083,
+    "ast_hash": "adf83e6cb6c8812748489784cabb8bcb",
+    "semantic_hash": "adf83e6cb6c8812748489784cabb8bcb"
+  },
+  "apps/android/app/src/androidTest/java/dev/daesrock/eventanilla/ui/AuthScreensTest.kt": {
+    "mtime": 1791865837.1495728,
+    "seen": 1792039909.6529093,
+    "ast_hash": "fd32b2bbf0cc7315df63ad3b6d452016",
+    "semantic_hash": "fd32b2bbf0cc7315df63ad3b6d452016"
+  },
+  "apps/android/app/src/androidTest/java/dev/daesrock/eventanilla/ui/CatalogScreensTest.kt": {
+    "mtime": 1791865837.1505702,
+    "seen": 1792039909.6529107,
+    "ast_hash": "cf414e87f445767ed332ea30b240481d",
+    "semantic_hash": "cf414e87f445767ed332ea30b240481d"
+  },
+  "apps/android/app/src/androidTest/java/dev/daesrock/eventanilla/ui/EmptyAuthCapturesTest.kt": {
+    "mtime": 1791865837.1505702,
+    "seen": 1792039909.6529117,
+    "ast_hash": "f0baa685bcdaee2e55f789099f66e863",
+    "semantic_hash": "f0baa685bcdaee2e55f789099f66e863"
+  },
+  "apps/android/app/src/androidTest/java/dev/daesrock/eventanilla/ui/InstitutionalUiTest.kt": {
+    "mtime": 1791865837.1515713,
+    "seen": 1792039909.6529124,
+    "ast_hash": "86796a8250bafa3ba2f77e6331d892eb",
+    "semantic_hash": "86796a8250bafa3ba2f77e6331d892eb"
+  },
+  "apps/android/app/src/androidTest/java/dev/daesrock/eventanilla/ui/MainScreensCapturesTest.kt": {
+    "mtime": 1791865837.1515713,
+    "seen": 1792039909.6529133,
+    "ast_hash": "8cc937ace57f125299a6cd604c83b0f6",
+    "semantic_hash": "8cc937ace57f125299a6cd604c83b0f6"
+  },
+  "apps/android/app/src/androidTest/java/dev/daesrock/eventanilla/ui/MainScreensTest.kt": {
+    "mtime": 1791865837.152844,
+    "seen": 1792039909.6529143,
+    "ast_hash": "26778e9b242cd9a2afb09255580d697a",
+    "semantic_hash": "26778e9b242cd9a2afb09255580d697a"
+  },
+  "apps/android/app/src/androidTest/java/dev/daesrock/eventanilla/ui/PublicApiConnectionTest.kt": {
+    "mtime": 1791865837.1538453,
+    "seen": 1792039909.652915,
+    "ast_hash": "dad39defa7b12838ffe6d38947e49671",
+    "semantic_hash": "dad39defa7b12838ffe6d38947e49671"
+  },
+  "apps/android/app/src/androidTest/java/dev/daesrock/eventanilla/ui/RecoveryFlowTest.kt": {
+    "mtime": 1791865837.1538453,
+    "seen": 1792039909.6529162,
+    "ast_hash": "aed8826dbace2cbe0e9f7304064186bf",
+    "semantic_hash": "aed8826dbace2cbe0e9f7304064186bf"
+  },
+  "apps/android/app/src/debug/java/dev/daesrock/eventanilla/devtools/AuthLabActivity.kt": {
+    "mtime": 1791865837.223927,
+    "seen": 1792039909.652917,
+    "ast_hash": "d6f1be64209c4b6e905a8dc1cd538729",
+    "semantic_hash": "d6f1be64209c4b6e905a8dc1cd538729"
+  },
+  "apps/android/app/src/debug/java/dev/daesrock/eventanilla/devtools/AuthLabPreviews.kt": {
+    "mtime": 1791865837.223927,
+    "seen": 1792039909.652918,
+    "ast_hash": "f3aa2c4c67e5b8d23c3c5b0f70ff3d89",
+    "semantic_hash": "f3aa2c4c67e5b8d23c3c5b0f70ff3d89"
+  },
+  "apps/android/app/src/debug/java/dev/daesrock/eventanilla/devtools/UiLabActivity.kt": {
+    "mtime": 1791865837.223927,
+    "seen": 1792039909.6529188,
+    "ast_hash": "1862f4ae328f7f5e00661ee521515f87",
+    "semantic_hash": "1862f4ae328f7f5e00661ee521515f87"
+  },
+  "apps/android/app/src/debug/java/dev/daesrock/eventanilla/ui/DeveloperToolsEntry.kt": {
+    "mtime": 1791865837.2254317,
+    "seen": 1792039909.6529195,
+    "ast_hash": "e70a0a06b513a8fd29217085dc088197",
+    "semantic_hash": "e70a0a06b513a8fd29217085dc088197"
+  },
+  "apps/android/app/src/main/assets/common-passwords.metadata.json": {
+    "mtime": 1791865837.2304757,
+    "seen": 1792039909.6529205,
+    "ast_hash": "d7c4d5ff4ce77195ef02a2bd3605f54c",
+    "semantic_hash": "d7c4d5ff4ce77195ef02a2bd3605f54c"
+  },
+  "apps/android/app/src/main/assets/municipalities.json": {
+    "mtime": 1791865837.2365074,
+    "seen": 1792039909.6529217,
+    "ast_hash": "f5bdd29739b73a35cdda5f227f7f50c4",
+    "semantic_hash": "f5bdd29739b73a35cdda5f227f7f50c4"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/MainActivity.kt": {
+    "mtime": 1791865837.239621,
+    "seen": 1792039909.6529224,
+    "ast_hash": "5c79b780db973e25d414b3be8329941e",
+    "semantic_hash": "5c79b780db973e25d414b3be8329941e"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/app/AccessCoordinator.kt": {
+    "mtime": 1791865837.240624,
+    "seen": 1792039909.652923,
+    "ast_hash": "8534a51f206f0ffb79c5308d31a9eb9b",
+    "semantic_hash": "8534a51f206f0ffb79c5308d31a9eb9b"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/app/AppContainer.kt": {
+    "mtime": 1791865837.240624,
+    "seen": 1792039909.6529238,
+    "ast_hash": "9362116d17a4fd087ddaec1d26143305",
+    "semantic_hash": "9362116d17a4fd087ddaec1d26143305"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/app/EVentanillaApp.kt": {
+    "mtime": 1791865837.241655,
+    "seen": 1792039909.652925,
+    "ast_hash": "6d2c73e5821f3b2f3d3fd7b3062fea62",
+    "semantic_hash": "6d2c73e5821f3b2f3d3fd7b3062fea62"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/app/MainDestinations.kt": {
+    "mtime": 1791865837.241655,
+    "seen": 1792039909.6529267,
+    "ast_hash": "78ff2d91b546145a3e03a9fd74a66f0d",
+    "semantic_hash": "78ff2d91b546145a3e03a9fd74a66f0d"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/data/ApiClient.kt": {
+    "mtime": 1791865837.2436779,
+    "seen": 1792039909.6529274,
+    "ast_hash": "29a4f50144b64c060a400069e5f23c2d",
+    "semantic_hash": "29a4f50144b64c060a400069e5f23c2d"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/data/AuthInputPolicy.kt": {
+    "mtime": 1791865837.245191,
+    "seen": 1792039909.6529286,
+    "ast_hash": "4437dd75b445fcac86f17c4d7f700d11",
+    "semantic_hash": "4437dd75b445fcac86f17c4d7f700d11"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/data/AuthModels.kt": {
+    "mtime": 1791865837.245191,
+    "seen": 1792039909.6529293,
+    "ast_hash": "389aefb210b532f656558b166e23e0b2",
+    "semantic_hash": "389aefb210b532f656558b166e23e0b2"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/data/AuthRepository.kt": {
+    "mtime": 1791865837.245191,
+    "seen": 1792039909.6529303,
+    "ast_hash": "465fea90d158f11f971816f601c3a35d",
+    "semantic_hash": "465fea90d158f11f971816f601c3a35d"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/data/AuthResources.kt": {
+    "mtime": 1791865837.2472315,
+    "seen": 1792039909.652931,
+    "ast_hash": "280633837abb0789d58e3795ec49886f",
+    "semantic_hash": "280633837abb0789d58e3795ec49886f"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/data/AuthValidation.kt": {
+    "mtime": 1791865837.2472315,
+    "seen": 1792039909.652932,
+    "ast_hash": "aa5f681a2efed5ea892115af3be5eee6",
+    "semantic_hash": "aa5f681a2efed5ea892115af3be5eee6"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/data/VerificationDelivery.kt": {
+    "mtime": 1791865837.2482376,
+    "seen": 1792039909.652933,
+    "ast_hash": "0b9d90b72c2eef8b464143166d3292e3",
+    "semantic_hash": "0b9d90b72c2eef8b464143166d3292e3"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/design/Theme.kt": {
+    "mtime": 1791865837.2492452,
+    "seen": 1792039909.6529336,
+    "ast_hash": "8ef9a42921585bbb02af4c4eb5e6362e",
+    "semantic_hash": "8ef9a42921585bbb02af4c4eb5e6362e"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/design/institutional/InstitutionalFooter.kt": {
+    "mtime": 1791865837.2502449,
+    "seen": 1792039909.6529343,
+    "ast_hash": "36097b263182aecff5d2c2dcacc0c4a1",
+    "semantic_hash": "36097b263182aecff5d2c2dcacc0c4a1"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/design/institutional/InstitutionalHeader.kt": {
+    "mtime": 1791865837.2518492,
+    "seen": 1792039909.6529355,
+    "ast_hash": "bd0248c405cd6346d9fe484b47aff195",
+    "semantic_hash": "bd0248c405cd6346d9fe484b47aff195"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/design/institutional/InstitutionalNavigation.kt": {
+    "mtime": 1791865837.2528548,
+    "seen": 1792039909.6529362,
+    "ast_hash": "64d4adc85b19b0b9359716e668d6f5be",
+    "semantic_hash": "64d4adc85b19b0b9359716e668d6f5be"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/design/institutional/InstitutionalPage.kt": {
+    "mtime": 1791865837.253856,
+    "seen": 1792039909.6529372,
+    "ast_hash": "3059a92f61a5971bf1bc67f096906c82",
+    "semantic_hash": "3059a92f61a5971bf1bc67f096906c82"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/design/institutional/InstitutionalStyle.kt": {
+    "mtime": 1791865837.253856,
+    "seen": 1792039909.652938,
+    "ast_hash": "a8318080cc1340c680e55ec4424a4ffe",
+    "semantic_hash": "a8318080cc1340c680e55ec4424a4ffe"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/core/design/institutional/MainScreenComponents.kt": {
+    "mtime": 1791865837.2548566,
+    "seen": 1792039909.6529388,
+    "ast_hash": "4b88cde5169b9d03cdf6ed4a4f625227",
+    "semantic_hash": "4b88cde5169b9d03cdf6ed4a4f625227"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/appointments/presentation/AppointmentsScreen.kt": {
+    "mtime": 1791865837.2563608,
+    "seen": 1792039909.6529396,
+    "ast_hash": "ba1fd54be283ccb9cb771de0567af7d9",
+    "semantic_hash": "ba1fd54be283ccb9cb771de0567af7d9"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/auth/presentation/AuthFormComponents.kt": {
+    "mtime": 1791865837.2583663,
+    "seen": 1792039909.6529405,
+    "ast_hash": "cd961e232e94ac6dafc3ebf362543335",
+    "semantic_hash": "cd961e232e94ac6dafc3ebf362543335"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/auth/presentation/AuthFormViewModels.kt": {
+    "mtime": 1791865837.2583663,
+    "seen": 1792039909.6529412,
+    "ast_hash": "e0ec308b88834f40462d6a68d7f26678",
+    "semantic_hash": "e0ec308b88834f40462d6a68d7f26678"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/auth/presentation/LoginScreen.kt": {
+    "mtime": 1791865837.2598703,
+    "seen": 1792039909.6529424,
+    "ast_hash": "065e3ce1794faf8e47ba01f654db3393",
+    "semantic_hash": "065e3ce1794faf8e47ba01f654db3393"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/auth/presentation/MunicipalitySelector.kt": {
+    "mtime": 1791865837.2598703,
+    "seen": 1792039909.6529431,
+    "ast_hash": "069054d88e4385ac721c7d37739991ec",
+    "semantic_hash": "069054d88e4385ac721c7d37739991ec"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/auth/presentation/ProfileScreen.kt": {
+    "mtime": 1791865837.2608774,
+    "seen": 1792039909.6529438,
+    "ast_hash": "32bdb0c5fc914273a4876ef3913a9a71",
+    "semantic_hash": "32bdb0c5fc914273a4876ef3913a9a71"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/auth/presentation/RecoveryScreens.kt": {
+    "mtime": 1791865837.261876,
+    "seen": 1792039909.6529455,
+    "ast_hash": "7706f90e66868834a23444746abede7c",
+    "semantic_hash": "7706f90e66868834a23444746abede7c"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/auth/presentation/RegisterScreen.kt": {
+    "mtime": 1791865837.261876,
+    "seen": 1792039909.6529462,
+    "ast_hash": "b7923141e176d82ac5453ee045079f1c",
+    "semantic_hash": "b7923141e176d82ac5453ee045079f1c"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/auth/presentation/VerifyScreen.kt": {
+    "mtime": 1791865837.262876,
+    "seen": 1792039909.6529472,
+    "ast_hash": "4c3c6be5d67564c451204db0c8702d78",
+    "semantic_hash": "4c3c6be5d67564c451204db0c8702d78"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/catalog/data/BranchLinks.kt": {
+    "mtime": 1791865837.2648757,
+    "seen": 1792039909.652948,
+    "ast_hash": "bcaf1a72d7620ce7e49ee96732380c10",
+    "semantic_hash": "bcaf1a72d7620ce7e49ee96732380c10"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/catalog/data/CatalogRepository.kt": {
+    "mtime": 1791865837.2648757,
+    "seen": 1792039909.652949,
+    "ast_hash": "62f89f35e0f2efa43874c6fa7ddfc691",
+    "semantic_hash": "62f89f35e0f2efa43874c6fa7ddfc691"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/catalog/presentation/CatalogComponents.kt": {
+    "mtime": 1791865837.266379,
+    "seen": 1792039909.6529498,
+    "ast_hash": "886f77ce01c81d50c2eff2ccd8842a12",
+    "semantic_hash": "886f77ce01c81d50c2eff2ccd8842a12"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/catalog/presentation/CatalogDetailScreen.kt": {
+    "mtime": 1791865837.267385,
+    "seen": 1792039909.6529505,
+    "ast_hash": "82318321e557b6e62143029a736219d1",
+    "semantic_hash": "82318321e557b6e62143029a736219d1"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/catalog/presentation/CatalogScreens.kt": {
+    "mtime": 1791865837.2688913,
+    "seen": 1792039909.6529515,
+    "ast_hash": "6602aedcb52467d91e21ea53df73c885",
+    "semantic_hash": "6602aedcb52467d91e21ea53df73c885"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/catalog/presentation/CatalogViewModel.kt": {
+    "mtime": 1791865837.2688913,
+    "seen": 1792039909.6529524,
+    "ast_hash": "19a8ddc8bacfcb17ab8a07e2ed055b56",
+    "semantic_hash": "19a8ddc8bacfcb17ab8a07e2ed055b56"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/catalog/presentation/ProceduresScreen.kt": {
+    "mtime": 1791865837.2704105,
+    "seen": 1792039909.6529531,
+    "ast_hash": "1ee1a7d015bfdb2a1d6bb041b2213c37",
+    "semantic_hash": "1ee1a7d015bfdb2a1d6bb041b2213c37"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/home/presentation/HomeScreen.kt": {
+    "mtime": 1791865837.2724164,
+    "seen": 1792039909.652954,
+    "ast_hash": "91c6ed0a5850b7eed9c299f1095fa5c7",
+    "semantic_hash": "91c6ed0a5850b7eed9c299f1095fa5c7"
+  },
+  "apps/android/app/src/main/java/dev/daesrock/eventanilla/feature/notifications/presentation/NotificationsScreen.kt": {
+    "mtime": 1791865837.2744489,
+    "seen": 1792039909.6529548,
+    "ast_hash": "bd4a530dab1d331fd11af934e5f1edd4",
+    "semantic_hash": "bd4a530dab1d331fd11af934e5f1edd4"
+  },
+  "apps/android/app/src/release/java/dev/daesrock/eventanilla/ui/DeveloperToolsEntry.kt": {
+    "mtime": 1791865837.298671,
+    "seen": 1792039909.652956,
+    "ast_hash": "723dca68a7f74c83ebd0e6dff9546c9a",
+    "semantic_hash": "723dca68a7f74c83ebd0e6dff9546c9a"
+  },
+  "apps/android/app/src/test/java/dev/daesrock/eventanilla/core/data/AuthValidationTest.kt": {
+    "mtime": 1791865837.3047705,
+    "seen": 1792039909.652957,
+    "ast_hash": "919312bf97c3ca78e0566cb0207bc996",
+    "semantic_hash": "919312bf97c3ca78e0566cb0207bc996"
+  },
+  "apps/android/app/src/test/java/dev/daesrock/eventanilla/core/data/FieldContractTest.kt": {
+    "mtime": 1791865837.3047705,
+    "seen": 1792039909.6529577,
+    "ast_hash": "abab8edce91cf399335e23a82f5b5b46",
+    "semantic_hash": "abab8edce91cf399335e23a82f5b5b46"
+  },
+  "apps/android/app/src/test/java/dev/daesrock/eventanilla/core/data/SurnamesTest.kt": {
+    "mtime": 1791865837.3057702,
+    "seen": 1792039909.6529586,
+    "ast_hash": "182199ec987c98debb069ef38c2a8b86",
+    "semantic_hash": "182199ec987c98debb069ef38c2a8b86"
+  },
+  "apps/android/app/src/test/java/dev/daesrock/eventanilla/core/data/VerificationDeliveryTest.kt": {
+    "mtime": 1791865837.3072798,
+    "seen": 1792039909.6529596,
+    "ast_hash": "caf4de84f1fe3e183c6e1942c3fe4113",
+    "semantic_hash": "caf4de84f1fe3e183c6e1942c3fe4113"
+  },
+  "apps/android/app/src/test/java/dev/daesrock/eventanilla/feature/catalog/BranchLinksTest.kt": {
+    "mtime": 1791865837.308283,
+    "seen": 1792039909.6529603,
+    "ast_hash": "519f01ce8800ff2ebf41265c78114ce7",
+    "semantic_hash": "519f01ce8800ff2ebf41265c78114ce7"
+  },
+  "apps/android/app/src/test/java/dev/daesrock/eventanilla/feature/catalog/CatalogSearchTest.kt": {
+    "mtime": 1791865837.3097894,
+    "seen": 1792039909.652961,
+    "ast_hash": "618c6066b806669cdb76c5e2f1a41008",
+    "semantic_hash": "618c6066b806669cdb76c5e2f1a41008"
+  },
+  "apps/android/build.gradle.kts": {
+    "mtime": 1791865837.3103225,
+    "seen": 1792039909.6529617,
+    "ast_hash": "6539292e5b1c1880834e07a878f2474b",
+    "semantic_hash": "6539292e5b1c1880834e07a878f2474b"
+  },
+  "apps/android/gradlew": {
+    "mtime": 1791865837.3143282,
+    "seen": 1792039909.652963,
+    "ast_hash": "794669d78aef1dd5c7d889ef618b311a",
+    "semantic_hash": "794669d78aef1dd5c7d889ef618b311a"
+  },
+  "apps/android/settings.gradle.kts": {
+    "mtime": 1791865837.316864,
+    "seen": 1792039909.6529636,
+    "ast_hash": "c1bb4d6addd82f3544c10bf7010d6bdc",
+    "semantic_hash": "c1bb4d6addd82f3544c10bf7010d6bdc"
+  },
+  "apps/api/check-bun.mjs": {
+    "mtime": 1791865837.322117,
+    "seen": 1792039909.6529644,
+    "ast_hash": "cdab8d78f10794b3b0a456a7f7c31d76",
+    "semantic_hash": "cdab8d78f10794b3b0a456a7f7c31d76"
+  },
+  "apps/api/clean-dist.mjs": {
+    "mtime": 1791865837.3231175,
+    "seen": 1792039909.6529653,
+    "ast_hash": "ec553043565887cfef8a88397f86fd90",
+    "semantic_hash": "ec553043565887cfef8a88397f86fd90"
+  },
+  "apps/api/deploy-migrate.mjs": {
+    "mtime": 1791865837.3231175,
+    "seen": 1792039909.6529663,
+    "ast_hash": "4cf445ab2deaa889d791e80070813eb3",
+    "semantic_hash": "4cf445ab2deaa889d791e80070813eb3"
+  },
+  "apps/api/package.json": {
+    "mtime": 1791865837.3241475,
+    "seen": 1792039909.652967,
+    "ast_hash": "3b93be9dd89408e59d9b7f7d96b76e83",
+    "semantic_hash": "3b93be9dd89408e59d9b7f7d96b76e83"
+  },
+  "apps/api/prisma.config.ts": {
+    "mtime": 1791865837.3241475,
+    "seen": 1792039909.6529677,
+    "ast_hash": "464f28f53501d116c002228a81c5a7e6",
+    "semantic_hash": "464f28f53501d116c002228a81c5a7e6"
+  },
+  "apps/api/publish-catalog.mjs": {
+    "mtime": 1791865837.3241475,
+    "seen": 1792039909.6529686,
+    "ast_hash": "c727a22f12288ae21b22072a6b68a566",
+    "semantic_hash": "c727a22f12288ae21b22072a6b68a566"
+  },
+  "apps/api/resources/common-passwords.metadata.json": {
+    "mtime": 1791865837.3266582,
+    "seen": 1792039909.6529694,
+    "ast_hash": "d7c4d5ff4ce77195ef02a2bd3605f54c",
+    "semantic_hash": "d7c4d5ff4ce77195ef02a2bd3605f54c"
+  },
+  "apps/api/resources/municipalities.json": {
+    "mtime": 1791865837.3324685,
+    "seen": 1792039909.6529706,
+    "ast_hash": "f5bdd29739b73a35cdda5f227f7f50c4",
+    "semantic_hash": "f5bdd29739b73a35cdda5f227f7f50c4"
+  },
+  "apps/api/src/app.module.ts": {
+    "mtime": 1791865837.333469,
+    "seen": 1792039909.6529713,
+    "ast_hash": "cd8e24b701a1b75c4493f7943fa94336",
+    "semantic_hash": "cd8e24b701a1b75c4493f7943fa94336"
+  },
+  "apps/api/src/core/configuration/config.ts": {
+    "mtime": 1791865837.3364954,
+    "seen": 1792039909.652972,
+    "ast_hash": "c024fac662a0126c0b5ce20e84b368b0",
+    "semantic_hash": "c024fac662a0126c0b5ce20e84b368b0"
+  },
+  "apps/api/src/core/configuration/environment.ts": {
+    "mtime": 1791865837.3375037,
+    "seen": 1792039909.6529727,
+    "ast_hash": "0bbc885d1da756fad1aab402b548666f",
+    "semantic_hash": "0bbc885d1da756fad1aab402b548666f"
+  },
+  "apps/api/src/core/persistence/database.module.ts": {
+    "mtime": 1791865837.3385048,
+    "seen": 1792039909.652974,
+    "ast_hash": "837a3bf35f1545d72b5229f1652398c4",
+    "semantic_hash": "837a3bf35f1545d72b5229f1652398c4"
+  },
+  "apps/api/src/core/persistence/database.service.ts": {
+    "mtime": 1791865837.3395014,
+    "seen": 1792039909.6529746,
+    "ast_hash": "dae5001896d0a0667bcc82e9d49ec4a5",
+    "semantic_hash": "dae5001896d0a0667bcc82e9d49ec4a5"
+  },
+  "apps/api/src/core/security/crypto.ts": {
+    "mtime": 1791865837.340501,
+    "seen": 1792039909.6529756,
+    "ast_hash": "18f057af8d7f3f3b94d471458da3ac90",
+    "semantic_hash": "18f057af8d7f3f3b94d471458da3ac90"
+  },
+  "apps/api/src/core/validation/validation.ts": {
+    "mtime": 1791865837.3415034,
+    "seen": 1792039909.6529768,
+    "ast_hash": "754ce44c312e0ffdac4e8b008855e83e",
+    "semantic_hash": "754ce44c312e0ffdac4e8b008855e83e"
+  },
+  "apps/api/src/features/appointments/appointment.repository.ts": {
+    "mtime": 1791865837.3435025,
+    "seen": 1792039909.6529775,
+    "ast_hash": "19df8a3a33f4957361da9b2d916f641b",
+    "semantic_hash": "19df8a3a33f4957361da9b2d916f641b"
+  },
+  "apps/api/src/features/auth/auth.controller.ts": {
+    "mtime": 1791865837.3446538,
+    "seen": 1792039909.6529782,
+    "ast_hash": "6b7dc26479a60d03ce81e41a8a6757f5",
+    "semantic_hash": "6b7dc26479a60d03ce81e41a8a6757f5"
+  },
+  "apps/api/src/features/auth/auth.dto.ts": {
+    "mtime": 1791865837.3446538,
+    "seen": 1792039909.6529791,
+    "ast_hash": "4e46b0ccc398e375ee65d15239adbf82",
+    "semantic_hash": "4e46b0ccc398e375ee65d15239adbf82"
+  },
+  "apps/api/src/features/auth/auth.module.ts": {
+    "mtime": 1791865837.3456552,
+    "seen": 1792039909.6529799,
+    "ast_hash": "2c1cc29722a85ee9c68fadd2ad36fd88",
+    "semantic_hash": "2c1cc29722a85ee9c68fadd2ad36fd88"
+  },
+  "apps/api/src/features/auth/auth.service.ts": {
+    "mtime": 1791865837.3471599,
+    "seen": 1792039909.6529808,
+    "ast_hash": "f2ab599d6a7a53f5eb17510878ef460c",
+    "semantic_hash": "f2ab599d6a7a53f5eb17510878ef460c"
+  },
+  "apps/api/src/features/auth/password-policy.ts": {
+    "mtime": 1791865837.348166,
+    "seen": 1792039909.6529818,
+    "ast_hash": "92b9dc3c7f58eb4547e497928e0caeef",
+    "semantic_hash": "92b9dc3c7f58eb4547e497928e0caeef"
+  },
+  "apps/api/src/features/auth/public-user.ts": {
+    "mtime": 1791865837.348166,
+    "seen": 1792039909.6529837,
+    "ast_hash": "297edd501b6dc386f7ec253b856b0a09",
+    "semantic_hash": "297edd501b6dc386f7ec253b856b0a09"
+  },
+  "apps/api/src/features/auth/surnames.ts": {
+    "mtime": 1791865837.349267,
+    "seen": 1792039909.6529846,
+    "ast_hash": "728f3d9dd946a7f60ad0e704400e92df",
+    "semantic_hash": "728f3d9dd946a7f60ad0e704400e92df"
+  },
+  "apps/api/src/features/auth/verification-receipt.ts": {
+    "mtime": 1791865837.349267,
+    "seen": 1792039909.6529856,
+    "ast_hash": "42b35bf7db0fecfd6cdaf460445027d4",
+    "semantic_hash": "42b35bf7db0fecfd6cdaf460445027d4"
+  },
+  "apps/api/src/features/catalog/municipalities.ts": {
+    "mtime": 1791865837.3507724,
+    "seen": 1792039909.6529863,
+    "ast_hash": "6a421b0bf3cc1600970ec33ca8f583c7",
+    "semantic_hash": "6a421b0bf3cc1600970ec33ca8f583c7"
+  },
+  "apps/api/src/features/catalog/public-catalog.controller.ts": {
+    "mtime": 1791865837.3517768,
+    "seen": 1792039909.6529875,
+    "ast_hash": "a99277e7384a213fcab6258179d14cb3",
+    "semantic_hash": "a99277e7384a213fcab6258179d14cb3"
+  },
+  "apps/api/src/features/catalog/public-catalog.service.ts": {
+    "mtime": 1791865837.3517768,
+    "seen": 1792039909.6529882,
+    "ast_hash": "c8433c5c5a5c0070d5a871cd63999e0f",
+    "semantic_hash": "c8433c5c5a5c0070d5a871cd63999e0f"
+  },
+  "apps/api/src/features/catalog/status.controller.ts": {
+    "mtime": 1791865837.3527822,
+    "seen": 1792039909.6529891,
+    "ast_hash": "77b987745e02593f05b5a95bdde8598f",
+    "semantic_hash": "77b987745e02593f05b5a95bdde8598f"
+  },
+  "apps/api/src/features/challenges/challenge.service.ts": {
+    "mtime": 1791865837.3527822,
+    "seen": 1792039909.6529899,
+    "ast_hash": "979b867b086a9e4db131acfb7d623e8b",
+    "semantic_hash": "979b867b086a9e4db131acfb7d623e8b"
+  },
+  "apps/api/src/features/mail/mail-worker.service.ts": {
+    "mtime": 1791865837.3542876,
+    "seen": 1792039909.652991,
+    "ast_hash": "cd404d331b36f15def0e1b654cb00ce6",
+    "semantic_hash": "cd404d331b36f15def0e1b654cb00ce6"
+  },
+  "apps/api/src/features/mail/mail.module.ts": {
+    "mtime": 1791865837.3558035,
+    "seen": 1792039909.6529918,
+    "ast_hash": "b1948c8d99179db486bd9457e595a425",
+    "semantic_hash": "b1948c8d99179db486bd9457e595a425"
+  },
+  "apps/api/src/features/mail/mail.service.ts": {
+    "mtime": 1791865837.3563087,
+    "seen": 1792039909.6529963,
+    "ast_hash": "0a586a73b53164f4c6b7591473786fc2",
+    "semantic_hash": "0a586a73b53164f4c6b7591473786fc2"
+  },
+  "apps/api/src/features/sessions/session.service.ts": {
+    "mtime": 1791865837.3573158,
+    "seen": 1792039909.6529975,
+    "ast_hash": "55cd8ea78e06901ead5b15cdb4b6ea27",
+    "semantic_hash": "55cd8ea78e06901ead5b15cdb4b6ea27"
+  },
+  "apps/api/src/main.ts": {
+    "mtime": 1791865837.3583155,
+    "seen": 1792039909.6529982,
+    "ast_hash": "16af5efda3f3e87d7986e82b73436de4",
+    "semantic_hash": "16af5efda3f3e87d7986e82b73436de4"
+  },
+  "apps/api/test/auth-contract.test.mjs": {
+    "mtime": 1791865837.3583155,
+    "seen": 1792039909.6529992,
+    "ast_hash": "ff0a1b7df9ba07f4c28291bdacb6bb99",
+    "semantic_hash": "ff0a1b7df9ba07f4c28291bdacb6bb99"
+  },
+  "apps/api/test/auth.test.mjs": {
+    "mtime": 1791865837.3598251,
+    "seen": 1792039909.6529999,
+    "ast_hash": "90fa0dc2202e34f2b55d21f4d77217aa",
+    "semantic_hash": "90fa0dc2202e34f2b55d21f4d77217aa"
+  },
+  "apps/api/test/crypto.test.mjs": {
+    "mtime": 1791865837.3608308,
+    "seen": 1792039909.653001,
+    "ast_hash": "835c69f67c88266defe7c6aa90d9934f",
+    "semantic_hash": "835c69f67c88266defe7c6aa90d9934f"
+  },
+  "apps/api/test/environment.test.mjs": {
+    "mtime": 1791865837.361833,
+    "seen": 1792039909.6530018,
+    "ast_hash": "e85fc06cc7cb2dab98dadc353b03b777",
+    "semantic_hash": "e85fc06cc7cb2dab98dadc353b03b777"
+  },
+  "apps/api/test/field-contract.test.mjs": {
+    "mtime": 1791865837.362832,
+    "seen": 1792039909.6530025,
+    "ast_hash": "52b579e14eee7740df24dd50254e4a17",
+    "semantic_hash": "52b579e14eee7740df24dd50254e4a17"
+  },
+  "apps/api/test/proxy.test.mjs": {
+    "mtime": 1791865837.362832,
+    "seen": 1792039909.6530035,
+    "ast_hash": "f176c7c7f4feda2ef21b4ffbd050cda1",
+    "semantic_hash": "f176c7c7f4feda2ef21b4ffbd050cda1"
+  },
+  "apps/api/test/public-catalog.test.mjs": {
+    "mtime": 1791865837.3638327,
+    "seen": 1792039909.6530042,
+    "ast_hash": "c76490e4dc95760bdf7468baf20bedd9",
+    "semantic_hash": "c76490e4dc95760bdf7468baf20bedd9"
+  },
+  "apps/api/test/surnames.test.mjs": {
+    "mtime": 1791865837.364833,
+    "seen": 1792039909.6530054,
+    "ast_hash": "5eabbac63bd91a02f3a7d01fcfb3a1b9",
+    "semantic_hash": "5eabbac63bd91a02f3a7d01fcfb3a1b9"
+  },
+  "apps/api/test/verification.test.mjs": {
+    "mtime": 1791865837.364833,
+    "seen": 1792039909.653006,
+    "ast_hash": "21f4e69aaf569d3bf713fb51745f8d1f",
+    "semantic_hash": "21f4e69aaf569d3bf713fb51745f8d1f"
+  },
+  "apps/api/tsconfig.json": {
+    "mtime": 1791865837.364833,
+    "seen": 1792039909.653007,
+    "ast_hash": "27b1a70ac2f235e22e5b84bbd14411c8",
+    "semantic_hash": "27b1a70ac2f235e22e5b84bbd14411c8"
+  },
+  "contracts/auth-fields.json": {
+    "mtime": 1791865837.366572,
+    "seen": 1792039909.653008,
+    "ast_hash": "a789f97baa9cc85be3b58878d0d07f1f",
+    "semantic_hash": "a789f97baa9cc85be3b58878d0d07f1f"
+  },
+  "database/catalog/coesa-2026-10-11.json": {
+    "mtime": 1791865837.369095,
+    "seen": 1792039909.653009,
+    "ast_hash": "a361efb56c5275bffe099068c3d3d53e",
+    "semantic_hash": "a361efb56c5275bffe099068c3d3d53e"
+  },
+  "database/permissions/runtime.sql": {
+    "mtime": 1791865837.3701408,
+    "seen": 1792039909.65301,
+    "ast_hash": "44639c7a40abf483da0090e9bf81da14",
+    "semantic_hash": "44639c7a40abf483da0090e9bf81da14"
+  },
+  "database/postgres/01-roles.sh": {
+    "mtime": 1791865837.3711479,
+    "seen": 1792039909.6530106,
+    "ast_hash": "ef8637eb8d0628a4e7688b0d0a601909",
+    "semantic_hash": "ef8637eb8d0628a4e7688b0d0a601909"
+  },
+  "database/postgres/check-permissions.sql": {
+    "mtime": 1791865837.3721502,
+    "seen": 1792039909.6530116,
+    "ast_hash": "e9b2e161b389f221ef61147329938953",
+    "semantic_hash": "e9b2e161b389f221ef61147329938953"
+  },
+  "database/postgres/manager.sql": {
+    "mtime": 1791865837.3721502,
+    "seen": 1792039909.6530125,
+    "ast_hash": "ec0c02f9ed46f80c6f5321d49150931e",
+    "semantic_hash": "ec0c02f9ed46f80c6f5321d49150931e"
+  },
+  "database/postgres/retire-consultation.sql": {
+    "mtime": 1791865837.3736565,
+    "seen": 1792039909.6530132,
+    "ast_hash": "f43abe8d25b7d3d2dc6ae3feb4f568a1",
+    "semantic_hash": "f43abe8d25b7d3d2dc6ae3feb4f568a1"
+  },
+  "database/prisma/migrations/202610070001_accounts/migration.sql": {
+    "mtime": 1791865837.375664,
+    "seen": 1792039909.6530142,
+    "ast_hash": "b0dbc2946c2f22a31f7dd2968f41b090",
+    "semantic_hash": "b0dbc2946c2f22a31f7dd2968f41b090"
+  },
+  "database/prisma/migrations/202610070002_mail_outbox/migration.sql": {
+    "mtime": 1791865837.3766618,
+    "seen": 1792039909.6530151,
+    "ast_hash": "28e13d60c385c5d165e18296871028ac",
+    "semantic_hash": "28e13d60c385c5d165e18296871028ac"
+  },
+  "database/prisma/migrations/202610080001_municipality_code/migration.sql": {
+    "mtime": 1791865837.3766618,
+    "seen": 1792039909.6530159,
+    "ast_hash": "6fd71bcf43818a63cf01ddf0f57aaff6",
+    "semantic_hash": "6fd71bcf43818a63cf01ddf0f57aaff6"
+  },
+  "database/prisma/migrations/202610110001_complete_domain/migration.sql": {
+    "mtime": 1791865837.3785589,
+    "seen": 1792039909.6530168,
+    "ast_hash": "6b54efa0efd1e164cb67b1aeb860fe68",
+    "semantic_hash": "6b54efa0efd1e164cb67b1aeb860fe68"
+  },
+  "database/prisma/migrations/202610110002_separate_surnames/migration.sql": {
+    "mtime": 1791865837.3795688,
+    "seen": 1792039909.6530178,
+    "ast_hash": "fc0d17228269622841a3c77d5a15a763",
+    "semantic_hash": "fc0d17228269622841a3c77d5a15a763"
+  },
+  "database/prisma/migrations/202610120001_public_catalog/migration.sql": {
+    "mtime": 1791865837.380566,
+    "seen": 1792039909.653019,
+    "ast_hash": "17a1fd50128c91f725833dc1db4ee14b",
+    "semantic_hash": "17a1fd50128c91f725833dc1db4ee14b"
+  },
+  "deployment/backup/restore-check.mjs": {
+    "mtime": 1791865837.3835669,
+    "seen": 1792039909.6530197,
+    "ast_hash": "5eded7fb4453d35e93a270a0b465d20e",
+    "semantic_hash": "5eded7fb4453d35e93a270a0b465d20e"
+  },
+  "deployment/backup/run.mjs": {
+    "mtime": 1791865837.3850718,
+    "seen": 1792039909.6530204,
+    "ast_hash": "b0115a797ed4b738cf075c88859bedf3",
+    "semantic_hash": "b0115a797ed4b738cf075c88859bedf3"
+  },
+  "deployment/check-private-services.sh": {
+    "mtime": 1791865837.3850718,
+    "seen": 1792039909.653021,
+    "ast_hash": "1285326d7d2475aeba7748c071c4a771",
+    "semantic_hash": "1285326d7d2475aeba7748c071c4a771"
+  },
+  "deployment/logs.sh": {
+    "mtime": 1791865837.386587,
+    "seen": 1792039909.6530223,
+    "ast_hash": "dadc6505a491cbc6a5f79bb44f2e26a7",
+    "semantic_hash": "dadc6505a491cbc6a5f79bb44f2e26a7"
+  },
+  "deployment/pgadmin/servers.json": {
+    "mtime": 1791865837.3875935,
+    "seen": 1792039909.653023,
+    "ast_hash": "a1831165f7c8642f0f62719fd3906fb0",
+    "semantic_hash": "a1831165f7c8642f0f62719fd3906fb0"
+  },
+  "deployment/prepare-host.sh": {
+    "mtime": 1791865837.3875935,
+    "seen": 1792039909.653024,
+    "ast_hash": "5c7823515945a98bc305d332ba8ab11a",
+    "semantic_hash": "5c7823515945a98bc305d332ba8ab11a"
+  },
+  "deployment/run-restore-check.sh": {
+    "mtime": 1791865837.388594,
+    "seen": 1792039909.653025,
+    "ast_hash": "971dcb108f77fec09cb89e7aed336c94",
+    "semantic_hash": "971dcb108f77fec09cb89e7aed336c94"
+  },
+  "deployment/update-services.sh": {
+    "mtime": 1791865837.3930962,
+    "seen": 1792039909.6530259,
+    "ast_hash": "b35870d18144c5116eec158b7de77bfd",
+    "semantic_hash": "b35870d18144c5116eec158b7de77bfd"
+  },
+  "scripts/build-android.ps1": {
+    "mtime": 1791865837.3941014,
+    "seen": 1792039909.6530268,
+    "ast_hash": "e09bb160e849d4eef069e24e74f7b1a0",
+    "semantic_hash": "e09bb160e849d4eef069e24e74f7b1a0"
+  },
+  "scripts/check-public-api.mjs": {
+    "mtime": 1791865837.395605,
+    "seen": 1792039909.6530275,
+    "ast_hash": "a32bb17dc459ad40ceebecab069bd42a",
+    "semantic_hash": "a32bb17dc459ad40ceebecab069bd42a"
+  },
+  "scripts/generate-privacy-qr.py": {
+    "mtime": 1791865837.395605,
+    "seen": 1792039909.6530287,
+    "ast_hash": "0bcb3dbabb8963b05b3c04c9136d037a",
+    "semantic_hash": "0bcb3dbabb8963b05b3c04c9136d037a"
+  },
+  "scripts/import-auth-resources.py": {
+    "mtime": 1791865837.3966105,
+    "seen": 1792039909.6530294,
+    "ast_hash": "b4438ceebcad8869298d199fa54bdec2",
+    "semantic_hash": "b4438ceebcad8869298d199fa54bdec2"
+  },
+  "scripts/open-auth-lab.ps1": {
+    "mtime": 1791865837.3966105,
+    "seen": 1792039909.6530302,
+    "ast_hash": "66157df27f89e62ffc55ae26ca2c95bc",
+    "semantic_hash": "66157df27f89e62ffc55ae26ca2c95bc"
+  },
+  "scripts/open-ui-lab.ps1": {
+    "mtime": 1791865837.3976173,
+    "seen": 1792039909.6530309,
+    "ast_hash": "f4ef735ff7cc1ed5fe2776f34224ff1e",
+    "semantic_hash": "f4ef735ff7cc1ed5fe2776f34224ff1e"
+  },
+  "scripts/package-deployment.mjs": {
+    "mtime": 1791865837.3976173,
+    "seen": 1792039909.6530318,
+    "ast_hash": "f2385d3d61f4f7226644dfb99d4b89c8",
+    "semantic_hash": "f2385d3d61f4f7226644dfb99d4b89c8"
+  },
+  "scripts/prepare-deployment.mjs": {
+    "mtime": 1791865837.3976173,
+    "seen": 1792039909.653033,
+    "ast_hash": "a1e81f4b32ab92335459c8d1ec3d7fa7",
+    "semantic_hash": "a1e81f4b32ab92335459c8d1ec3d7fa7"
+  },
+  "scripts/start-api.ps1": {
+    "mtime": 1791865837.3991225,
+    "seen": 1792039909.6530337,
+    "ast_hash": "e38d18992337b4ed815b91e478caf826",
+    "semantic_hash": "e38d18992337b4ed815b91e478caf826"
+  },
+  "scripts/start-local-db.mjs": {
+    "mtime": 1791865837.400129,
+    "seen": 1792039909.6530347,
+    "ast_hash": "968659c12c6e6b8c1dc97418e0f22f13",
+    "semantic_hash": "968659c12c6e6b8c1dc97418e0f22f13"
+  },
+  "scripts/stop-local-db.mjs": {
+    "mtime": 1791865837.400129,
+    "seen": 1792039909.6530359,
+    "ast_hash": "8677c354a7ecd8e8b16474f3dbf140fa",
+    "semantic_hash": "8677c354a7ecd8e8b16474f3dbf140fa"
+  },
+  "scripts/test-api.ps1": {
+    "mtime": 1791865837.400129,
+    "seen": 1792039909.6530366,
+    "ast_hash": "89d7d2b8aa7d20b96a96b78ab289a962",
+    "semantic_hash": "89d7d2b8aa7d20b96a96b78ab289a962"
+  },
+  "scripts/verify-privacy-qr.py": {
+    "mtime": 1791865837.4020739,
+    "seen": 1792039909.6530375,
+    "ast_hash": "0d157f4a36cae27d8bbfd74f79671410",
+    "semantic_hash": "0d157f4a36cae27d8bbfd74f79671410"
+  },
+  "tests/api/E-Ventanilla.postman_collection.json": {
+    "mtime": 1791865837.4030802,
+    "seen": 1792039909.6530383,
+    "ast_hash": "7c5449b14609e0380618c68e6e205804",
+    "semantic_hash": "7c5449b14609e0380618c68e6e205804"
+  },
+  "tests/api/templates.test.mjs": {
+    "mtime": 1791865837.4040823,
+    "seen": 1792039909.6530392,
+    "ast_hash": "fc60c787b08221d042977ee53e6fe25b",
+    "semantic_hash": "fc60c787b08221d042977ee53e6fe25b"
+  },
+  "tests/database/domain.integration.mjs": {
+    "mtime": 1791865837.4055874,
+    "seen": 1792039909.6530402,
+    "ast_hash": "97d476cb516e98db6ecc5d6fe99caa66",
+    "semantic_hash": "97d476cb516e98db6ecc5d6fe99caa66"
+  },
+  "tests/database/initialization.sh": {
+    "mtime": 1791865837.4066064,
+    "seen": 1792039909.653041,
+    "ast_hash": "043ea70bb139847cd4c4ae0fdd99cace",
+    "semantic_hash": "043ea70bb139847cd4c4ae0fdd99cace"
+  },
+  "tests/database/permissions.integration.mjs": {
+    "mtime": 1791865837.407614,
+    "seen": 1792039909.6530418,
+    "ast_hash": "bddd710f266f9cb037ba4cd11072f9aa",
+    "semantic_hash": "bddd710f266f9cb037ba4cd11072f9aa"
+  },
+  "tests/database/prisma.integration.mjs": {
+    "mtime": 1791865837.407614,
+    "seen": 1792039909.6530428,
+    "ast_hash": "57e192c79c13aed3bfe01ca087725c69",
+    "semantic_hash": "57e192c79c13aed3bfe01ca087725c69"
+  },
+  "tests/database/surnames.integration.mjs": {
+    "mtime": 1791865837.4086144,
+    "seen": 1792039909.6530437,
+    "ast_hash": "c88f89d727251f01bb8f85c62e4255b8",
+    "semantic_hash": "c88f89d727251f01bb8f85c62e4255b8"
+  },
+  ".github/workflows/checks.yml": {
+    "mtime": 1791865837.1393387,
+    "seen": 1792039909.6530445,
+    "ast_hash": "974434472479d41d3adf12a7324c5351",
+    "semantic_hash": "974434472479d41d3adf12a7324c5351"
+  },
+  "apps/android/app/src/main/assets/Inter-OFL.txt": {
+    "mtime": 1791865837.2289457,
+    "seen": 1792039909.6530454,
+    "ast_hash": "5e95cb23ed621124015c5d23224ba2d3",
+    "semantic_hash": "5e95cb23ed621124015c5d23224ba2d3"
+  },
+  "apps/android/app/src/main/assets/SecLists-LICENSE.txt": {
+    "mtime": 1791865837.2304757,
+    "seen": 1792039909.6530464,
+    "ast_hash": "401b149404ffd1e4428eeaf22e441e17",
+    "semantic_hash": "401b149404ffd1e4428eeaf22e441e17"
+  },
+  "apps/api/resources/SecLists-LICENSE.txt": {
+    "mtime": 1791865837.325653,
+    "seen": 1792039909.653047,
+    "ast_hash": "401b149404ffd1e4428eeaf22e441e17",
+    "semantic_hash": "401b149404ffd1e4428eeaf22e441e17"
+  },
+  "deployment/compose.yaml": {
+    "mtime": 1791865837.3850718,
+    "seen": 1792039909.653048,
+    "ast_hash": "f7dde9c13f80d26284ed98162c729dfd",
+    "semantic_hash": "f7dde9c13f80d26284ed98162c729dfd"
+  },
+  "apps/android/app/src/main/res/drawable-nodpi/brand_full.png": {
+    "mtime": 1791865837.2764478,
+    "seen": 1792039909.6530488,
+    "ast_hash": "00ad28cadd623d61308920cd3b8c14c2",
+    "semantic_hash": "00ad28cadd623d61308920cd3b8c14c2"
+  },
+  "apps/android/app/src/main/res/drawable-nodpi/chiapas_shield.png": {
+    "mtime": 1791865837.2807558,
+    "seen": 1792039909.65305,
+    "ast_hash": "f286ce287f13e33cc40f4af2376963ce",
+    "semantic_hash": "f286ce287f13e33cc40f4af2376963ce"
+  },
+  "apps/android/app/src/main/res/drawable-nodpi/institutional_pattern.png": {
+    "mtime": 1791865837.2822602,
+    "seen": 1792039909.6530507,
+    "ast_hash": "586f152d7739ba3acb889a601b602da0",
+    "semantic_hash": "586f152d7739ba3acb889a601b602da0"
+  },
+  "apps/android/app/src/main/res/drawable-nodpi/logo_coesa.png": {
+    "mtime": 1791865837.2822602,
+    "seen": 1792039909.6530514,
+    "ast_hash": "c4eab59bd1564b2735dfa88b1e0d9c11",
+    "semantic_hash": "c4eab59bd1564b2735dfa88b1e0d9c11"
+  },
+  "apps/android/app/src/main/res/drawable-nodpi/privacy_qr.png": {
+    "mtime": 1791865837.2822602,
+    "seen": 1792039909.6530523,
+    "ast_hash": "4cce52f9784c7c950fba6b8dae595699",
+    "semantic_hash": "4cce52f9784c7c950fba6b8dae595699"
+  },
+  "apps/android/app/src/main/res/raw/header_notifications.svg": {
+    "mtime": 1791865837.2899916,
+    "seen": 1792039909.6530533,
+    "ast_hash": "27c5ff0cf1b83ff5397a93fe88bbf532",
+    "semantic_hash": "27c5ff0cf1b83ff5397a93fe88bbf532"
+  },
+  "apps/android/app/src/main/res/raw/header_search.svg": {
+    "mtime": 1791865837.2910001,
+    "seen": 1792039909.6530542,
+    "ast_hash": "1a24989a444d87b74be1e897909bb253",
+    "semantic_hash": "1a24989a444d87b74be1e897909bb253"
+  },
+  "apps/android/app/src/main/res/raw/nav_home.svg": {
+    "mtime": 1791865837.2910001,
+    "seen": 1792039909.653055,
+    "ast_hash": "826d68eb125e388ce81df12d95defeda",
+    "semantic_hash": "826d68eb125e388ce81df12d95defeda"
+  },
+  "apps/android/app/src/main/res/raw/nav_notifications.svg": {
+    "mtime": 1791865837.292001,
+    "seen": 1792039909.6530557,
+    "ast_hash": "f078c885899a04057be262cf52f7d4ee",
+    "semantic_hash": "f078c885899a04057be262cf52f7d4ee"
+  },
+  "apps/android/app/src/main/res/raw/nav_procedures.svg": {
+    "mtime": 1791865837.2935057,
+    "seen": 1792039909.6530569,
+    "ast_hash": "c4a9a6bd059ca9190f1f5e6aabc395fc",
+    "semantic_hash": "c4a9a6bd059ca9190f1f5e6aabc395fc"
+  },
+  "apps/android/app/src/main/res/raw/nav_profile.svg": {
+    "mtime": 1791865837.2935057,
+    "seen": 1792039909.6530578,
+    "ast_hash": "82c4169d81ab992313bc8ecc510216df",
+    "semantic_hash": "82c4169d81ab992313bc8ecc510216df"
+  }
+}
