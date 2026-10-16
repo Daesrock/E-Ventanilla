@@ -1,0 +1,11 @@
+# Añade OSRM a instalaciones existentes sin reemplazar su configuración ni sus secretos.
+services:
+  api:
+    image: ${API_IMAGE:-eventanilla-api}
+    environment:
+      OSRM_BASE_URL: http://eventanilla_osrm:5000
+    networks:
+      routing_net:
+
+networks:
+  routing_net: {internal: true, name: eventanilla_routing}

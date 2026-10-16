@@ -39,6 +39,7 @@ jobs:
       - run: bun tests/database/permissions.integration.mjs
       - run: bun tests/database/prisma.integration.mjs
       - run: bun tests/database/surnames.integration.mjs
+      - run: bun tests/database/admin.integration.mjs
       - run: sh tests/database/initialization.sh
 
   android:

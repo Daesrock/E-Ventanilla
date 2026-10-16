@@ -13,6 +13,8 @@ const branchSelect = {
   phone: true,
   email: true,
   officeHours: true,
+  latitude: true,
+  longitude: true,
   municipality: { select: { code: true, name: true } },
   sourceUrl: true,
   sourceCheckedAt: true,
@@ -26,6 +28,20 @@ const procedureSelect = {
   sourceUrl: true,
   sourceCheckedAt: true,
 } satisfies Prisma.ProcedureSelect;
+
+// Solo se publican pares completos y válidos. Los puntos se cargan tras corroborarlos.
+function branchCoordinates(row: { latitude: unknown; longitude: unknown }) {
+  const latitude = row.latitude == null ? NaN : Number(row.latitude);
+  const longitude = row.longitude == null ? NaN : Number(row.longitude);
+  const valid =
+    Number.isFinite(latitude) &&
+    Number.isFinite(longitude) &&
+    latitude >= -90 &&
+    latitude <= 90 &&
+    longitude >= -180 &&
+    longitude <= 180;
+  return { latitude: valid ? latitude : null, longitude: valid ? longitude : null };
+}
 
 function search<T extends { name: string }>(items: T[], query?: unknown) {
   if (query !== undefined && typeof query !== 'string')
@@ -50,6 +66,7 @@ export class PublicCatalogService {
       items: search(
         rows.map((row) => ({
           ...row,
+          ...branchCoordinates(row),
           municipality: row.municipality.name,
           municipalityCode: row.municipality.code,
         })),
@@ -64,7 +81,30 @@ export class PublicCatalogService {
       select: branchSelect,
     });
     if (!row) throw new NotFoundException('La sede no está disponible.');
-    return { ...row, municipality: row.municipality.name, municipalityCode: row.municipality.code };
+    return {
+      ...row,
+      ...branchCoordinates(row),
+      municipality: row.municipality.name,
+      municipalityCode: row.municipality.code,
+    };
+  }
+
+  async branchProcedures(id: string) {
+    const branch = await this.db.branch.findFirst({
+      where: { id, active: true, published: true },
+      select: { id: true },
+    });
+    if (!branch) throw new NotFoundException('La sede no está disponible.');
+    const rows = await this.db.procedure.findMany({
+      where: {
+        active: true,
+        published: true,
+        branches: { some: { branchId: id, active: true } },
+      },
+      select: procedureSelect,
+      orderBy: { name: 'asc' },
+    });
+    return { items: rows.map((row) => ({ ...row, cost: row.cost?.toString() ?? null })) };
   }
 
   async procedures(query?: unknown) {

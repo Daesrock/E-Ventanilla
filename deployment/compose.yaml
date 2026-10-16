@@ -43,9 +43,11 @@ services:
       RESEND_API_KEY_FILE: /run/secrets/resend_api_key
       RESEND_FROM_FILE: /run/secrets/resend_from
       TRUSTED_PROXY_IPS: ${TRUSTED_PROXY_IPS:?Configura TRUSTED_PROXY_IPS con la IP de Nginx}
+      OSRM_BASE_URL: ${OSRM_BASE_URL:-}
     secrets: [api_database_url, auth_code_secret, resend_api_key, resend_from]
     networks:
       database_net:
+      routing_net:
       proxy_net:
         aliases: [eventanilla_api]
     depends_on:
@@ -155,6 +157,7 @@ networks:
   backup_egress:
   restore_net: {internal: true}
   proxy_net: {external: true, name: proxy_net}
+  routing_net: {internal: true, name: eventanilla_routing}
 
 volumes:
   postgres_data:

@@ -1,5 +1,6 @@
 package dev.daesrock.eventanilla.ui
 
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
@@ -16,6 +17,8 @@ import dev.daesrock.eventanilla.app.*
 import dev.daesrock.eventanilla.core.data.*
 import dev.daesrock.eventanilla.core.design.EVentanillaTheme
 import dev.daesrock.eventanilla.feature.catalog.data.CatalogRepository
+import dev.daesrock.eventanilla.feature.catalog.presentation.LocalBranchLocationSource
+import dev.daesrock.eventanilla.feature.catalog.presentation.LocalBranchRoutingSource
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.*
@@ -50,9 +53,16 @@ class CatalogScreensTest {
             }
         }
     }
-    private fun show(gateway: Gateway, route: String = "directory", enlarged: Boolean = false) {
+    private fun show(
+        gateway: Gateway,
+        route: String = "directory",
+        enlarged: Boolean = false,
+        locationSource: TestBranchLocationSource = TestBranchLocationSource()
+    ) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val vm = AccessCoordinator(AuthRepository(gateway), AuthResources(context))
+        val locationPermission = LocationPermissionTestOwner()
+        val routingSource = TestBranchRoutingSource()
         val handler = object : UriHandler {
             override fun openUri(uri: String) {
                 openedUrl = uri
@@ -62,6 +72,9 @@ class CatalogScreensTest {
             val density = LocalDensity.current
             CompositionLocalProvider(
                 LocalUriHandler provides handler,
+                LocalBranchLocationSource provides locationSource,
+                LocalBranchRoutingSource provides routingSource,
+                LocalActivityResultRegistryOwner provides locationPermission,
                 LocalDensity provides Density(density.density, if (enlarged) 2f else density.fontScale)
             ) {
                 Box(if (enlarged) Modifier.width(320.dp) else Modifier) {
@@ -172,5 +185,27 @@ class CatalogScreensTest {
         compose.onNodeWithText(name).performScrollTo().assertIsDisplayed().performClick()
         waitFor("Requisitos y costos por confirmar.")
         compose.onNodeWithText(name).performScrollTo().assertIsDisplayed()
+    }
+
+    @Test fun nearbyOrderingRespectsTheChosenMunicipalityAndNeverSelectsABranchAutomatically() {
+        val gateway = Gateway()
+        gateway.branch.put("municipality", "Comitán de Domínguez").put("latitude", 0).put("longitude", 2)
+        gateway.branchItems.put(
+            JSONObject().put("id", "other-city").put("name", "Sede técnica de otro municipio")
+                .put("municipality", "Palenque").put("latitude", 0).put("longitude", 0)
+        )
+        val location =
+            TestBranchLocationSource(granted = true, point = dev.daesrock.eventanilla.feature.catalog.data.GeoPoint.from(0.0, 0.0))
+        show(gateway, "procedures", locationSource = location)
+        waitFor("Elegir sede")
+        compose.onNodeWithTag("catalog_municipality").performScrollTo().performClick()
+        compose.onNodeWithText("Comitán de Domínguez").performClick()
+        compose.onNodeWithText("Elegir sede").performScrollTo().performClick()
+        waitFor("Sedes cercanas")
+        compose.onNodeWithText("Sede técnica de otro municipio").assertDoesNotExist()
+        compose.onNodeWithText("Sede técnica · Comitán").assertIsDisplayed()
+        compose.onNodeWithText("Disponibilidad de trámites por sede por confirmar.").assertDoesNotExist()
+        compose.onNodeWithText("Sede técnica · Comitán").performClick()
+        compose.onNodeWithText("Disponibilidad de trámites por sede por confirmar.").assertExists()
     }
 }

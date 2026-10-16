@@ -10,6 +10,9 @@ export class PublicCatalogController {
   @Get('branches/:id') branch(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.catalog.branch(id);
   }
+  @Get('branches/:id/procedures') branchProcedures(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.catalog.branchProcedures(id);
+  }
   @Get('procedures') procedures(@Query('q') query?: unknown) {
     return this.catalog.procedures(query);
   }

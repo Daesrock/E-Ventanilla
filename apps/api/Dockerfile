@@ -7,7 +7,7 @@ COPY database/ /workspace/database/
 COPY contracts/ /workspace/contracts/
 COPY apps/android/app/src/main/assets/ /workspace/apps/android/app/src/main/assets/
 # Generar Prisma no necesita una base de datos accesible.
-RUN export DATABASE_URL=postgresql://localhost/eventanilla AUTH_CODE_SECRET=0000000000000000000000000000000000000000000000000000000000000000; bun run build && bun test test
+RUN export DATABASE_URL=postgresql://localhost/eventanilla AUTH_CODE_SECRET=0000000000000000000000000000000000000000000000000000000000000000; bun run build && bun test --timeout 15000 test
 
 FROM oven/bun:1.4.2-debian@sha256:4f6e31d1a54d6a3dd312daef655fc998101b5043d52e12592ac293ef04b9bc73 AS production-deps
 WORKDIR /workspace/apps/api

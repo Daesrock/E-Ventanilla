@@ -34,8 +34,44 @@ function fixture() {
     service: new PublicCatalogService({ branch: table(branch), procedure: table(procedure) }),
     calls,
     id,
+    branch,
   };
 }
+
+test('coordenadas públicas: publica pares válidos como números, sin sustituir ausencias por cero', async () => {
+  const { service, branch, id } = fixture();
+  const missing = await service.branch(id);
+  assert.equal(missing.latitude, null);
+  assert.equal(missing.longitude, null);
+  branch.latitude = '0';
+  branch.longitude = '0';
+  const detail = await service.branch(id);
+  assert.equal(detail.latitude, 0);
+  assert.equal(detail.longitude, 0);
+  branch.latitude = '14.5';
+  branch.longitude = '-92.5';
+  const listed = (await service.branches()).items[0];
+  assert.equal(listed.latitude, 14.5);
+  assert.equal(listed.longitude, -92.5);
+});
+
+test('omite ambos componentes si el par de coordenadas está incompleto o fuera de rango', async () => {
+  const { service, branch, id } = fixture();
+  for (const [latitude, longitude] of [
+    [null, -92],
+    [15, null],
+    [91, -92],
+    [15, -181],
+    [NaN, 0],
+    [0, Infinity],
+  ]) {
+    branch.latitude = latitude;
+    branch.longitude = longitude;
+    const result = await service.branch(id);
+    assert.equal(result.latitude, null);
+    assert.equal(result.longitude, null);
+  }
+});
 
 test('solo consulta registros activos publicados y selecciona campos públicos explícitos', async () => {
   const { service, calls } = fixture();
