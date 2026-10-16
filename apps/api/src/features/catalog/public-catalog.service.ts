@@ -67,6 +67,24 @@ export class PublicCatalogService {
     return { ...row, municipality: row.municipality.name, municipalityCode: row.municipality.code };
   }
 
+  async branchProcedures(id: string) {
+    const branch = await this.db.branch.findFirst({
+      where: { id, active: true, published: true },
+      select: { id: true },
+    });
+    if (!branch) throw new NotFoundException('La sede no está disponible.');
+    const rows = await this.db.procedure.findMany({
+      where: {
+        active: true,
+        published: true,
+        branches: { some: { branchId: id, active: true } },
+      },
+      select: procedureSelect,
+      orderBy: { name: 'asc' },
+    });
+    return { items: rows.map((row) => ({ ...row, cost: row.cost?.toString() ?? null })) };
+  }
+
   async procedures(query?: unknown) {
     const rows = await this.db.procedure.findMany({
       where: { active: true, published: true },
