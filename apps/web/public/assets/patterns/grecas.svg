@@ -1,0 +1,24 @@
+<!-- Grecas escalonadas propias para el fondo del panel; verde institucional con acentos rosa. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="148" height="148" viewBox="0 0 148 148">
+  <g fill="none" stroke="#149381" stroke-opacity=".07" stroke-width="2.5" stroke-linecap="square">
+    <g transform="translate(37 37)">
+      <path d="M-24 -24H24V24H-24V-12H12V12H-12V0H0"/>
+    </g>
+    <g transform="translate(111 37)">
+      <path d="M-24 -24H24V24H-24V-12H12V12H-12V0H0"/>
+    </g>
+    <g transform="translate(37 111)">
+      <path d="M-24 -24H24V24H-24V-12H12V12H-12V0H0"/>
+    </g>
+    <g transform="translate(111 111)">
+      <path d="M-24 -24H24V24H-24V-12H12V12H-12V0H0"/>
+    </g>
+  </g>
+  <g fill="#e97ead" fill-opacity=".08">
+    <path d="M74 68l6 6-6 6-6-6Z"/>
+    <path d="M0 -6 6 0 0 6-6 0Z"/>
+    <path d="M148 -6 154 0 148 6 142 0Z"/>
+    <path d="M0 142 6 148 0 154-6 148Z"/>
+    <path d="M148 142 154 148 148 154 142 148Z"/>
+  </g>
+</svg>

@@ -43,7 +43,10 @@
 body {
   margin: 0;
   color: var(--ink);
-  background: var(--canvas);
+  /* Fondo principal con grecas tenues (verde y rosa); se desplaza con el contenido. */
+  background-color: var(--canvas);
+  background-image: url('/assets/patterns/grecas.svg');
+  background-size: 148px 148px;
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.55;
@@ -933,7 +936,7 @@ tbody tr:hover {
 .geometric-surface {
   background-color: var(--green-dark);
   background-image:
-    url('/assets/patterns/institutional.svg'), linear-gradient(120deg, #0b6355, #149381);
+    url('/assets/patterns/grecas-light.svg'), linear-gradient(120deg, #0b6355, #149381);
 }
 .welcome-banner {
   border-radius: var(--radius-lg);

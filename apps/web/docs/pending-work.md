@@ -33,6 +33,9 @@ de `main` (`ddcd9df`). Entrega: `contracts/entrega-web-api-2026-10-16.md`.
   y tarjetas de sede rediseñadas; respeta `prefers-reduced-motion`.
 - Emblema de la Comisión Estatal de Simplificación Administrativa (`coesmer.png`)
   restaurado como crédito institucional en menú lateral y pie del acceso.
+- Fondo principal con grecas escalonadas tenues (verde + rosa) que se desplazan
+  con el scroll; las superficies de color (acceso y bienvenida) usan la variante
+  clara. Reemplaza al patrón anterior de rombos.
 - Personal: root crea las cuentas; el departamento asigna responsables desde cada
   sede. La **Alta asistida se retiró de la interfaz** (evita confusión en la
   presentación); `scripts/provision-counter-head.mjs` permanece como herramienta del

@@ -8,5 +8,5 @@ export const brand = {
   logo: '/assets/logos/eventanilla.png',
   // Emblema de la Comisión Estatal de Simplificación Administrativa (crédito institucional).
   coesmerLogo: '/assets/logos/coesmer.png',
-  pattern: '/assets/patterns/institutional.svg',
+  pattern: '/assets/patterns/grecas-light.svg',
 } as const;

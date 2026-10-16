@@ -26,7 +26,8 @@ Sombras suaves en dos capas (`--shadow-card`, `--shadow-pop`), barra superior co
 
 ## Patrón y logo
 
-- `assets/patterns/institutional.svg`: rombos escalonados propios inspirados en la referencia. Decorativo, sin datos ni contenido esencial. Se usa como background en acceso y bienvenida.
+- `assets/patterns/grecas.svg`: grecas escalonadas propias en verde `#149381` con acentos rosa `#e97ead` (opacidades ~7%). Decorativo; se usa como fondo principal del panel y se desplaza con el contenido.
+- `assets/patterns/grecas-light.svg`: las mismas grecas en trazo blanco con acento rosa claro; se usan en superficies institucionales de color (acceso y banner de bienvenida), en lugar del patrón anterior de rombos.
 - `assets/logos/eventanilla.png`: logo oficial E-Ventanilla entregado por el equipo (166×102). Reemplaza al recurso anterior de la dependencia.
 - `assets/logos/coesmer.png`: emblema de la Comisión Estatal de Simplificación Administrativa, restaurado del historial como crédito institucional.
 - `InstitutionalLogo`: rutas, proporción y descripción centralizadas; se muestra cercano a su tamaño nativo para no perder nitidez.

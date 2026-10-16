@@ -111,15 +111,16 @@ En raíz del proyecto: `../../.gitignore` excluye dependencias, secretos y artef
 
 ## Recursos y herramientas
 
-| Archivo                                    | Responsabilidad                                                                     |
-| ------------------------------------------ | ----------------------------------------------------------------------------------- |
-| `public/assets/logos/favicon.png`          | Recorte cuadrado del logo oficial para favicon                                      |
-| `public/assets/patterns/institutional.svg` | Patrón decorativo propio de rombos escalonados                                      |
-| `public/assets/logos/README.md`            | Procedencia y vigencia de los logos oficiales                                       |
-| `public/assets/logos/coesmer.png`          | Emblema de la Comisión Estatal (crédito institucional en menú y acceso)             |
-| `public/assets/logos/eventanilla.png`      | Logo oficial E-Ventanilla entregado; reemplaza al recurso anterior                  |
-| `tools/check-docs.mjs`                     | Cobertura de inventario y encabezados de responsabilidad                            |
-| `tools/check-api.ts`                       | Comprobación opcional de GET reales mediante BFF efímero, sin cuentas ni escrituras |
+| Archivo                                   | Responsabilidad                                                                     |
+| ----------------------------------------- | ----------------------------------------------------------------------------------- |
+| `public/assets/logos/favicon.png`         | Recorte cuadrado del logo oficial para favicon                                      |
+| `public/assets/patterns/grecas.svg`       | Grecas tenues (verde y rosa) del fondo principal, con scroll                        |
+| `public/assets/patterns/grecas-light.svg` | Grecas blancas para superficies institucionales de color                            |
+| `public/assets/logos/README.md`           | Procedencia y vigencia de los logos oficiales                                       |
+| `public/assets/logos/coesmer.png`         | Emblema de la Comisión Estatal (crédito institucional en menú y acceso)             |
+| `public/assets/logos/eventanilla.png`     | Logo oficial E-Ventanilla entregado; reemplaza al recurso anterior                  |
+| `tools/check-docs.mjs`                    | Cobertura de inventario y encabezados de responsabilidad                            |
+| `tools/check-api.ts`                      | Comprobación opcional de GET reales mediante BFF efímero, sin cuentas ni escrituras |
 
 ## Pruebas y documentos
 
