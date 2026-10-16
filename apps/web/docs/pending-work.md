@@ -15,6 +15,9 @@ de `main` (`ddcd9df`). Entrega: `contracts/entrega-web-api-2026-10-16.md`.
 - BD local aislada 55432 y tres cuentas de prueba; accesos en `.tools/web-local-access.json`.
 - Aprovisionamiento controlado de ROOT por `scripts/provision-root.mjs`, con Prisma y auditoría.
 - Integración real BFF → API → PostgreSQL local verificada. Ningún fixture se envió al VPS.
+- `main` (`dd19837`) integrado en `bry`: mostradores revisados y aprovisionamiento
+  ROOT único (`root-provisioning.ts` + script en Dockerfile). El endpoint de
+  mostradores **ya está desplegado** en producción (401 sin sesión verificado).
 
 ## Despliegue y validación del responsable
 

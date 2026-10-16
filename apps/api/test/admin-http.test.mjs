@@ -44,6 +44,7 @@ async function withApi(run) {
   };
   let branchQuery;
   let procedureQuery;
+  let counterQuery;
   let writes = 0;
   const db = {
     session: {
@@ -66,6 +67,15 @@ async function withApi(run) {
       findMany: async (args) => {
         procedureQuery = args;
         return [];
+      },
+    },
+    serviceCounter: {
+      findMany: async (args) => {
+        counterQuery = args;
+        return [
+          { id: branchId, number: 1, active: true },
+          { id: randomUUID(), number: 2, active: false },
+        ];
       },
     },
     $transaction: async () => {
@@ -118,6 +128,9 @@ async function withApi(run) {
       get writes() {
         return writes;
       },
+      get counterQuery() {
+        return counterQuery;
+      },
     });
   } finally {
     await app.close();
@@ -151,6 +164,49 @@ test('HTTP administrativo: inyección real, identidad segura y rechazo de ciudad
     identity.role.code = 'ROOT';
     identity.role.active = false;
     assert.equal((await request('/v1/admin/me')).status, 403);
+  });
+});
+
+test('HTTP mostradores: proyecta referencias activas e inactivas y ordena por número', async () => {
+  await withApi(async (api) => {
+    const response = await api.request(`/v1/admin/branches/${branchId}/counters`);
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.deepEqual(
+      body.items.map((item) => Object.keys(item).sort()),
+      [
+        ['active', 'id', 'number'],
+        ['active', 'id', 'number'],
+      ],
+    );
+    assert.equal(body.items[1].active, false);
+    assert.deepEqual(api.counterQuery, {
+      where: { branchId },
+      select: { id: true, number: true, active: true },
+      orderBy: { number: 'asc' },
+    });
+    assert.equal(api.writes, 0);
+  });
+});
+
+test('HTTP mostradores: exige appointment.read, alcance, UUID válido y existencia de sede', async () => {
+  await withApi(async (api) => {
+    const path = `/v1/admin/branches/${branchId}/counters`;
+    api.identity.role.permissions = [];
+    let response = await api.request(path);
+    assert.equal(response.status, 403);
+    assert.equal((await response.json()).code, 'ADMIN_PERMISSION_REQUIRED');
+    api.identity.role.permissions = [{ permission: { code: 'appointment.read' } }];
+    api.identity.role.code = 'COUNTER_HEAD';
+    response = await api.request(path);
+    assert.equal(response.status, 403);
+    assert.equal((await response.json()).code, 'BRANCH_OUT_OF_SCOPE');
+    assert.equal(api.counterQuery, undefined);
+    api.identity.role.code = 'DEPARTMENT_HEAD';
+    assert.equal((await api.request('/v1/admin/branches/invalid/counters')).status, 400);
+    api.db.branch.findUnique = async () => null;
+    assert.equal((await api.request(path)).status, 404);
+    assert.equal(api.counterQuery, undefined);
   });
 });
 

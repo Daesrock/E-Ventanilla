@@ -27,6 +27,10 @@ y Secure en producción. El store actual es de un proceso: reiniciar el BFF exig
 
 ## 2. Cambio nuevo de API: solo lectura, sin migración
 
+`GET /v1/admin/branches/:id/counters` ya fue integrado por el responsable en `main`
+(`dd19837`) y **está desplegado**: sin sesión responde 401 "Inicia sesión para continuar.".
+Este documento describe el contrato vigente del endpoint.
+
 ```http
 GET /v1/admin/branches/:id/counters
 Authorization: Bearer <sesión administrativa>
@@ -64,7 +68,7 @@ Los contratos `/v1/auth/*` y los catálogos públicos existentes se conservan.
 
 Comprobado en esta máquina, con Bun 1.4.2 y PostgreSQL local aislado en 55432:
 
-- API: 76 pruebas aprobadas; build incluido en `bun run test`.
+- API: 82 pruebas aprobadas; build incluido en `bun run test`.
 - Web/BFF: 16 pruebas unitarias aprobadas usando un worker.
 - Navegador: 11 recorridos aprobados. Flujo de departamento (oferta, revisión, persistencia y descarte),
   alta de catálogo por root con error por campo y costo pendiente, y ventanilla móvil
@@ -154,12 +158,27 @@ La sesión BFF no se comparte entre procesos: esta versión se despliega con un 
 El aprovisionamiento es una operación del propietario, no un endpoint público.
 No usar el SQL de ejemplo retirado de `admin-migracion.md`; omitía `updatedAt`.
 
-Nuevo helper: `scripts/provision-root.mjs`. Requiere checkout del repositorio,
-dependencias API instaladas, `apps/api/dist` generado y una conexión de destino
-autorizada (`DATABASE_URL` o `DATABASE_URL_FILE`, como en la API).
-Puede cargar `apps/api/.env` si existe; **verificar el destino antes de ejecutarlo**.
-El script usa el cliente Prisma, DTO de registro, validación de municipio y función
-de hash de la propia API. No solicita el registro ciudadano ni crea un perfil Citizen.
+La versión revisada del responsable (integrada en `main` `dd19837` y ya incluida en
+esta rama) vive como módulo interno `apps/api/src/features/admin/root-provisioning.ts`
+y `scripts/provision-root.mjs`. Reglas reforzadas:
+
+- **Una sola cuenta ROOT inicial en toda la vida de la instalación**: si ya existe
+  cualquier usuario con rol ROOT, el script rechaza con 409 sin modificar nada.
+  Las demás cuentas administrativas (DEPARTMENT_HEAD, COUNTER_HEAD) se crean
+  después desde el panel o `POST /v1/admin/staff`.
+- Bloqueo `FOR UPDATE` sobre el rol ROOT: dos ejecuciones simultáneas no crean
+  dos cuentas iniciales.
+- No promueve cuentas existentes; no crea `Citizen`; deja auditoría `staff.bootstrap`.
+- No imprime contraseña ni hash; el JSON privado nunca se versiona y en Linux
+  debe tener permisos de archivo restringidos (`0600`).
+- Exige Bun 1.4.2 (`check-bun.mjs`); el `Dockerfile` de la API ya copia
+  `scripts/provision-root.mjs`, así que puede ejecutarse desde la imagen.
+
+Requiere checkout del repositorio, dependencias API instaladas, `apps/api/dist`
+generado y una conexión de destino autorizada (`DATABASE_URL` o `DATABASE_URL_FILE`,
+como en la API). Puede cargar `apps/api/.env` si existe; **verificar el destino
+antes de ejecutarlo**. El script usa el cliente Prisma, DTO de registro, validación
+de municipio y función de hash de la propia API.
 
 Preparar un JSON **privado fuera de Git** con datos corroborados del titular:
 
@@ -179,11 +198,11 @@ bun scripts/provision-root.mjs /ruta/privada/titular-root.json
 ```
 
 Crea User + AdministrativeStaff + auditoría `staff.bootstrap` en una transacción.
-Prisma genera UUID/timestamps, incluido `updatedAt`. El correo se considera corroborado
-por el operador. Rechaza cuentas existentes y no imprime contraseña/hash.
-Después de aprovisionar, gestionar el archivo privado mediante la práctica de secretos
-del operador; no copiarlo al repo. Desde ROOT, crear DEPARTMENT_HEAD y COUNTER_HEAD
-con el panel o `POST /v1/admin/staff`. Las cuentas locales de prueba no se copian al VPS.
+Prisma genera UUID/timestamps, incluido `updatedAt`. El correo se considera
+corroborado por el operador. Después de aprovisionar, gestionar el archivo privado
+mediante la práctica de secretos del operador; no copiarlo al repo. Desde ROOT,
+crear DEPARTMENT_HEAD y COUNTER_HEAD con el panel o `POST /v1/admin/staff`.
+Las cuentas locales de prueba no se copian al VPS.
 
 ## 6. Verificación posterior en producción
 
