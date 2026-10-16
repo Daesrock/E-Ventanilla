@@ -1229,21 +1229,35 @@ tbody tr:hover {
   margin: 0;
 }
 .offer-item {
-  padding: 18px 0;
+  padding: 13px 12px;
   border-bottom: 1px solid var(--line);
   display: flex;
-  align-items: flex-start;
-  gap: 11px;
+  align-items: center;
+  gap: 12px;
+  border-radius: var(--radius-md);
+  transition: background 0.15s ease;
 }
-.offer-item:first-child {
-  padding-top: 0;
+.offer-item:hover {
+  background: #fafafc;
 }
 .offer-item:last-child {
-  border: 0;
-  padding-bottom: 0;
+  border-bottom: 0;
 }
-.offer-item > div {
+.offer-item > div,
+.offer-item > strong {
   flex: 1;
+  min-width: 0;
+}
+.offer-item input[type='checkbox'] {
+  margin-top: 0;
+}
+.offer-item .cost,
+.offer-item > span {
+  margin-left: auto;
+  white-space: nowrap;
+  font-weight: 700;
+  color: var(--green-dark);
+  text-align: right;
 }
 .offer-item strong {
   display: block;
@@ -2093,7 +2107,7 @@ td {
 .offer-item input[type='checkbox'] {
   width: 20px;
   height: 20px;
-  margin-top: 2px;
+  margin-top: 0;
 }
 .cost {
   font-size: 13px;
