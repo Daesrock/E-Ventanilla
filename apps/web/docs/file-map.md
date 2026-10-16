@@ -136,6 +136,22 @@ En raíz del proyecto: `../../.gitignore` excluye dependencias, secretos y artef
 | `docs/pending-work.md`        | Trabajo pendiente en orden: BD en VPS, etapas API y conexión web               |
 | `docs/file-map.md`            | Este inventario y criterio de documentación por archivo                        |
 
-## Generados y privados excluidos
+## Administración institucional conectada
+
+| Archivo                                  | Responsabilidad                                                  |
+| ---------------------------------------- | ---------------------------------------------------------------- |
+| `src/app/providers/admin-context.ts`     | Contrato de sesión y permisos por página                         |
+| `src/app/providers/AdminProvider.tsx`    | Identidad real, login, recuperación y cierre de sesión           |
+| `src/services/api/admin.ts`              | Tipos y cliente administrativo, paginación y descarga CSV        |
+| `src/features/admin/AdminPanel.tsx`      | Selección de módulo real con guardas de permisos                 |
+| `src/features/admin/AdminBranches.tsx`   | Sedes, edición, responsables y oferta de trámites con revisión   |
+| `src/features/admin/AdminCatalog.tsx`    | Catálogo central real, costo nullable y publicación              |
+| `src/features/admin/AdminOperations.tsx` | Horarios, personal, citas/atención y reportes paginados          |
+| `src/features/admin/AdminUI.tsx`         | Formularios de contrato, errores de campo, consulta y paginación |
+| `src/features/admin/admin-hooks.tsx`     | Consultas cancelables y aviso de salida con cambios              |
+| `src/features/admin/admin-fields.ts`     | Campos comunes de fuente y publicación                           |
+| `tests/e2e/admin.spec.ts`                | Oferta persistida, permisos móvil y alta de catálogo con errores |
+
+## Generados y privados excluidos (reglas)
 
 `node_modules/`: dependencias instaladas. `dist/`: build regenerable. `test-results/`, `playwright-report/`, `coverage/`: artefactos de verificación. `.env`: configuración privada no versionada. No editar estos archivos como fuentes ni mantener documentación individual de cada dependencia.

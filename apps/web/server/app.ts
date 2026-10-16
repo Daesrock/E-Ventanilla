@@ -1,7 +1,7 @@
 /**
- * BFF con rutas permitidas explícitamente: GET públicos y sesiones existentes.
- * Verifica origen en POST, mantiene token en memoria y nunca expone CRUD ficticio
- * como API real. Fetch y store inyectables permiten pruebas sin tocar el VPS.
+ * BFF con allowlist de consultas públicas, sesiones y métodos administrativos.
+ * Verifica origen en mutaciones, conserva tokens en memoria y reenvía errores
+ * de contrato. Fetch y store inyectables permiten pruebas sin tocar el VPS.
  */
 import express, { type Request, type Response } from 'express';
 import type { ServerConfig } from './config';
@@ -61,16 +61,17 @@ export function createApp(
     }
     next();
   });
-  app.use(express.json({ limit: '8kb' }));
+  app.use(express.json({ limit: '256kb' }));
   const cookieOptions = {
     httpOnly: true,
     secure: config.production,
     sameSite: 'strict' as const,
-    path: '/bff/auth',
+    path: '/bff',
   };
   const clearSession = (req: Request, res: Response) => {
     store.delete(sessionId(req));
     res.clearCookie(COOKIE, cookieOptions);
+    res.clearCookie(COOKIE, { ...cookieOptions, path: '/bff/auth' });
   };
   const upstream = async (path: string, options: RequestInit = {}) => {
     const response = await upstreamFetch(new URL(path, config.apiBaseUrl), {
@@ -79,19 +80,33 @@ export function createApp(
       signal: AbortSignal.timeout(10_000),
       redirect: 'error',
     });
-    const body: unknown = await response.json().catch(() => null);
+    const body: unknown = response.headers.get('Content-Type')?.includes('text/csv')
+      ? await response.text()
+      : await response.json().catch(() => null);
     return { response, body };
   };
-  const upstreamError = (res: Response, status: number) => {
+  const upstreamError = (res: Response, status: number, body?: unknown) => {
     const messages: Record<number, string> = {
       400: 'La API rechazó los campos enviados.',
       401: 'Credenciales o sesión no válidas.',
       403: 'La API no permite esta operación para la cuenta.',
       429: 'Demasiadas solicitudes. Espera antes de reintentar.',
     };
-    res
-      .status(status >= 400 && status <= 599 ? status : 502)
-      .json({ message: messages[status] ?? `La API respondió HTTP ${status}.` });
+    const source = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
+    const fieldErrors =
+      source.fieldErrors && typeof source.fieldErrors === 'object'
+        ? Object.fromEntries(
+            Object.entries(source.fieldErrors).filter(([, value]) => typeof value === 'string'),
+          )
+        : undefined;
+    res.status(status >= 400 && status <= 599 ? status : 502).json({
+      message:
+        status < 500 && typeof source.message === 'string'
+          ? source.message
+          : (messages[status] ?? `La API respondió HTTP ${status}.`),
+      ...(status < 500 && typeof source.code === 'string' ? { code: source.code } : {}),
+      ...(status < 500 && fieldErrors ? { fieldErrors } : {}),
+    });
   };
   for (const path of publicPaths)
     app.get(`/bff/${path}`, async (_req, res) => {
@@ -139,7 +154,7 @@ export function createApp(
         body: JSON.stringify({ identifier: identifier.trim(), password }),
       });
       if (!result.response.ok) {
-        upstreamError(res, result.response.status);
+        upstreamError(res, result.response.status, result.body);
         return;
       }
       const body = result.body as { token?: unknown; expiresAt?: unknown; user?: unknown } | null;
@@ -150,6 +165,7 @@ export function createApp(
       const expiresAt = Date.parse(body.expiresAt);
       const id = store.create(body.token, expiresAt);
       store.delete(sessionId(req));
+      res.clearCookie(COOKIE, { ...cookieOptions, path: '/bff/auth' });
       res.cookie(COOKIE, id, { ...cookieOptions, expires: new Date(expiresAt) });
       res.json({
         user: publicUser(body.user),
@@ -211,6 +227,54 @@ export function createApp(
       res
         .status(502)
         .json({ message: 'Sesión web cerrada. No se pudo confirmar revocación en la API.' });
+    }
+  });
+  const id = '[0-9a-fA-F-]{36}';
+  const allowed = [
+    ['GET', /^admin\/me$/],
+    ['GET', /^admin\/(branches|procedures|staff|appointments|reports)$/],
+    ['GET', /^admin\/reports\/export\.csv$/],
+    ['POST', /^admin\/(branches|procedures|staff)$/],
+    ['PATCH', new RegExp(`^admin/(branches|procedures|staff|time-slots)/${id}$`)],
+    ['PATCH', new RegExp(`^admin/branches/${id}/(head|procedures)$`)],
+    ['GET', new RegExp(`^admin/branches/${id}/(procedures|time-slots|counters)$`)],
+    ['POST', new RegExp(`^admin/branches/${id}/time-slots$`)],
+    ['POST', new RegExp(`^admin/appointments/${id}/attendance$`)],
+  ] as const;
+  app.use('/bff/admin', async (req, res, next) => {
+    const path = `admin${req.path === '/' ? '' : req.path}`;
+    if (!allowed.some(([method, pattern]) => method === req.method && pattern.test(path))) {
+      next();
+      return;
+    }
+    const session = store.get(sessionId(req));
+    if (!session) {
+      clearSession(req, res);
+      res.status(401).json({ message: 'Inicia sesión para continuar.' });
+      return;
+    }
+    try {
+      const search = new URL(req.originalUrl, 'http://bff.local').search;
+      const result = await upstream(path + search, {
+        method: req.method,
+        headers: {
+          Authorization: `Bearer ${session.token}`,
+          ...(!['GET', 'HEAD'].includes(req.method) ? { 'Content-Type': 'application/json' } : {}),
+        },
+        ...(!['GET', 'HEAD'].includes(req.method) ? { body: JSON.stringify(req.body) } : {}),
+      });
+      if (!result.response.ok) {
+        if (result.response.status === 401) clearSession(req, res);
+        upstreamError(res, result.response.status, result.body);
+        return;
+      }
+      if (typeof result.body === 'string' && path === 'admin/reports/export.csv') {
+        res.type('text/csv').attachment('reporte.csv').send(result.body);
+      } else res.status(result.response.status).json(result.body);
+    } catch {
+      res
+        .status(502)
+        .json({ message: 'No se pudo consultar la API administrativa. Puedes reintentar.' });
     }
   });
   app.use('/bff', (_req, res) =>

@@ -7,9 +7,14 @@ import { roleLabels } from '../../features/auth/policy';
 import { ProductMark } from '../branding/ProductMark';
 import { InstitutionalLogo } from '../branding/InstitutionalLogo';
 import { initials } from '../../utils/format';
+import { useAdminSession, pagePermission } from '../../app/providers/admin-context';
 
 export function Sidebar({ open, close }: { open: boolean; close: () => void }) {
-  const { user } = useDemo();
+  const { user: demoUser } = useDemo();
+  const { identity } = useAdminSession();
+  const user = identity
+    ? { name: `${identity.user.firstName} ${identity.user.lastName}`, role: identity.role.code }
+    : demoUser;
   return (
     <>
       {open && <button className="sidebar-scrim" aria-label="Cerrar menú" onClick={close} />}
@@ -33,6 +38,12 @@ export function Sidebar({ open, close }: { open: boolean; close: () => void }) {
               <p>{section === 'principal' ? 'ADMINISTRACIÓN' : 'SISTEMA'}</p>
               {navigation
                 .filter((item) => item.section === section)
+                .filter(
+                  (item) =>
+                    !identity ||
+                    !pagePermission[item.path] ||
+                    identity.permissions.includes(pagePermission[item.path]!),
+                )
                 .map((item) => (
                   <NavLink
                     key={item.path}
@@ -62,7 +73,10 @@ export function Sidebar({ open, close }: { open: boolean; close: () => void }) {
                 <strong>{user.name}</strong>
                 <small>{roleLabels[user.role]}</small>
               </div>
-              <span className="online-dot" aria-label="Perfil demostrativo activo" />
+              <span
+                className="online-dot"
+                aria-label={identity ? 'Sesión institucional activa' : 'Perfil demostrativo activo'}
+              />
             </div>
           )}
         </div>

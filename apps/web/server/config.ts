@@ -7,9 +7,14 @@ export interface ServerConfig {
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
+  const production = env.NODE_ENV === 'production';
   const api = new URL(env.API_BASE_URL ?? 'https://api-ventanilla.daesrock.dev/v1/');
+  const localHttp =
+    !production &&
+    api.protocol === 'http:' &&
+    ['127.0.0.1', 'localhost', '[::1]'].includes(api.hostname);
   if (
-    api.protocol !== 'https:' ||
+    (api.protocol !== 'https:' && !localHttp) ||
     !api.pathname.endsWith('/') ||
     api.username ||
     api.password ||
@@ -19,7 +24,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     throw new Error(
       'API_BASE_URL debe ser HTTPS, terminar con / y no contener credenciales ni parámetros.',
     );
-  const production = env.NODE_ENV === 'production';
   const app = new URL(env.APP_ORIGIN ?? 'http://127.0.0.1:5173');
   if (!['http:', 'https:'].includes(app.protocol) || (production && app.protocol !== 'https:'))
     throw new Error('APP_ORIGIN debe ser un origen HTTP local o HTTPS en producción.');

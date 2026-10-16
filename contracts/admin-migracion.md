@@ -1,5 +1,10 @@
 # Integración administrativa: BD y nuevos endpoints
 
+> Actualización 16-10-2026: este documento describe la entrega inicial. La guía vigente
+> para los cambios nuevos de web/BFF/mostradores es
+> [entrega-web-api-2026-10-16.md](entrega-web-api-2026-10-16.md).
+> Las migraciones iniciales ya fueron aplicadas por el responsable del VPS según su revisión.
+
 Documento de entrega para el equipo que actualizará la **base de datos** y la **API**.
 Explica qué se cambió, para qué sirve, cómo aplicarlo y cómo verificar que quedó bien.
 La parte de BD venía preparada desde el 14 de octubre (`202610140001_administration`);
@@ -7,12 +12,12 @@ los endpoints administrativos se agregaron después, en la rama `bry`.
 
 ## 1. Resumen: qué cambia y en qué ayuda
 
-| Parte             | Cambio                                                                                        | Para qué sirve                                                                                                       |
-| ----------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Base de datos     | Migración `202610140001_administration` (aditiva)                                              | Auditoría administrativa, rol `ROOT`, 18 permisos con matriz por rol, índices de reportes y domicilio/NSS opcionales |
-| API (nueva)       | Rutas `/v1/admin/*` en módulo `features/admin/` (aditivas)                                     | El panel web deja los datos simulados: sedes, trámites, oferta, horarios, citas, reportes y alta de jefes reales      |
-| API (aditiva)     | `GET /v1/catalog/branches/:id/procedures`                                                      | Consulta pública de trámites disponibles por sede (Android actual no la consume)                                      |
-| API (sin cambios) | `/v1/auth/*` y `/v1/catalog/*` vigentes                                                        | Android y flujos ciudadanos no se tocan                                                                              |
+| Parte             | Cambio                                                     | Para qué sirve                                                                                                       |
+| ----------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Base de datos     | Migración `202610140001_administration` (aditiva)          | Auditoría administrativa, rol `ROOT`, 18 permisos con matriz por rol, índices de reportes y domicilio/NSS opcionales |
+| API (nueva)       | Rutas `/v1/admin/*` en módulo `features/admin/` (aditivas) | El panel web deja los datos simulados: sedes, trámites, oferta, horarios, citas, reportes y alta de jefes reales     |
+| API (aditiva)     | `GET /v1/catalog/branches/:id/procedures`                  | Consulta pública de trámites disponibles por sede (Android actual no la consume)                                     |
+| API (sin cambios) | `/v1/auth/*` y `/v1/catalog/*` vigentes                    | Android y flujos ciudadanos no se tocan                                                                              |
 
 Regla respetada: **toda la autorización vive en la base** (rol + permiso + alcance).
 La API no crea una segunda autoridad ni edita `Role`/`Permission`/`RolePermission`
@@ -39,12 +44,12 @@ autorizado (`eventanilla_migrator`) en el VPS; no hay base local.
   (`completed/rejected/failed`), metadata JSONB y fecha. **No guarda credenciales ni tokens.**
 - Rol `ROOT` (`hierarchyLevel = 100`) y **18 permisos** con matriz:
 
-| Rol               | Permisos                                                                                                                                                    |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ROOT              | Los 18                                                                                                                                                      |
-| DEPARTMENT_HEAD   | 13: `staff.read`, `branch.read/update`, `offer.manage`, `procedure.read/create/update`, `slot.read/create/update`, `appointment.read/update`, `report.read` |
-| COUNTER_HEAD      | 8: `branch.read/update`, `slot.read/create/update`, `appointment.read/update`, `report.read`                                                                |
-| CITIZEN / STAFF   | Ninguno administrativo (los endpoints les responden 403)                                                                                                    |
+| Rol             | Permisos                                                                                                                                                    |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ROOT            | Los 18                                                                                                                                                      |
+| DEPARTMENT_HEAD | 13: `staff.read`, `branch.read/update`, `offer.manage`, `procedure.read/create/update`, `slot.read/create/update`, `appointment.read/update`, `report.read` |
+| COUNTER_HEAD    | 8: `branch.read/update`, `slot.read/create/update`, `appointment.read/update`, `report.read`                                                                |
+| CITIZEN / STAFF | Ninguno administrativo (los endpoints les responden 403)                                                                                                    |
 
 - Índices de reportes: `Appointment(branchId, scheduledAt)` y `Attendance(branchId, arrivedAt)`.
 
@@ -66,29 +71,29 @@ Todos bajo `/v1/admin/*`, con sesión `Bearer` de una cuenta administrativa
 (la misma de `/v1/auth/login`). El servidor resuelve rol, permisos y sedes;
 el cliente nunca decide su alcance.
 
-| Método | Ruta                                        | Permiso             | Qué hace                                                            |
-| ------ | ------------------------------------------- | ------------------- | ------------------------------------------------------------------- |
-| GET    | `/v1/admin/me`                              | (rol admin)         | Identidad, rol, permisos, perfiles y sedes asignadas                |
-| GET    | `/v1/admin/staff`                           | `staff.read`        | Listado de personal con rol, perfiles y sedes                       |
-| POST   | `/v1/admin/staff`                           | `staff.create`      | Alta transaccional de jefes (User + AdministrativeStaff + perfil)   |
-| PATCH  | `/v1/admin/staff/:id`                       | `staff.update`      | Vigencia, contacto, domicilio y perfil técnico de ventanilla        |
-| GET    | `/v1/admin/branches`                        | `branch.read`       | Sedes con municipio, responsable y fuente (según alcance)           |
-| POST   | `/v1/admin/branches`                        | `branch.create`     | Alta de sede VUGE/VIM                                               |
-| PATCH  | `/v1/admin/branches/:id`                    | `branch.update`     | Datos, contacto, vigencia y publicación (con fuente corroborada)    |
-| PATCH  | `/v1/admin/branches/:id/head`               | `branch.update`     | Asigna o retira jefe de ventanilla (solo root/departamento)         |
-| GET    | `/v1/admin/branches/:id/procedures`         | `branch.read`       | Oferta de trámites de la sede (incluye inactivos)                   |
-| PATCH  | `/v1/admin/branches/:id/procedures`         | `offer.manage`      | Activa/desactiva oferta (nunca borra asociaciones)                  |
-| GET    | `/v1/admin/procedures`                      | `procedure.read`    | Catálogo central completo (incluye no publicados)                   |
-| POST   | `/v1/admin/procedures`                      | `procedure.create`  | Alta de trámite con costo central                                   |
-| PATCH  | `/v1/admin/procedures/:id`                  | `procedure.update`  | Actualiza trámite, costo, vigencia y publicación                    |
-| GET    | `/v1/admin/branches/:branchId/time-slots`   | `slot.read`         | Horarios y cupos (`from`/`to` opcionales)                           |
-| POST   | `/v1/admin/branches/:branchId/time-slots`   | `slot.create`       | Crea bloque (valida horas y superposición)                          |
-| PATCH  | `/v1/admin/time-slots/:id`                  | `slot.update`       | Edita horas, capacidad o vigencia; `occupied` jamás se envía        |
-| GET    | `/v1/admin/appointments`                    | `appointment.read`  | Citas con filtros y paginación (`branchId`, `from`, `to`, `status`, `procedureId`, `page`, `pageSize`) |
-| POST   | `/v1/admin/appointments/:id/attendance`     | `appointment.update`| Llegada/inicio/fin (`arrive`/`start`/`end`) sobre `Attendance`      |
-| GET    | `/v1/admin/reports`                         | `report.read`       | Métricas del periodo + listado paginado; mismo alcance              |
-| GET    | `/v1/admin/reports/export.csv`              | `report.read`       | CSV completo (todas las filas filtradas, columnas seleccionables)   |
-| GET    | `/v1/catalog/branches/:id/procedures`       | público             | Aditivo público: trámites publicados y activos de una sede          |
+| Método | Ruta                                      | Permiso              | Qué hace                                                                                               |
+| ------ | ----------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------ |
+| GET    | `/v1/admin/me`                            | (rol admin)          | Identidad, rol, permisos, perfiles y sedes asignadas                                                   |
+| GET    | `/v1/admin/staff`                         | `staff.read`         | Listado de personal con rol, perfiles y sedes                                                          |
+| POST   | `/v1/admin/staff`                         | `staff.create`       | Alta transaccional de jefes (User + AdministrativeStaff + perfil)                                      |
+| PATCH  | `/v1/admin/staff/:id`                     | `staff.update`       | Vigencia, contacto, domicilio y perfil técnico de ventanilla                                           |
+| GET    | `/v1/admin/branches`                      | `branch.read`        | Sedes con municipio, responsable y fuente (según alcance)                                              |
+| POST   | `/v1/admin/branches`                      | `branch.create`      | Alta de sede VUGE/VIM                                                                                  |
+| PATCH  | `/v1/admin/branches/:id`                  | `branch.update`      | Datos, contacto, vigencia y publicación (con fuente corroborada)                                       |
+| PATCH  | `/v1/admin/branches/:id/head`             | `branch.update`      | Asigna o retira jefe de ventanilla (solo root/departamento)                                            |
+| GET    | `/v1/admin/branches/:id/procedures`       | `branch.read`        | Oferta de trámites de la sede (incluye inactivos)                                                      |
+| PATCH  | `/v1/admin/branches/:id/procedures`       | `offer.manage`       | Activa/desactiva oferta (nunca borra asociaciones)                                                     |
+| GET    | `/v1/admin/procedures`                    | `procedure.read`     | Catálogo central completo (incluye no publicados)                                                      |
+| POST   | `/v1/admin/procedures`                    | `procedure.create`   | Alta de trámite con costo central                                                                      |
+| PATCH  | `/v1/admin/procedures/:id`                | `procedure.update`   | Actualiza trámite, costo, vigencia y publicación                                                       |
+| GET    | `/v1/admin/branches/:branchId/time-slots` | `slot.read`          | Horarios y cupos (`from`/`to` opcionales)                                                              |
+| POST   | `/v1/admin/branches/:branchId/time-slots` | `slot.create`        | Crea bloque (valida horas y superposición)                                                             |
+| PATCH  | `/v1/admin/time-slots/:id`                | `slot.update`        | Edita horas, capacidad o vigencia; `occupied` jamás se envía                                           |
+| GET    | `/v1/admin/appointments`                  | `appointment.read`   | Citas con filtros y paginación (`branchId`, `from`, `to`, `status`, `procedureId`, `page`, `pageSize`) |
+| POST   | `/v1/admin/appointments/:id/attendance`   | `appointment.update` | Llegada/inicio/fin (`arrive`/`start`/`end`) sobre `Attendance`                                         |
+| GET    | `/v1/admin/reports`                       | `report.read`        | Métricas del periodo + listado paginado; mismo alcance                                                 |
+| GET    | `/v1/admin/reports/export.csv`            | `report.read`        | CSV completo (todas las filas filtradas, columnas seleccionables)                                      |
+| GET    | `/v1/catalog/branches/:id/procedures`     | público              | Aditivo público: trámites publicados y activos de una sede                                             |
 
 Notas de comportamiento:
 
@@ -122,10 +127,11 @@ Pruebas nuevas: `apps/api/test/admin.test.mjs`.
 7. Ejecutar smoke tests (sección 5).
 8. Aprovisionar la primera cuenta `ROOT` (sección 5.3).
 
-> **Estado de verificación:** en la máquina donde se escribió esta entrega **no hay Bun
-> ni PostgreSQL local**, así que `bun run test` y `bun run build` quedan **pendientes de
-> ejecutar en un entorno con Bun 1.4.2**. Los contratos ciudadanos existentes
-> (`bun test test`) siguen cubiertos por las pruebas actuales.
+> **Estado actualizado:** Bun 1.4.2 y PostgreSQL local ya están disponibles.
+> La API actual pasa 76 pruebas, incluido el endpoint de mostradores.
+> También se comprobó BFF → API → PostgreSQL local con identidades de prueba,
+> oferta persistida, responsables, horarios, catálogo y reportes. Producción requiere
+> desplegar el nuevo código y verificarlo con una cuenta administrativa real.
 
 ## 5. Smoke tests
 
@@ -162,24 +168,21 @@ Comprobar además:
 ### 5.3 Primera cuenta ROOT (aprovisionamiento controlado)
 
 No existe endpoint de alta de root y no se usará `auth/register` (es de ciudadanos).
-El hash de contraseña debe estar en el formato de la API: `scrypt$<salt hex 32>$<64 bytes hex>`
-(scrypt N=131072, r=8, p=1). Puede generarlo con Node 22+ (sin instalar nada):
+El ejemplo SQL anterior fue retirado: omitía `User.updatedAt` y no era una receta
+correcta de aprovisionamiento. Usar `scripts/provision-root.mjs` con un JSON privado
+de datos corroborados. El script valida con los DTO y la política de contraseña de
+la API, genera el hash con su función `hashPassword`, crea User + AdministrativeStaff
+y auditoría en una transacción. Prisma completa identificadores y timestamps.
+No promueve cuentas existentes ni imprime contraseña/hash.
 
 ```sh
-node -e "const c=require('crypto');const s=c.randomBytes(16).toString('hex');c.scrypt('LA-CONTRASENA',s,64,{N:131072,r:8,p:1,maxmem:160*1024*1024},(e,k)=>console.log('scrypt$'+s+'$'+k.toString('hex')))"
+# Desde la raíz del checkout, con apps/api instalado y compilado y la conexión de destino configurada:
+bun scripts/provision-root.mjs /ruta/privada/titular-root.json
 ```
 
-Después, en SQL (ajustar datos; usar un municipio existente):
-
-```sql
-INSERT INTO "User" (id, "firstName", "lastName", curp, email, "passwordHash",
-                    municipality, "municipalityCode", "emailVerifiedAt", "roleId")
-VALUES (gen_random_uuid(), 'Nombre', 'Apellido Apellido', 'CURP000000HCSXXX00',
-        'cuenta-admin@dominio.mx', 'scrypt$...', 'Tuxtla Gutiérrez', '07101', now(),
-        (SELECT id FROM "Role" WHERE code = 'ROOT'));
-
-INSERT INTO "AdministrativeStaff" ("userId") VALUES ('<UUID del usuario anterior>');
-```
+El archivo privado debe contener `firstName`, `paternalLastName`, `curp`, `email`,
+`municipalityCode` y `password`; `maternalLastName` es opcional. No versionar ese archivo.
+Detalles y verificación: [entrega vigente](entrega-web-api-2026-10-16.md).
 
 Para un jefe de departamento o de ventanilla conviene usar ya `POST /v1/admin/staff`
 con la sesión root (valida CURP, municipio, duplicados y deja auditoría).
@@ -204,8 +207,8 @@ con la sesión root (valida CURP, municipio, duplicados y deja auditoría).
 2. **Perfil técnico de ventanilla**: `POST/PATCH /v1/admin/staff` puede otorgar el perfil
    `CounterStaff` a un jefe de ventanilla (`counterStaff: true`). La decisión operativa de
    usarlo o dejarlo solo en consulta sigue abierta.
-3. **Root real**: mecanismo de aprovisionamiento es el de la sección 5.3 (manual, controlado).
-4. **Base de pruebas**: sin definir (VPS con túnel o contenedor local).
+3. **Root real**: aprovisionamiento controlado con `scripts/provision-root.mjs` (sección 5.3).
+4. **Base de pruebas**: entorno nativo local aislado en 55432; fixtures exclusivamente locales.
 
 ## 8. Incidentes y reglas de seguridad
 

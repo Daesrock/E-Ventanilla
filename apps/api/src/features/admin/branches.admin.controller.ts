@@ -63,6 +63,12 @@ export class BranchesAdminController {
     return this.branches.offersFor(admin, id);
   }
 
+  @Get(':id/counters')
+  @RequirePermission('appointment.read')
+  counters(@CurrentAdmin() admin: AdminContext, @Param('id', new ParseUUIDPipe()) id: string) {
+    return this.branches.countersFor(admin, id);
+  }
+
   @Patch(':id/procedures')
   @RequirePermission('offer.manage')
   @RequireRoles('ROOT', 'DEPARTMENT_HEAD')

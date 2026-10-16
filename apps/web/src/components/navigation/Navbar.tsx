@@ -8,23 +8,26 @@ import { initials } from '../../utils/format';
 import { apiLogout } from '../../features/auth/auth.service';
 import { useToast } from '../../hooks/useToast';
 import { Modal } from '../ui/Modal';
+import { useAdminSession } from '../../app/providers/admin-context';
 
 export function Navbar({ toggleMenu, menuOpen }: { toggleMenu: () => void; menuOpen: boolean }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useDemo();
+  const { user: demoUser, logout } = useDemo();
+  const session = useAdminSession();
+  const user = session.identity
+    ? { name: `${session.identity.user.firstName} ${session.identity.user.lastName}` }
+    : demoUser;
   const notify = useToast();
   const [exiting, setExiting] = useState(false);
   const [demoInfo, setDemoInfo] = useState(false);
   const exit = async () => {
     setExiting(true);
     try {
-      await apiLogout();
+      if (session.identity) await session.signOut();
+      else await apiLogout();
     } catch {
-      notify(
-        'Demo cerrada; no se pudo confirmar cierre de sesión API. Puedes verificarlo desde Conexión con API.',
-        'error',
-      );
+      notify('Sesión web cerrada; no se pudo confirmar la revocación remota.', 'error');
     } finally {
       logout();
       navigate('/acceso');
@@ -46,21 +49,27 @@ export function Navbar({ toggleMenu, menuOpen }: { toggleMenu: () => void; menuO
           <span>{current?.label ?? 'Página'}</span>
         </div>
         <div className="navbar-actions">
-          <button
-            className="demo-pill"
-            onClick={() => setDemoInfo(true)}
-            aria-label="Acerca de la demostración"
-          >
-            <FlaskConical size={13} />
-            Demostración
-          </button>
+          {session.identity ? (
+            <span className="demo-pill">Acceso institucional</span>
+          ) : (
+            <button
+              className="demo-pill"
+              onClick={() => setDemoInfo(true)}
+              aria-label="Acerca de la demostración"
+            >
+              <FlaskConical size={13} />
+              Demostración
+            </button>
+          )}
           <span className="avatar avatar-small" aria-label={user?.name}>
             {initials(user?.name ?? '')}
           </span>
           <button
             className="icon-button"
-            title="Salir de la demostración y cerrar sesión API"
-            aria-label="Salir de la demostración"
+            title="Cerrar sesión"
+            aria-label={
+              session.identity ? 'Cerrar sesión institucional' : 'Salir de la demostración'
+            }
             disabled={exiting}
             onClick={() => void exit()}
           >

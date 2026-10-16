@@ -359,6 +359,21 @@ export class BranchesAdminService {
     };
   }
 
+  async countersFor(admin: AdminContext, branchId: string) {
+    assertBranchScope(admin, branchId);
+    const branch = await this.db.branch.findUnique({
+      where: { id: branchId },
+      select: { id: true },
+    });
+    if (!branch) throw new NotFoundException('La sede no existe.');
+    const items = await this.db.serviceCounter.findMany({
+      where: { branchId },
+      select: { id: true, number: true, active: true },
+      orderBy: { number: 'asc' },
+    });
+    return { items };
+  }
+
   async updateOffers(admin: AdminContext, branchId: string, data: OfferUpdateDto) {
     assertBranchScope(admin, branchId);
     const branch = await this.db.branch.findUnique({

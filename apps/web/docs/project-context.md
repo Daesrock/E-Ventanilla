@@ -2,6 +2,22 @@
 
 Documento de continuidad: objetivo, decisiones, estado y plan de integración. Si retomas este trabajo con otro asistente, este es el primer archivo que debe leerse junto con `README.md` de la aplicación.
 
+## Actualización vigente: 16-10-2026
+
+La descripción de etapas iniciales que sigue es histórica. El panel ya tiene un
+modo institucional conectado a API y un modo demostración separado. `bry` incorpora
+la versión revisada de `main` y el nuevo listado de mostradores por sede. Hay BD
+aislada local en 55432, Bun 1.4.2, cuentas locales y prueba integrada real aprobada.
+Las dos migraciones administrativas iniciales fueron aplicadas en el VPS según el
+responsable del despliegue. Esta entrega no agrega migraciones.
+
+Estado operativo y límites: [pending-work.md](pending-work.md).
+Contratos reales: [api-integration.md](api-integration.md).
+Entrega y aprovisionamiento ROOT: `contracts/entrega-web-api-2026-10-16.md`.
+La identidad real se carga en memoria de React desde `/bff/admin/me`; el token permanece
+en servidor. Login real no selecciona rol. Capturas, fixtures y cuentas locales no se
+cargan en producción; quedan fuera de los commits nuevos.
+
 ## 1. Objetivo
 
 Panel administrativo para el **Departamento de Gestión Empresarial y Ventanillas Integrales** de la Comisión Estatal de Simplificación Administrativa. Una sola dependencia, sedes VUGE/VIM por municipio, citas para trámites gubernamentales.

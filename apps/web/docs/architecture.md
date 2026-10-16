@@ -1,18 +1,17 @@
-# Arquitectura del prototipo
+# Arquitectura del panel y demostración
 
 ## Propósito y alcance
 
-Una dependencia institucional administra sus sedes VUGE/VIM por municipio. Root prepara estructura y cuentas; jefe de departamento configura oferta y responsables; jefe de ventanilla consulta y opera dentro de sedes asignadas. Esta entrega permite validar interfaz y reglas con datos ficticios.
+Una dependencia institucional administra sus sedes VUGE/VIM por municipio. Root prepara estructura y cuentas; jefe de departamento configura oferta y responsables; jefe de ventanilla consulta y opera dentro de sedes asignadas. El acceso institucional consume API; la demostración preserva datos ficticios locales.
 
 ## Capas
 
 ```text
 React Router
-├── AuthLayout → acceso de demostración
-└── DashboardLayout → navbar + sidebar + footer + Outlet
-    └── features → páginas y componentes de cada módulo
-        ├── DemoProvider → comandos → almacén ficticio local
-        └── servicios API → /bff → API NestJS existente → PostgreSQL
+├── AuthLayout → login institucional + selección demo
+└── DashboardLayout → navbar + sidebar + footer
+    ├── AdminProvider → AdminPanel → módulos reales → /bff/admin → NestJS → PostgreSQL
+    └── DemoProvider → Outlet → páginas demo → comandos → almacén ficticio local
 ```
 
 ### `app/`
@@ -37,9 +36,14 @@ Ocupación de los bloques es un ejemplo independiente: el prototipo no implement
 
 ### `server/`
 
-BFF Express de mismo origen. Lista explícita de endpoints; no es un proxy arbitrario. Publica solo servicios públicos y sesión API. POST exige origen configurado y rechaza solicitudes cross-site. Tokens permanecen en memoria con fecha de expiración; cookie contiene ID aleatorio, es HttpOnly/SameSite=Strict y Secure en producción.
+BFF Express de mismo origen. Lista explícita de endpoints; no es un proxy arbitrario. Publica servicios públicos, sesiones y rutas administrativas permitidas. Tokens permanecen en memoria con fecha de expiración; cookie contiene ID aleatorio, es HttpOnly/SameSite=Strict y Secure en producción.
 
 Este almacén de sesión es de un solo proceso y se vacía al reiniciar. La autenticación real del diagnóstico permanece separada del perfil ficticio. No existe acceso directo a PostgreSQL.
+
+La allowlist incluye métodos administrativos. POST y PATCH comprueban origen.
+Cookie: `/bff`. El cliente recibe errores por campo, códigos y paginación; CSV se
+transmite como archivo. El modo real conserva identidad solo en memoria de React y
+se recupera al recargar desde `/bff/admin/me`. No consulta mocks como respaldo.
 
 ## Flujos principales
 
@@ -49,6 +53,14 @@ Este almacén de sesión es de un solo proceso y se vacía al reiniciar. La aute
 4. GET real → navegador consulta BFF → BFF consulta URL privada configurada → respuesta pública.
 5. Login API → BFF recibe credenciales transitoriamente → API devuelve sesión → BFF guarda token → devuelve identidad pública y cookie independiente.
 
-## Criterio para integración futura
+## Contratos del modo institucional
+
+`services/api/admin.ts` conserva los tipos del servidor (rol objeto, municipio
+objeto, costo string/null). `features/admin` contiene pantallas reales, formularios
+con errores de API, consultas cancelables, paginación y protección de cambios pendientes.
+La política de `auth/policy.ts` sigue siendo exclusivamente demostrativa; el modo real
+usa permisos y alcance de API. El contrato se documenta en `docs/api-integration.md`.
+
+## Criterio para ampliaciones
 
 No resolver endpoints ausentes mediante escrituras SQL o un registro ciudadano con rol elegido en frontend. Cambiar servicios cuando exista contrato administrativo real. La API deberá proporcionar identidad, autorización y ámbito; las reglas locales de demo no son controles de seguridad de producción.

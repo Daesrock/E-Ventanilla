@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "description": "Endpoints administrativos y aditivos agregados en la rama bry. La autorización se resuelve en la base (rol + permiso + alcance); los permisos listados son los códigos de \"Permission\" que exige cada ruta.",
   "basePath": "/v1",
   "auth": {
@@ -8,6 +8,14 @@
     "notes": "Misma sesión de la API. Cuenta ciudadana o sin AdministrativeStaff recibe 403 ADMIN_ACCESS_REQUIRED; permiso faltante recibe 403 ADMIN_PERMISSION_REQUIRED; sede fuera de alcance recibe 403 BRANCH_OUT_OF_SCOPE."
   },
   "endpoints": [
+    {
+      "method": "GET",
+      "path": "/v1/admin/branches/{id}/counters",
+      "permission": "appointment.read",
+      "purpose": "Listar mostradores existentes de la sede para registrar llegada. Respeta alcance; no crea ni modifica mostradores.",
+      "response": { "items": [{ "id": "uuid", "number": 1, "active": true }] },
+      "errors": [401, 403, 404]
+    },
     {
       "method": "GET",
       "path": "/v1/admin/me",
@@ -28,8 +36,27 @@
       "permission": "staff.create",
       "role": "ROOT",
       "body": {
-        "required": ["firstName", "paternalLastName", "curp", "email", "password", "municipalityCode", "role"],
-        "optional": ["maternalLastName", "phone", "rfc", "counterStaff", "street", "exteriorNumber", "interiorNumber", "neighborhood", "postalCode", "socialSecurityNumber"],
+        "required": [
+          "firstName",
+          "paternalLastName",
+          "curp",
+          "email",
+          "password",
+          "municipalityCode",
+          "role"
+        ],
+        "optional": [
+          "maternalLastName",
+          "phone",
+          "rfc",
+          "counterStaff",
+          "street",
+          "exteriorNumber",
+          "interiorNumber",
+          "neighborhood",
+          "postalCode",
+          "socialSecurityNumber"
+        ],
         "roleValues": ["DEPARTMENT_HEAD", "COUNTER_HEAD"],
         "notes": "Alta transaccional User + AdministrativeStaff + perfil. Nunca usa auth/register; el correo queda verificado."
       },
@@ -41,7 +68,17 @@
       "permission": "staff.update",
       "role": "ROOT",
       "body": {
-        "optional": ["active", "phone", "street", "exteriorNumber", "interiorNumber", "neighborhood", "postalCode", "socialSecurityNumber", "counterStaff"],
+        "optional": [
+          "active",
+          "phone",
+          "street",
+          "exteriorNumber",
+          "interiorNumber",
+          "neighborhood",
+          "postalCode",
+          "socialSecurityNumber",
+          "counterStaff"
+        ],
         "notes": "counterStaff solo aplica a jefes de ventanilla; no se puede retirar si ya hay atenciones registradas."
       },
       "purpose": "Vigencia, contacto, domicilio y perfil técnico de ventanilla"
@@ -61,7 +98,24 @@
       "body": {
         "required": ["name", "type", "municipalityCode"],
         "typeValues": ["VUGE", "VIM"],
-        "optional": ["street", "exteriorNumber", "interiorNumber", "neighborhood", "postalCode", "address", "phone", "email", "officeHours", "latitude", "longitude", "published", "sourceKey", "sourceUrl", "sourceSha256", "sourceCheckedAt"],
+        "optional": [
+          "street",
+          "exteriorNumber",
+          "interiorNumber",
+          "neighborhood",
+          "postalCode",
+          "address",
+          "phone",
+          "email",
+          "officeHours",
+          "latitude",
+          "longitude",
+          "published",
+          "sourceKey",
+          "sourceUrl",
+          "sourceSha256",
+          "sourceCheckedAt"
+        ],
         "notes": "published=true exige sourceKey, sourceUrl https, sourceSha256 (64 hex) y sourceCheckedAt."
       },
       "purpose": "Alta de sede"
@@ -71,7 +125,28 @@
       "path": "/v1/admin/branches/{id}",
       "permission": "branch.update",
       "body": {
-        "optional": ["name", "type", "municipalityCode", "street", "exteriorNumber", "interiorNumber", "neighborhood", "postalCode", "address", "phone", "email", "officeHours", "latitude", "longitude", "active", "published", "sourceKey", "sourceUrl", "sourceSha256", "sourceCheckedAt"],
+        "optional": [
+          "name",
+          "type",
+          "municipalityCode",
+          "street",
+          "exteriorNumber",
+          "interiorNumber",
+          "neighborhood",
+          "postalCode",
+          "address",
+          "phone",
+          "email",
+          "officeHours",
+          "latitude",
+          "longitude",
+          "active",
+          "published",
+          "sourceKey",
+          "sourceUrl",
+          "sourceSha256",
+          "sourceCheckedAt"
+        ],
         "notes": "COUNTER_HEAD solo puede editar domicilio y contacto de sus sedes; nombre, tipo, municipio, vigencia, publicación y fuente quedan bloqueados con fieldErrors."
       },
       "purpose": "Actualización de sede"
@@ -81,7 +156,10 @@
       "path": "/v1/admin/branches/{id}/head",
       "permission": "branch.update",
       "role": "ROOT | DEPARTMENT_HEAD",
-      "body": { "optional": ["counterHeadId"], "notes": "counterHeadId=null retira al responsable." },
+      "body": {
+        "required": ["counterHeadId"],
+        "notes": "Enviar UUID para asignar o null explícito para retirar. Un cuerpo vacío no retira al responsable."
+      },
       "purpose": "Asignación de jefe de ventanilla"
     },
     {
@@ -95,7 +173,10 @@
       "path": "/v1/admin/branches/{id}/procedures",
       "permission": "offer.manage",
       "role": "ROOT | DEPARTMENT_HEAD",
-      "body": { "required": ["items"], "notes": "items: [{ procedureId, active }]. Desactiva, nunca elimina la asociación." },
+      "body": {
+        "required": ["items"],
+        "notes": "items: [{ procedureId, active }]. Desactiva, nunca elimina la asociación."
+      },
       "purpose": "Configuración de la oferta por sede"
     },
     {
@@ -112,7 +193,18 @@
       "role": "ROOT | DEPARTMENT_HEAD",
       "body": {
         "required": ["name"],
-        "optional": ["category", "description", "requirements", "cost", "estimatedMinutes", "published", "sourceKey", "sourceUrl", "sourceSha256", "sourceCheckedAt"],
+        "optional": [
+          "category",
+          "description",
+          "requirements",
+          "cost",
+          "estimatedMinutes",
+          "published",
+          "sourceKey",
+          "sourceUrl",
+          "sourceSha256",
+          "sourceCheckedAt"
+        ],
         "notes": "cost es único para todas las sedes; published=true exige fuente corroborada."
       },
       "purpose": "Alta de trámite"
@@ -135,14 +227,20 @@
       "method": "POST",
       "path": "/v1/admin/branches/{branchId}/time-slots",
       "permission": "slot.create",
-      "body": { "required": ["date", "startsAt", "endsAt", "capacity"], "notes": "date AAAA-MM-DD; horas HH:MM; valida superposición con bloques activos." },
+      "body": {
+        "required": ["date", "startsAt", "endsAt", "capacity"],
+        "notes": "date AAAA-MM-DD; horas HH:MM; valida superposición con bloques activos."
+      },
       "purpose": "Creación de bloque de atención"
     },
     {
       "method": "PATCH",
       "path": "/v1/admin/time-slots/{id}",
       "permission": "slot.update",
-      "body": { "optional": ["startsAt", "endsAt", "capacity", "active"], "notes": "occupied jamás se acepta; capacity >= occupied lo garantizan API y PostgreSQL." },
+      "body": {
+        "optional": ["startsAt", "endsAt", "capacity", "active"],
+        "notes": "occupied jamás se acepta; capacity >= occupied lo garantizan API y PostgreSQL."
+      },
       "purpose": "Edición o desactivación de bloque"
     },
     {
@@ -168,14 +266,33 @@
       "method": "GET",
       "path": "/v1/admin/reports",
       "permission": "report.read",
-      "query": ["from", "to", "branchId", "municipalityCode", "type", "procedureId", "status", "page", "pageSize"],
+      "query": [
+        "from",
+        "to",
+        "branchId",
+        "municipalityCode",
+        "type",
+        "procedureId",
+        "status",
+        "page",
+        "pageSize"
+      ],
       "purpose": "Métricas del periodo (citas, ciudadanos únicos, asistencia, atención, promedios) y listado paginado"
     },
     {
       "method": "GET",
       "path": "/v1/admin/reports/export.csv",
       "permission": "report.read",
-      "query": ["from", "to", "branchId", "municipalityCode", "type", "procedureId", "status", "columns"],
+      "query": [
+        "from",
+        "to",
+        "branchId",
+        "municipalityCode",
+        "type",
+        "procedureId",
+        "status",
+        "columns"
+      ],
       "purpose": "CSV completo con todas las filas filtradas y columnas seleccionables"
     },
     {

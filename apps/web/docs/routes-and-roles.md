@@ -1,6 +1,8 @@
 # Rutas y perfiles
 
-Documento de la navegación y permisos **demostrativos**. La API vigente no permite identificar ni autorizar estos perfiles administrativos.
+El acceso institucional obtiene rol, permisos y alcance de `/v1/admin/me`; no
+selecciona su rol. La tabla siguiente describe la demostración conservada. En modo
+real aplican además los permisos de API indicados abajo.
 
 | Ruta                              | Propósito                                       | Root                  | Departamento          | Ventanilla               |
 | --------------------------------- | ----------------------------------------------- | --------------------- | --------------------- | ------------------------ |
@@ -20,6 +22,21 @@ Documento de la navegación y permisos **demostrativos**. La API vigente no perm
 | Otras                             | Página 404 dentro del layout                    | Sí                    | Sí                    | Sí                       |
 
 ## Reglas
+
+### Diferencias del modo institucional
+
+- `/acceso`: correo/CURP y contraseña, con modo demo separado.
+- `branch.read/update`, `offer.manage` y `slot.*` controlan sedes, oferta y horarios.
+- Alta de sedes y de personal: ROOT con `branch.create`/`staff.create`.
+- Catálogo central `/tramites`: exige `procedure.read`; la matriz actual no lo da
+  a COUNTER_HEAD. Este rol consulta oferta desde los trámites de su sede.
+- `/usuarios`: exige `staff.read`; COUNTER_HEAD no tiene directorio de personal.
+- `/citas`: lectura por `appointment.read`; registrar atención requiere además
+  `appointment.update` y perfil CounterStaff. No se simulan estados en modo real.
+- `/reportes`: `report.read`; paginación y CSV con el alcance del servidor.
+- `/configuracion`: identidad real y actualización de permisos/sedes.
+- `DashboardLayout` conserva el shell y elige `AdminPanel` para la sesión real;
+  el modo demo conserva `Outlet`. El menú real se filtra por permisos.
 
 La vista de integración vive en `/configuracion/conexion`. `/conexion` redirige allí para conservar enlaces previos y mantener Configuración activa en navegación.
 

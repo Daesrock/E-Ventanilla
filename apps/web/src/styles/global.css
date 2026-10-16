@@ -2195,3 +2195,18 @@ td {
     margin-left: 38px;
   }
 }
+/* Panel administrativo real: componentes mantienen los tokens institucionales. */
+.admin-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 1rem;
+}
+.admin-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.admin-metric {
+  font-size: 1.75rem;
+}

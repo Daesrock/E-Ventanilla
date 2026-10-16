@@ -193,6 +193,6 @@ test('diagnóstico muestra respuesta pública sin permisos administrativos', asy
   await page.getByRole('button', { name: 'Consultar', exact: true }).first().click();
   await expect(page.locator('.json-output')).toContainText('e-ventanilla-api');
   await expect(
-    page.getByText('Las operaciones del panel siguen siendo simuladas', { exact: false }),
+    page.getByText('Este diagnóstico no cambia el perfil de demostración', { exact: false }),
   ).toBeVisible();
 });

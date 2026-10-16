@@ -25,6 +25,71 @@ const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
 describe('BFF de sesiones', () => {
+  it('reenvía PATCH administrativo con cookie /bff, token privado y errores de campo', async () => {
+    const upstream = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(json(loginBody))
+      .mockResolvedValueOnce(
+        json(
+          {
+            message: 'Revisa los campos indicados.',
+            code: 'VALIDATION_ERROR',
+            fieldErrors: { capacity: 'No puede ser menor a la ocupación.' },
+          },
+          400,
+        ),
+      );
+    const agent = request.agent(createApp(config, upstream));
+    const login = await agent
+      .post('/bff/auth/login')
+      .set('Origin', config.appOrigin)
+      .send({ identifier: 'example', password: 'pass' });
+    expect(String(login.headers['set-cookie'])).toContain('Path=/bff;');
+    const id = '11111111-1111-4111-8111-111111111111';
+    const result = await agent
+      .patch(`/bff/admin/time-slots/${id}`)
+      .set('Origin', config.appOrigin)
+      .send({ capacity: 2 });
+    expect(result.status).toBe(400);
+    expect(result.body.fieldErrors.capacity).toContain('ocupación');
+    expect(result.body.code).toBe('VALIDATION_ERROR');
+    expect(upstream.mock.calls[1][1]?.headers).toMatchObject({
+      Authorization: `Bearer ${loginBody.token}`,
+    });
+    expect(upstream.mock.calls[1][1]?.body).toBe('{"capacity":2}');
+    expect(JSON.stringify(result.body)).not.toContain(loginBody.token);
+  });
+  it('bloquea PATCH sin origen y rutas administrativas fuera de allowlist', async () => {
+    const upstream = vi.fn<typeof fetch>();
+    const app = createApp(config, upstream);
+    const id = '11111111-1111-4111-8111-111111111111';
+    expect((await request(app).patch(`/bff/admin/branches/${id}`).send({ name: 'x' })).status).toBe(
+      403,
+    );
+    expect((await request(app).get('/bff/admin/permissions')).status).toBe(404);
+    expect((await request(app).get('/bff/admin/branches')).status).toBe(401);
+    expect(upstream).not.toHaveBeenCalled();
+  });
+  it('conserva filtros, paginación y respuesta CSV en sesión administrativa', async () => {
+    const upstream = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(json(loginBody))
+      .mockResolvedValueOnce(json({ items: [], pagination: { page: 2, total: 0 } }))
+      .mockResolvedValueOnce(
+        new Response('FOLIO\r\nA-1\r\n', { headers: { 'Content-Type': 'text/csv' } }),
+      );
+    const agent = request.agent(createApp(config, upstream));
+    await agent
+      .post('/bff/auth/login')
+      .set('Origin', config.appOrigin)
+      .send({ identifier: 'example', password: 'pass' });
+    const staff = await agent.get('/bff/admin/staff?page=2&pageSize=25');
+    expect(staff.body.pagination.page).toBe(2);
+    expect(String(upstream.mock.calls[1][0])).toContain('staff?page=2&pageSize=25');
+    const csv = await agent.get('/bff/admin/reports/export.csv?from=2026-10-01&to=2026-10-31');
+    expect(csv.headers['content-type']).toContain('text/csv');
+    expect(csv.text).toContain('A-1');
+  });
   it('rechaza POST sin origen permitido antes de consultar API', async () => {
     const upstream = vi.fn<typeof fetch>();
     const res = await request(createApp(config, upstream))

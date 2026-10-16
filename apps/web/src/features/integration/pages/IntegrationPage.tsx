@@ -95,8 +95,8 @@ export function IntegrationPage() {
         description="Comprueba servicios existentes y, si tienes una cuenta, verifica su sesión sin modificar datos operativos."
       />
       <p className="alert alert-warning">
-        La API vigente no publica CRUD administrativo ni devuelve permisos de personal. Las
-        operaciones del panel siguen siendo simuladas, incluso si verificas una sesión real.
+        Este diagnóstico no cambia el perfil de demostración. Para administrar datos reales, cierra
+        la demostración e ingresa por Acceso institucional.
       </p>
       <div className="connection-grid">
         <section className="panel">
@@ -236,11 +236,10 @@ export function IntegrationPage() {
       </div>
       <section className="panel mt-6">
         <div className="panel-body">
-          <h2>Capacidades por integrar</h2>
+          <h2>Acceso administrativo</h2>
           <p className="muted text-xs mt-2">
-            Root, alta de jefes, asignación de responsables, configuración de sedes/trámites/cupos y
-            reportes necesitan endpoints y autorización administrativos. El prototipo conserva
-            servicios separados para adaptar el contrato cuando exista.
+            La API administrativa y sus permisos se utilizan desde Acceso institucional. Esta
+            pantalla conserva únicamente las comprobaciones del entorno de demostración.
           </p>
         </div>
       </section>

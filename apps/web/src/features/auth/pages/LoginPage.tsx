@@ -1,6 +1,6 @@
 /**
- * Acceso al prototipo mediante perfiles ficticios, sin solicitar credenciales reales.
- * Permite restablecer demostración; la prueba de sesión API vive en /conexion.
+ * Acceso institucional con contraseña y perfiles ficticios explícitamente separados.
+ * La autorización real procede de admin/me; restablecer solo afecta la demostración.
  */
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -10,9 +10,16 @@ import { Button } from '../../../components/ui/Button';
 import { Modal } from '../../../components/ui/Modal';
 import { useToast } from '../../../hooks/useToast';
 import { SelectField } from '../../../components/ui/Field';
+import { InputField } from '../../../components/ui/Field';
+import { useAdminSession } from '../../../app/providers/admin-context';
 
 export function LoginPage() {
   const { db, user, login, reset } = useDemo();
+  const session = useAdminSession();
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const navigate = useNavigate();
   const notify = useToast();
   const [selected, setSelected] = useState(
@@ -22,7 +29,7 @@ export function LoginPage() {
       '',
   );
   const [confirmReset, setConfirmReset] = useState(false);
-  if (user) return <Navigate to="/inicio" replace />;
+  if (user || session.identity) return <Navigate to="/inicio" replace />;
   const profiles = [
     {
       id: 'demo-department',
@@ -46,7 +53,51 @@ export function LoginPage() {
   return (
     <div className="login-content">
       <h2>Acceso</h2>
-      <p>Selecciona un perfil.</p>
+      <p>Acceso institucional con correo o CURP y contraseña. El rol lo determina tu cuenta.</p>
+      <form
+        className="form-stack"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          setBusy(true);
+          setLoginError('');
+          try {
+            await session.signIn(identifier, password);
+            setPassword('');
+            navigate('/inicio');
+          } catch (cause) {
+            setLoginError(cause instanceof Error ? cause.message : 'No se pudo ingresar.');
+            setPassword('');
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <InputField
+          label="Correo o CURP"
+          value={identifier}
+          onChange={(event) => setIdentifier(event.target.value)}
+          autoComplete="username"
+          required
+        />
+        <InputField
+          label="Contraseña"
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          autoComplete="current-password"
+          required
+        />
+        {(loginError || session.error) && (
+          <p className="alert alert-error" role="alert">
+            {loginError || session.error}
+          </p>
+        )}
+        <Button type="submit" disabled={busy || session.loading}>
+          {busy ? 'Ingresando…' : 'Ingresar al panel'}
+        </Button>
+      </form>
+      <h3 className="mt-6">Modo demostración</h3>
+      <p>Datos ficticios guardados en este navegador. Selecciona un perfil.</p>
       <form
         onSubmit={(event) => {
           event.preventDefault();

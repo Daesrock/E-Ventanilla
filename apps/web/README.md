@@ -1,10 +1,10 @@
 # E-Ventanilla · panel institucional
 
-Prototipo web de una sola dependencia: Departamento de Gestión Empresarial y Ventanillas Integrales de la Comisión Estatal de Simplificación Administrativa. Diseño propio, colores institucionales, logotipo oficial entregado y patrón geométrico independiente.
+Panel web de una sola dependencia: Departamento de Gestión Empresarial y Ventanillas Integrales de la Comisión Estatal de Simplificación Administrativa. Tiene acceso institucional conectado a API y un modo demostración independiente. Diseño propio y recursos institucionales entregados.
 
 ## Ejecutar localmente
 
-Requisitos: **Node.js 22.12+ o 24+**, npm y acceso a Internet para instalar paquetes. Desarrollo verificado con Node 24.15.0. La web es un proyecto autónomo en `apps/web`; no cambia versiones, código ni despliegue de la API existente. El objetivo, las decisiones y el plan de integración viven en [docs/project-context.md](docs/project-context.md).
+Requisitos: **Node.js 22.12+ o 24+**, npm y acceso a Internet para instalar paquetes. Desarrollo verificado con Node 24.15.0. La web vive en `apps/web`; la API usa Bun 1.4.2. La entrega de web/API se documenta en `contracts/entrega-web-api-2026-10-16.md`, desde la raíz del repo.
 
 Desde esta carpeta:
 
@@ -14,7 +14,7 @@ npm run assets
 npm run dev
 ```
 
-Abrir **http://127.0.0.1:5173**. El comando inicia Vite y BFF local (`127.0.0.1:3001`). Elegir perfil de demostración: jefe de departamento, jefe de ventanilla o root.
+Abrir **http://127.0.0.1:5173/acceso**. El comando inicia Vite y BFF local (`127.0.0.1:3001`). Usar correo/CURP y contraseña para acceso institucional, o elegir un perfil de demostración. Las cuentas de prueba local se preparan con `scripts/prepare-web-local.mjs`; sus credenciales quedan en `.tools/web-local-access.json` y no se versionan.
 
 `npm run assets` regenera la variante de presentación recortada a partir de `public/assets/logos/dependencia-original.png` (copia intacta del logo entregado). Si colocas de nuevo `coesmerBACKGROUND.png` en la raíz del repositorio, el comando actualiza primero esa copia. No se modifican colores ni contenido del logo.
 
@@ -29,9 +29,23 @@ Crear `.env` privado a partir de `.env.example` si necesitas cambiar configuraci
 | `APP_ORIGIN`     | `http://127.0.0.1:5173`                   | Origen permitido en solicitudes de escritura de sesión |
 | `NODE_ENV`       | desarrollo                                | `production` sirve `dist` y usa cookies Secure         |
 
-No colocar tokens, contraseñas o `DATABASE_URL` en variables públicas ni archivos versionados.
+No colocar tokens, contraseñas o `DATABASE_URL` en variables públicas ni archivos versionados. Para API local usar `API_BASE_URL=http://127.0.0.1:3000/v1/`; HTTP solo se acepta en loopback durante desarrollo. Producción exige HTTPS.
 
-## Funciones del prototipo
+## Modo institucional
+
+- Sedes con responsable, información, oferta de trámites y horarios.
+- Oferta con búsqueda, filtros, revisión de altas/retiros, descarte y persistencia en BD.
+- Catálogo central: costo decimal o pendiente (null), publicación con fuente corroborada.
+- Personal, citas y reportes con paginación de API; exportación CSV del conjunto completo filtrado.
+- Acciones y navegación según permisos/alcance de `/v1/admin/me`.
+- Atención registra tiempos; no inventa transiciones de estado de cita.
+- Root crea cuentas/sedes; departamento configura y asigna responsables.
+
+El BFF conserva el token en servidor y usa cookie HttpOnly con alcance `/bff`.
+La identidad administrativa se recupera al recargar. Reiniciar el BFF requiere nuevo login.
+En modo real los módulos no rellenan datos con la demostración.
+
+## Funciones de la demostración
 
 - Inicio con tres indicadores mensuales y accesos por tarea.
 - Directorio de sedes VUGE/VIM con municipio y responsable.
@@ -45,7 +59,7 @@ No colocar tokens, contraseñas o `DATABASE_URL` en variables públicas ni archi
 
 Los datos administrativos son **ficticios**, no un catálogo oficial. Guardado local usa `eventanilla.demo.data.v1` en localStorage; el perfil de demo usa sessionStorage. No se guardan tokens reales en esos almacenes. El acceso incluye botón para restablecer todos los datos de ejemplo.
 
-Una sesión real se prueba en **Conexión con API** y **no habilita permisos administrativos**. El token queda en memoria del BFF; el navegador recibe un ID web independiente en cookie HttpOnly. Una cuenta real no se convierte en root ni jefe por elegir un perfil demo.
+El diagnóstico histórico sigue disponible en demostración. El acceso institucional usa sus propios módulos y obtiene autorización de `admin/me`; seleccionar un perfil demo no modifica roles reales.
 
 **Interfaz simplificada:** Sedes se organiza en Información, Trámites y Horarios. Formularios agrupan datos, señalan obligatorios y muestran errores junto al campo. El menú usa nombres breves; Configuración concentra opciones técnicas. El distintivo Demostración de navbar explica el entorno sin avisos repetidos.
 

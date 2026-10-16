@@ -1,46 +1,64 @@
 # Integración con API vigente
 
-Fuente de contrato: documentación de la API entregada por el equipo, confirmada como vigente. URL configurada por defecto: `https://api-ventanilla.daesrock.dev/v1/`.
+Base de producción: `https://api-ventanilla.daesrock.dev/v1/`.
+Contratos: `contracts/admin-api.endpoints.json`; entrega y despliegue:
+`contracts/entrega-web-api-2026-10-16.md` (rutas relativas a la raíz del repositorio).
 
-## Endpoints conectados
+## Dos modos explícitos
 
-| BFF del panel                     | API compartida               | Comportamiento                                        |
-| --------------------------------- | ---------------------------- | ----------------------------------------------------- |
-| GET `/bff/health`                 | GET `health`                 | Estado del proceso                                    |
-| GET `/bff/ready`                  | GET `ready`                  | Disponibilidad de PostgreSQL vía API                  |
-| GET `/bff/catalog/status`         | GET `catalog/status`         | Corroboración del catálogo                            |
-| GET `/bff/catalog/municipalities` | GET `catalog/municipalities` | Catálogo público oficial                              |
-| POST `/bff/auth/login`            | POST `auth/login`            | `identifier`, `password`; token retenido en servidor  |
-| GET `/bff/auth/me`                | GET `auth/me`                | Consulta con token guardado y salida pública filtrada |
-| POST `/bff/auth/logout`           | POST `auth/logout`           | Revocación remota y cierre local                      |
+- **Acceso institucional:** correo o CURP y contraseña → `/bff/auth/login` →
+  `/bff/admin/me`. El rol, los permisos y las sedes se resuelven en API.
+  `AdminProvider` mantiene identidad en memoria React; recargar vuelve a consultar
+  la cookie HttpOnly. Los módulos reales no usan `DemoProvider` para completar datos.
+- **Demostración:** selector de perfiles y datos ficticios de `DemoProvider`.
+  Sus cambios se guardan exclusivamente en este navegador.
 
-No se conecta `auth/register`: registra ciudadanos, no jefes. Recuperación/verificación están documentadas en API, pero el prototipo no presenta formularios reales para ellas: faltan contratos completos de campos y no son necesarias para selección de perfil ficticio.
+## BFF
 
-## Sesiones reales
+- Token opaco exclusivamente en memoria del servidor; cookie con ID independiente,
+  `Path=/bff`, HttpOnly, SameSite=Strict y Secure en producción.
+- Comprobación de Origin/Sec-Fetch-Site en todas las mutaciones, incluido PATCH.
+- Allowlist explícita de métodos/rutas administrativas; conserva consultas y paginación.
+- Reenvía `message`, `code` y `fieldErrors` de errores 4xx; mensajes genéricos en 5xx.
+- CSV se transmite como archivo; no se transforma en JSON.
+- Logout revoca en API y elimina cookie/store incluso si falla la confirmación remota.
+- `administrativeAccess: false` en la respuesta histórica de autenticación es solo
+  compatibilidad del diagnóstico: la autorización del panel se consulta en `admin/me`.
+- El store es de un solo proceso. Reiniciar o cambiar de instancia requiere volver a ingresar.
+- Desarrollo permite HTTP únicamente hacia loopback; producción exige HTTPS.
 
-Login de API devuelve token opaco, `expiresAt` y usuario. BFF crea ID web aleatorio independiente. No decodifica token como JWT, no lo entrega al frontend ni guarda credenciales en almacenamiento del navegador. Cookie tiene alcance `/bff/auth`; HttpOnly, SameSite=Strict y Secure en producción. POST comprueba Origin y Sec-Fetch-Site. Logout intenta revocar en API; si falla, elimina sesión local y comunica falta de confirmación remota.
+## Módulos reales
 
-`administrativeAccess: false` se devuelve siempre: contrato vigente no incluye roles/permisos administrativos. Prueba de sesión no modifica el perfil ficticio del prototipo.
+| Pantalla    | API relativa a `/v1`                                      | Consideraciones                                                           |
+| ----------- | --------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Sesión      | `admin/me`                                                | Rol objeto, permisos y alcance; nunca rol elegido en el cliente           |
+| Sedes       | `admin/branches`                                          | Lista completa dentro del alcance; filtros locales                        |
+| Responsable | `admin/staff`, `admin/branches/:id/head`                  | Consulta todas las páginas de candidatos; envía UUID o null explícito     |
+| Oferta      | `admin/branches/:id/procedures`                           | PATCH solo de asociaciones cambiadas; revisión, descarte y aviso al salir |
+| Catálogo    | `admin/procedures`                                        | `cost` string o null; null = por confirmar, cero = gratuito               |
+| Horarios    | `admin/branches/:id/time-slots`, `admin/time-slots/:id`   | `occupied` no se envía; conflictos y capacidad validados por API/BD       |
+| Personal    | `admin/staff`                                             | Paginación real; alta/edición solo root                                   |
+| Citas       | `admin/appointments`, `admin/appointments/:id/attendance` | Paginación real; asistencia solo con perfil técnico y permiso             |
+| Mostradores | `admin/branches/:id/counters`                             | Nuevo en esta entrega; listado para registrar llegada                     |
+| Reportes    | `admin/reports`, `admin/reports/export.csv`               | Paginación de pantalla; exportación del conjunto filtrado completo        |
 
-Salir desde navbar cierra perfil de demostración e intenta cerrar/revocar sesión API opcional. Si BFF no está disponible, se comunica que no se pudo confirmar cierre remoto.
+Campos de sede: `municipality: {code,name}`, responsable independiente, contactos nullable.
+Publicar exige sourceKey, URL HTTPS, SHA-256 corroborado y fecha; el formulario solicita estos datos.
+El acceso ciudadano, registro y recuperación conservan sus contratos existentes.
 
-## Funciones simuladas
+## Reportes y atención
 
-Sedes, catálogo de trámites, oferta por sede, horarios, cupos, cuentas de jefes, citas, asistencia, resultado y reportes usan almacén local. No se escriben datos a API ni PostgreSQL. Las reglas se inspiran en esquema recibido, pero nombres de estados de demo no prueban enumeraciones reales del dominio.
+- Fecha programada en `America/Mexico_City`; intervalo inclusivo.
+- Ciudadanos únicos dentro de la cohorte de citas del periodo.
+- Llegadas y atenciones finalizadas pertenecen a esa misma cohorte, incluso si el
+  evento ocurrió otro día. No son conteos de eventos independientes del periodo.
+- Promedios solo con tiempos completos, fin >= inicio; sin datos → null/`—`.
+- CSV: todas las filas filtradas y solo columnas seleccionadas; escape y neutralización en API.
+- Atención registra llegada, inicio y fin. No cambia `Appointment.status` ni inventa estados.
 
-Vista ciudadana dentro de sede es un preview local de reglas propuestas: sede/trámite publicados y activos, asociación activa. Debe alinearse con API antes de uso real.
+## Límites actuales
 
-## Reportes
-
-- Filtro temporal: **fecha programada de cita** en `America/Mexico_City`.
-- Intervalo: días inicial/final inclusive.
-- Personas: `COUNT DISTINCT citizenId` en conjunto filtrado.
-- Asistencia: existencia de llegada registrada en la cita del conjunto.
-- Atención finalizada: existencia de fecha de fin.
-- Promedios: solo tiempos completos, fin mayor/igual a inicio; sin datos devuelve `—`, no cero.
-- Por tanto, asistencia/atención son resultados de la **cohorte de citas** del periodo, no conteos independientes de eventos ocurridos en ese mes.
-- CSV: todos los resultados filtrados, únicamente columnas seleccionadas, escapado de comillas y neutralización de fórmulas.
-
-## Pendientes contractuales
-
-Root y alta administrativa; identidad/rol/permiso/ámbito; consultas y mutaciones administrativas de sedes, responsables, catálogo, oferta, horarios; citas/atención; consultas agregadas con definiciones y paginación reales. No crear una segunda autoridad de esquema o autenticación para resolver estos pendientes.
+La cuenta real ROOT la aprovisiona el propietario; los accesos locales no existen
+automáticamente en el VPS. El listado de mostradores no permite darlos de alta:
+para registrar llegada deben existir mostradores activos y un perfil CounterStaff.
+No se agregan endpoints de gestión de permisos, auditoría o transiciones de estado de citas.
