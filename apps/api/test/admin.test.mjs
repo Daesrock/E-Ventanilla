@@ -65,7 +65,7 @@ function adminFixture(roleCode, { permissions = [], branches = [], profiles = {}
   const db = {
     session: {
       findUnique: async () => ({
-        user: { id: user.id, active: true },
+        user: { id: user.id, active: true, emailVerifiedAt: new Date() },
         expiresAt: new Date(Date.now() + 60000),
       }),
     },

@@ -6,18 +6,37 @@ import { fieldFailure } from '../../core/validation/validation.js';
 
 export const MEXICO_CITY_OFFSET = '-06:00';
 
+/** Valida 'AAAA-MM-DD' real (V8 acepta días inexistentes y los rueda; aquí se rechazan). */
+export function assertDateOnly(value: string, field = 'date'): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) throw fieldFailure({ [field]: 'Escribe una fecha en formato AAAA-MM-DD.' });
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  )
+    throw fieldFailure({ [field]: 'Escribe una fecha válida.' });
+  return value;
+}
+
 export function startOfMexicoDay(date: string): Date {
-  return new Date(`${date}T00:00:00${MEXICO_CITY_OFFSET}`);
+  return new Date(`${assertDateOnly(date)}T00:00:00${MEXICO_CITY_OFFSET}`);
 }
 
 export function endOfMexicoDay(date: string): Date {
-  return new Date(`${date}T23:59:59.999${MEXICO_CITY_OFFSET}`);
+  return new Date(`${assertDateOnly(date)}T23:59:59.999${MEXICO_CITY_OFFSET}`);
 }
 
 export function assertDateRange(from: string, to: string) {
+  assertDateOnly(from, 'from');
+  assertDateOnly(to, 'to');
   const start = startOfMexicoDay(from);
   const end = endOfMexicoDay(to);
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start > end)
+  if (start > end)
     throw fieldFailure({ from: 'Revisa el periodo: la fecha inicial debe ser anterior o igual a la final.' });
   return { start, end };
 }

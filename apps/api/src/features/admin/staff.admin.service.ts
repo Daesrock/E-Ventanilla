@@ -222,7 +222,14 @@ export class StaffAdminService {
         }
       }
     }
-    const staffData: Prisma.AdministrativeStaffUncheckedUpdateInput = {};
+    const staffData: {
+      street?: string | null;
+      exteriorNumber?: string | null;
+      interiorNumber?: string | null;
+      neighborhood?: string | null;
+      postalCode?: string | null;
+      socialSecurityNumber?: string | null;
+    } = {};
     if (data.street !== undefined) staffData.street = data.street;
     if (data.exteriorNumber !== undefined) staffData.exteriorNumber = data.exteriorNumber;
     if (data.interiorNumber !== undefined) staffData.interiorNumber = data.interiorNumber;

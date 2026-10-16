@@ -22,7 +22,16 @@ export function optionalDate(value: unknown, field: string): string | undefined 
   if (value === undefined) return undefined;
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value))
     throw fieldFailure({ [field]: 'Escribe una fecha en formato AAAA-MM-DD.' });
-  if (Number.isNaN(new Date(`${value}T00:00:00Z`).getTime()))
+  const parts = value.split('-').map(Number);
+  const year = parts[0]!;
+  const month = parts[1]!;
+  const day = parts[2]!;
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  )
     throw fieldFailure({ [field]: 'Escribe una fecha válida.' });
   return value;
 }

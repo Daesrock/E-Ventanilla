@@ -21,7 +21,6 @@ export class AdminGuard implements CanActivate {
       admin?: AdminContext;
     }>();
     const admin = await this.admin.authenticate(bearerToken(request.headers.authorization));
-    request.admin = admin;
     const required =
       this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
         context.getHandler(),
@@ -32,6 +31,7 @@ export class AdminGuard implements CanActivate {
         message: 'No cuentas con permiso para esta operación administrativa.',
         code: 'ADMIN_PERMISSION_REQUIRED',
       });
+    request.admin = admin;
     return true;
   }
 }

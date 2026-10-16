@@ -21,8 +21,13 @@ const appointmentAdminSelect = {
   scheduledAt: true,
   branchId: true,
   procedureId: true,
-  branch: { select: { id: true, name: true, municipality: { select: { code: true, name: true } } } },
-  procedure: { select: { id: true, name: true, cost: true } },
+  // La oferta es la ruta a la sede y al trámite: Appointment no tiene esas relaciones directas.
+  slot: {
+    select: {
+      branch: { select: { id: true, name: true, municipality: { select: { code: true, name: true } } } },
+    },
+  },
+  offering: { select: { procedure: { select: { id: true, name: true, cost: true } } } },
   citizen: {
     select: {
       user: {
@@ -49,12 +54,16 @@ function present(row: AppointmentRow) {
     status: row.status,
     scheduledAt: row.scheduledAt.toISOString(),
     branch: {
-      id: row.branch.id,
-      name: row.branch.name,
-      municipality: row.branch.municipality.name,
-      municipalityCode: row.branch.municipality.code,
+      id: row.slot.branch.id,
+      name: row.slot.branch.name,
+      municipality: row.slot.branch.municipality.name,
+      municipalityCode: row.slot.branch.municipality.code,
     },
-    procedure: { id: row.procedure.id, name: row.procedure.name, cost: row.procedure.cost?.toString() ?? null },
+    procedure: {
+      id: row.offering.procedure.id,
+      name: row.offering.procedure.name,
+      cost: row.offering.procedure.cost?.toString() ?? null,
+    },
     citizen: { name: personName(row.citizen.user) },
     attendance: row.attendance
       ? {

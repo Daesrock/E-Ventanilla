@@ -18,10 +18,15 @@ const reportRowSelect = {
   folio: true,
   status: true,
   scheduledAt: true,
-  branch: {
-    select: { name: true, type: true, municipality: { select: { code: true, name: true } } },
+  // Appointment no tiene relaciones directas a sede/trámite: se llega por cupo y oferta.
+  slot: {
+    select: {
+      branch: {
+        select: { name: true, type: true, municipality: { select: { code: true, name: true } } },
+      },
+    },
   },
-  procedure: { select: { name: true } },
+  offering: { select: { procedure: { select: { name: true } } } },
   citizen: {
     select: {
       user: {
@@ -114,14 +119,15 @@ export function csvCell(value: unknown) {
 
 function present(row: ReportRow) {
   const attendance = row.attendance;
+  const branch = row.slot.branch;
   return {
     folio: row.folio,
     scheduledAt: row.scheduledAt.toISOString(),
-    branch: row.branch.name,
-    branchType: row.branch.type,
-    municipality: row.branch.municipality.name,
-    municipalityCode: row.branch.municipality.code,
-    procedure: row.procedure.name,
+    branch: branch.name,
+    branchType: branch.type,
+    municipality: branch.municipality.name,
+    municipalityCode: branch.municipality.code,
+    procedure: row.offering.procedure.name,
     citizen: personName(row.citizen.user),
     status: row.status,
     arrivedAt: attendance?.arrivedAt.toISOString() ?? null,
@@ -202,9 +208,11 @@ export class ReportsAdminService {
       ...(procedureId ? { procedureId } : {}),
       ...(municipalityCode || type
         ? {
-            branch: {
-              ...(municipalityCode ? { municipality: { code: municipalityCode } } : {}),
-              ...(type ? { type } : {}),
+            slot: {
+              branch: {
+                ...(municipalityCode ? { municipality: { code: municipalityCode } } : {}),
+                ...(type ? { type } : {}),
+              },
             },
           }
         : {}),

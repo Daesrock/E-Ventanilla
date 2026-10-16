@@ -17,7 +17,6 @@ import {
   Length,
   Matches,
   Max,
-  MaxDecimalPlaces,
   MaxLength,
   Min,
   ValidateNested,

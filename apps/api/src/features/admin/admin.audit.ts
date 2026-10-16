@@ -2,6 +2,7 @@
  * Auditoría administrativa: cada mutación deja actor, acción, recurso y resultado.
  * Nunca guarda credenciales, códigos ni tokens; metadata solo lleva detalles controlados.
  */
+import type { Prisma } from '../../generated/prisma/client.js';
 import type { AuditTarget } from './admin.types.js';
 
 export interface AuditEntry {
@@ -11,7 +12,7 @@ export interface AuditEntry {
   resourceId?: string | null;
   branchId?: string | null;
   outcome?: 'completed' | 'rejected' | 'failed';
-  metadata?: Record<string, string | number | boolean | null>;
+  metadata?: Prisma.InputJsonValue;
 }
 
 export async function writeAudit(target: AuditTarget, entry: AuditEntry) {

@@ -1,4 +1,6 @@
 /** Contratos internos del panel administrativo. La autorización vive en `admin.auth.ts`. */
+import type { Prisma } from '../../generated/prisma/client.js';
+
 export interface AdminIdentity {
   id: string;
   firstName: string;
@@ -27,15 +29,7 @@ export interface AdminContext {
 export interface AuditTarget {
   administrativeAuditLog: {
     create: (args: {
-      data: {
-        actorUserId: string;
-        action: string;
-        resourceType: string;
-        resourceId?: string | null;
-        branchId?: string | null;
-        outcome?: string;
-        metadata?: unknown;
-      };
-    }) => Promise<unknown>;
+      data: Prisma.AdministrativeAuditLogUncheckedCreateInput;
+    }) => PromiseLike<unknown>;
   };
 }
