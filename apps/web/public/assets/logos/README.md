@@ -1,6 +1,8 @@
 # Logos institucionales
 
-- `dependencia-original.png`: copia intacta del archivo `coesmerBACKGROUND.png` entregado por el equipo.
-- `dependencia.png`: variante recortada para presentación, sin cambios en colores, texto o proporciones del logotipo.
+- `eventanilla.png`: logo oficial de E-Ventanilla entregado por el equipo (166×102 px). Se usa sin alterar textos, colores ni proporciones.
 
-`npm run assets` regenera la variante de presentación a partir de la copia intacta. Si existe `coesmerBACKGROUND.png` en la raíz del repositorio, primero actualiza la copia original. El componente `InstitutionalLogo` usa la variante de presentación. No sustituir el logo oficial por un dibujo del prototipo; el recurso es entregado por el equipo, no descargado de la API.
+Este recurso reemplazó al logo anterior de la dependencia (`dependencia*.png`, retirados).
+El componente `InstitutionalLogo` centraliza la ruta, la proporción y el texto alternativo.
+No sustituir el logo oficial por un dibujo del prototipo; el recurso es entregado por el equipo, no descargado de la API.
+El isotipo propio del producto (`assets/mark.svg`) se conserva únicamente para favicon.

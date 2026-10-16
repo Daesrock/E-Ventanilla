@@ -49,7 +49,7 @@ E-Ventanilla/
 └── deployment/, scripts/, tests/   ← despliegue y verificación
 ```
 
-El logo entregado se conserva en `apps/web/public/assets/logos/dependencia-original.png`; el resto de insumos recibidos quedó resumido aquí y en `docs/api-integration.md`.
+El logo oficial de E-Ventanilla se conserva en `apps/web/public/assets/logos/eventanilla.png` (reemplazó al recurso anterior de la dependencia en octubre de 2026); el resto de insumos recibidos quedó resumido aquí y en `docs/api-integration.md`.
 
 Regla vigente: **aquí se trabaja la web y la API juntas, preservando Android.**
 

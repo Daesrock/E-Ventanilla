@@ -4,6 +4,7 @@ export const brand = {
   institution: 'Comisión Estatal de Simplificación Administrativa',
   department: 'Departamento de Gestión Empresarial y Ventanillas Integrales',
   shortDepartment: 'Gestión Empresarial y Ventanillas Integrales',
-  logo: '/assets/logos/dependencia.png',
+  // Logo oficial E-Ventanilla entregado por el equipo; reemplaza al recurso anterior.
+  logo: '/assets/logos/eventanilla.png',
   pattern: '/assets/patterns/institutional.svg',
 } as const;

@@ -214,3 +214,76 @@ test('ventanilla móvil conserva menú, alcance y bloqueo de catálogo central',
   await page.goto('/tramites');
   await expect(page.getByRole('heading', { name: 'Sin permiso para esta sección' })).toBeVisible();
 });
+
+test('departamento no ve cuentas ROOT en Responsables y sí a los jefes de ventanilla', async ({
+  page,
+}) => {
+  const staff = [
+    {
+      id: 'root-account',
+      name: 'Titular Root',
+      email: 'root@local.example',
+      role: { code: 'ROOT', name: 'Root · preparación inicial' },
+      active: true,
+      profiles: { counterStaff: false, counterHead: false, departmentHead: false },
+      branches: [],
+    },
+    {
+      id: 'dept-account',
+      name: 'Departamento Local',
+      email: 'depto@local.example',
+      role: { code: 'DEPARTMENT_HEAD', name: 'Jefe de departamento' },
+      active: true,
+      profiles: { counterStaff: false, counterHead: false, departmentHead: true },
+      branches: [],
+    },
+    {
+      id: 'head-account',
+      name: 'Ventanilla Local',
+      email: 'ventanilla@local.example',
+      role: { code: 'COUNTER_HEAD', name: 'Jefe de ventanilla' },
+      active: true,
+      profiles: { counterStaff: true, counterHead: true, departmentHead: false },
+      branches: [{ id, name: 'Sede propia' }],
+    },
+  ];
+  let signedIn = false;
+  await page.route('**/bff/**', async (route) => {
+    const path = new URL(route.request().url()).pathname;
+    const reply = (body: unknown, status = 200) => route.fulfill({ status, json: body });
+    if (path.endsWith('/auth/login')) {
+      signedIn = true;
+      return reply({ user: {}, expiresAt: '2099-01-01' });
+    }
+    if (path.endsWith('/admin/me')) {
+      if (!signedIn) return reply({ message: 'Sin sesión' }, 401);
+      return reply({
+        user: {
+          id: 'dept-account',
+          firstName: 'Departamento',
+          lastName: 'Local',
+          email: 'depto@local.example',
+        },
+        role: { code: 'DEPARTMENT_HEAD', name: 'Jefe de departamento' },
+        permissions: ['branch.read', 'branch.update', 'slot.read', 'staff.read', 'report.read'],
+        scope: { allBranches: true, branches: [{ id, name: 'Sede propia' }] },
+        profiles: { counterStaff: false, counterHead: false, departmentHead: true },
+      });
+    }
+    if (path.endsWith('/admin/staff'))
+      return reply({
+        items: staff,
+        pagination: { page: 1, pageSize: 25, total: 3, totalPages: 1 },
+      });
+    return reply({ items: [] });
+  });
+  await page.goto('/acceso');
+  await page.getByLabel('Correo o CURP').fill('depto@local.example');
+  await page.getByLabel(/Contraseña/).fill('Pass-de-prueba-42');
+  await page.getByRole('button', { name: 'Ingresar al panel' }).click();
+  await page.getByRole('link', { name: 'Responsables', exact: true }).click();
+  await expect(page.getByText('Ventanilla Local')).toBeVisible();
+  await expect(page.getByText('Departamento Local', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('Titular Root')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Nueva cuenta' })).toHaveCount(0);
+});

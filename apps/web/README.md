@@ -10,13 +10,12 @@ Desde esta carpeta:
 
 ```sh
 npm ci
-npm run assets
 npm run dev
 ```
 
 Abrir **http://127.0.0.1:5173/acceso**. El comando inicia Vite y BFF local (`127.0.0.1:3001`). Usar correo/CURP y contraseña para acceso institucional, o elegir un perfil de demostración. Las cuentas de prueba local se preparan con `scripts/prepare-web-local.mjs`; sus credenciales quedan en `.tools/web-local-access.json` y no se versionan.
 
-`npm run assets` regenera la variante de presentación recortada a partir de `public/assets/logos/dependencia-original.png` (copia intacta del logo entregado). Si colocas de nuevo `coesmerBACKGROUND.png` en la raíz del repositorio, el comando actualiza primero esa copia. No se modifican colores ni contenido del logo.
+El logo oficial de E-Ventanilla (`public/assets/logos/eventanilla.png`) se incluye en el árbol del proyecto y no requiere preparación adicional. Reemplazó al recurso anterior de la dependencia; el isotipo `mark.svg` solo se usa como favicon.
 
 ### Configuración opcional
 

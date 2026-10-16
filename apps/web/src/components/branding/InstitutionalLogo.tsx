@@ -1,4 +1,4 @@
-/** Logo oficial centralizado; respeta proporción y usa texto alternativo institucional. */
+/** Logo oficial de E-Ventanilla; proporción fija para no deformar el recurso entregado. */
 import { brand } from '../../app/config/brand';
 
 export function InstitutionalLogo({ className = '' }: { className?: string }) {
@@ -6,9 +6,9 @@ export function InstitutionalLogo({ className = '' }: { className?: string }) {
     <img
       className={`institutional-logo ${className}`}
       src={brand.logo}
-      alt={brand.institution}
-      width="580"
-      height="185"
+      alt={`Logotipo ${brand.product}`}
+      width="166"
+      height="102"
     />
   );
 }

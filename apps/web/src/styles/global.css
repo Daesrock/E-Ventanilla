@@ -1464,7 +1464,8 @@ tbody tr:hover {
   align-items: center;
 }
 .auth-logo {
-  width: 350px;
+  /* El recurso entregado es 166x102; se muestra cercano a su tamaño nativo para no perder nitidez. */
+  width: 190px;
   margin-bottom: 30px;
 }
 .login-content {
@@ -1698,7 +1699,7 @@ tbody tr:hover {
     padding: 35px 25px;
   }
   .auth-logo {
-    max-width: 310px;
+    width: 160px;
   }
   .login-content {
     margin: auto;

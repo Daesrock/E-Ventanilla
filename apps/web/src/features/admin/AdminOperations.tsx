@@ -65,12 +65,12 @@ export function AdminSlots({ branchId: fixedBranch }: { branchId?: string }) {
     { name: 'endsAt', label: 'Hora final', type: 'time', required: true },
     {
       name: 'capacity',
-      label: 'Capacidad total',
+      label: 'Cupos del bloque (capacidad)',
       type: 'number',
       min: editor && editor !== 'new' ? Math.max(1, editor.occupied) : 1,
       step: '1',
       required: true,
-      hint: 'Los cupos ocupados los calcula PostgreSQL; nunca se editan.',
+      hint: 'Máximo de citas que pueden agendarse en este horario. Nunca menor a los cupos ya ocupados.',
     },
     ...(editor && editor !== 'new'
       ? [{ name: 'active', label: 'Bloque activo', type: 'checkbox' } as AdminField]
@@ -171,6 +171,11 @@ export function AdminStaffPage() {
   const [page, setPage] = useState(1);
   const query = useAdminQuery<Page<AdminStaff>>(`staff?${queryString({ q: search, page })}`);
   const [editor, setEditor] = useState<AdminStaff | 'new' | null>(null);
+  // Presentación según el observador: Root ve todo; el departamento ve su cuenta y
+  // los jefes de ventanilla, sin cuentas ROOT (igual que la regla demostrativa).
+  const visibleStaff = (query.data?.items ?? []).filter(
+    (item) => identity?.role.code === 'ROOT' || item.role.code !== 'ROOT',
+  );
   const createFields: AdminField[] = [
     { name: 'firstName', label: 'Nombre', required: true },
     { name: 'paternalLastName', label: 'Apellido paterno', required: true },
@@ -252,7 +257,7 @@ export function AdminStaffPage() {
                 </tr>
               </thead>
               <tbody>
-                {query.data.items.map((item) => (
+                {visibleStaff.map((item) => (
                   <tr key={item.id}>
                     <td>
                       <span className="table-primary">{item.name}</span>
@@ -277,9 +282,7 @@ export function AdminStaffPage() {
                 ))}
               </tbody>
             </table>
-            {!query.data.items.length && (
-              <p className="panel-body">Sin cuentas para esta búsqueda.</p>
-            )}
+            {!visibleStaff.length && <p className="panel-body">Sin cuentas para esta búsqueda.</p>}
           </div>
           <Pager pagination={query.data.pagination} change={setPage} />
         </section>

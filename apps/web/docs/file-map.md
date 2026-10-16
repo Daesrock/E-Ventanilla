@@ -19,7 +19,7 @@ Inventario de responsabilidad de cada archivo de la aplicación. Los fuentes con
 | `playwright.config.ts` | Navegador Chromium, servidor local y artefactos de pruebas                        |
 | `README.md`            | Instalación, comandos, alcance funcional, datos ficticios y enlaces documentales  |
 
-En raíz del proyecto: `../../.gitignore` excluye dependencias, secretos y artefactos. El logo entregado se conserva en `public/assets/logos/dependencia-original.png`; los insumos de contexto recibidos están resumidos en `docs/project-context.md`.
+En raíz del proyecto: `../../.gitignore` excluye dependencias, secretos y artefactos. El logo oficial entregado se conserva en `public/assets/logos/eventanilla.png`; los insumos de contexto recibidos están resumidos en `docs/project-context.md`.
 
 ## App y layouts
 
@@ -110,16 +110,14 @@ En raíz del proyecto: `../../.gitignore` excluye dependencias, secretos y artef
 
 ## Recursos y herramientas
 
-| Archivo                                        | Responsabilidad                                                                     |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `public/assets/mark.svg`                       | Isotipo del producto para favicon y marca, no logo oficial                          |
-| `public/assets/patterns/institutional.svg`     | Patrón decorativo propio de rombos escalonados                                      |
-| `public/assets/logos/README.md`                | Procedencia, variantes y regeneración de logos                                      |
-| `public/assets/logos/dependencia-original.png` | Copia intacta del logo recibido                                                     |
-| `public/assets/logos/dependencia.png`          | Logo recortado solo en márgenes para presentación                                   |
-| `tools/prepare-assets.mjs`                     | Preparación reproducible de recursos binarios mediante Sharp                        |
-| `tools/check-docs.mjs`                         | Cobertura de inventario y encabezados de responsabilidad                            |
-| `tools/check-api.ts`                           | Comprobación opcional de GET reales mediante BFF efímero, sin cuentas ni escrituras |
+| Archivo                                    | Responsabilidad                                                                     |
+| ------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `public/assets/mark.svg`                   | Isotipo del producto para favicon y marca, no logo oficial                          |
+| `public/assets/patterns/institutional.svg` | Patrón decorativo propio de rombos escalonados                                      |
+| `public/assets/logos/README.md`            | Procedencia y vigencia del logo oficial                                             |
+| `public/assets/logos/eventanilla.png`      | Logo oficial E-Ventanilla entregado; reemplaza al recurso anterior                  |
+| `tools/check-docs.mjs`                     | Cobertura de inventario y encabezados de responsabilidad                            |
+| `tools/check-api.ts`                       | Comprobación opcional de GET reales mediante BFF efímero, sin cuentas ni escrituras |
 
 ## Pruebas y documentos
 

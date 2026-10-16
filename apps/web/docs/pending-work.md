@@ -18,6 +18,10 @@ de `main` (`ddcd9df`). Entrega: `contracts/entrega-web-api-2026-10-16.md`.
 - `main` (`dd19837`) integrado en `bry`: mostradores revisados y aprovisionamiento
   ROOT único (`root-provisioning.ts` + script en Dockerfile). El endpoint de
   mostradores **ya está desplegado** en producción (401 sin sesión verificado).
+- Logo oficial E-Ventanilla reemplaza al recurso anterior (acceso y sidebar; se retiró
+  el pipeline `prepare-assets`). En Responsables, el jefe de departamento ya no ve
+  cuentas ROOT (regla de presentación alineada con la demostración).
+- Horarios: campo de capacidad renombrado a «Cupos del bloque» con ayuda explícita.
 
 ## Despliegue y validación del responsable
 
