@@ -2,7 +2,7 @@
 
 ## Identidad
 
-Diseño original para una dependencia de Chiapas. El logo oficial de E-Ventanilla fue entregado por el equipo y se usa sin alterar texto, colores o proporciones; reemplazó al recurso anterior de la dependencia. El isotipo propio (`mark.svg`) se conserva únicamente para favicon.
+Diseño original para una dependencia de Chiapas. El logo oficial de E-Ventanilla fue entregado por el equipo y se usa sin alterar texto, colores o proporciones; reemplazó al recurso anterior de la dependencia y se usa también en la marca del producto y en el favicon.
 
 ## Paleta
 

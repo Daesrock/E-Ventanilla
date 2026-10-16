@@ -154,6 +154,15 @@ svg {
   align-items: center;
   gap: 10px;
 }
+.product-mark img {
+  /* El recurso oficial tiene fondo claro; se muestra como ficha nítida en fondos claros y oscuros. */
+  height: 32px;
+  width: auto;
+  padding: 2px 5px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+}
 .product-mark > span {
   font-size: 21px;
   font-weight: 800;

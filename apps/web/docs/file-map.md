@@ -112,7 +112,7 @@ En raíz del proyecto: `../../.gitignore` excluye dependencias, secretos y artef
 
 | Archivo                                    | Responsabilidad                                                                     |
 | ------------------------------------------ | ----------------------------------------------------------------------------------- |
-| `public/assets/mark.svg`                   | Isotipo del producto para favicon y marca, no logo oficial                          |
+| `public/assets/logos/favicon.png`          | Recorte cuadrado del logo oficial para favicon                                      |
 | `public/assets/patterns/institutional.svg` | Patrón decorativo propio de rombos escalonados                                      |
 | `public/assets/logos/README.md`            | Procedencia y vigencia del logo oficial                                             |
 | `public/assets/logos/eventanilla.png`      | Logo oficial E-Ventanilla entregado; reemplaza al recurso anterior                  |

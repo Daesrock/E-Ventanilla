@@ -15,7 +15,7 @@ npm run dev
 
 Abrir **http://127.0.0.1:5173/acceso**. El comando inicia Vite y BFF local (`127.0.0.1:3001`). Usar correo/CURP y contraseña para acceso institucional, o elegir un perfil de demostración. Las cuentas de prueba local se preparan con `scripts/prepare-web-local.mjs`; sus credenciales quedan en `.tools/web-local-access.json` y no se versionan.
 
-El logo oficial de E-Ventanilla (`public/assets/logos/eventanilla.png`) se incluye en el árbol del proyecto y no requiere preparación adicional. Reemplazó al recurso anterior de la dependencia; el isotipo `mark.svg` solo se usa como favicon.
+El logo oficial de E-Ventanilla (`public/assets/logos/eventanilla.png`) se incluye en el árbol del proyecto y no requiere preparación adicional. Reemplazó al recurso anterior de la dependencia; el favicon es un recorte cuadrado del mismo logo (`public/assets/logos/favicon.png`).
 
 ### Configuración opcional
 

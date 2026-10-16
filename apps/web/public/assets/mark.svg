@@ -1,6 +1,0 @@
-<!-- Isotipo del producto E-Ventanilla para favicon; no reemplaza el logo institucional. -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="18" fill="#009D86"/>
-  <path d="M17 19h29v7H25v7h17v7H25v6h21v7H17Z" fill="#fff"/>
-  <path d="m49 10 7 7-7 7-7-7Z" fill="#FF0164"/>
-</svg>
