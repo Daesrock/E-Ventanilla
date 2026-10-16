@@ -5,7 +5,10 @@ de `main` (`ddcd9df`). Entrega: `contracts/entrega-web-api-2026-10-16.md`.
 
 ## Hecho
 
-- Acceso institucional por contraseña, separado de perfiles de demostración.
+- Acceso institucional por contraseña como única entrada del panel; la demostración
+  ya no se ofrece desde `/acceso` (permanece solo para pruebas y sesiones existentes).
+- Configuración (sesión institucional) reservada a ROOT; los jefes no la ven.
+- Texto de acceso: nombre completo del departamento; se retiró el eslogan y el kicker.
 - BFF administrativo con cookie `/bff`, lista de rutas/métodos y errores por campo.
 - Módulos reales de sedes, responsables, oferta por sede, catálogo, horarios,
   personal, citas y reportes/CSV. Datos reales y ficticios permanecen separados.

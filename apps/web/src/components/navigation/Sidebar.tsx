@@ -8,10 +8,34 @@ import { ProductMark } from '../branding/ProductMark';
 import { InstitutionalLogo } from '../branding/InstitutionalLogo';
 import { initials } from '../../utils/format';
 import { useAdminSession, pagePermission } from '../../app/providers/admin-context';
+import { brand } from '../../app/config/brand';
+
+/** Identidad del bloque superior: rol real y sedes asignadas cuando existen. */
+function workspaceIdentity(identity: ReturnType<typeof useAdminSession>['identity']): {
+  title: string;
+  subtitle: string;
+} {
+  if (!identity) return { title: 'Gestión empresarial', subtitle: 'Comisión estatal · Chiapas' };
+  if (identity.role.code === 'ROOT')
+    return { title: 'Root', subtitle: 'Preparación inicial · Chiapas' };
+  if (identity.role.code === 'DEPARTMENT_HEAD')
+    return { title: 'Jefe de departamento', subtitle: brand.shortDepartment };
+  const names = identity.scope.branches.map((branch) => branch.name);
+  return {
+    title: 'Jefe de ventanilla',
+    subtitle:
+      names.length === 0
+        ? 'Sin sede asignada'
+        : names.length === 1
+          ? names[0]!
+          : `${names[0]} +${names.length - 1}`,
+  };
+}
 
 export function Sidebar({ open, close }: { open: boolean; close: () => void }) {
   const { user: demoUser } = useDemo();
   const { identity } = useAdminSession();
+  const workspace = workspaceIdentity(identity);
   const user = identity
     ? { name: `${identity.user.firstName} ${identity.user.lastName}`, role: identity.role.code }
     : demoUser;
@@ -28,8 +52,8 @@ export function Sidebar({ open, close }: { open: boolean; close: () => void }) {
         <div className="workspace">
           <span className="workspace-icon">GE</span>
           <div>
-            <strong>Gestión empresarial</strong>
-            <small>Comisión estatal · Chiapas</small>
+            <strong>{workspace.title}</strong>
+            <small>{workspace.subtitle}</small>
           </div>
         </div>
         <nav>

@@ -1,6 +1,12 @@
 /** Recorridos críticos reales de UI con datos ficticios y consultas externas sustituidas. */
 import { test, expect, type Page } from '@playwright/test';
 
+const demoProfiles: Record<string, string> = {
+  'Jefe de departamento': 'demo-department',
+  'Jefe de ventanilla': 'demo-counter',
+  'Root · preparación inicial': 'demo-root',
+};
+
 async function enter(page: Page, profile = 'Jefe de departamento') {
   await page.route('**/bff/**', async (route) => {
     const path = new URL(route.request().url()).pathname;
@@ -21,8 +27,14 @@ async function enter(page: Page, profile = 'Jefe de departamento') {
   });
   await page.goto('/acceso');
   await page.screenshot({ path: test.info().outputPath('acceso.png'), fullPage: true });
-  await page.getByRole('radio', { name: profile, exact: true }).check();
-  await page.getByRole('button', { name: 'Entrar a la demostración' }).click();
+  await expect(page.getByRole('heading', { name: 'Acceso institucional' })).toBeVisible();
+  // La demostración ya no se ofrece desde la interfaz; las pruebas activan el perfil
+  // ficticio directamente en sessionStorage, igual que una sesión demo existente.
+  await page.evaluate(
+    (id) => window.sessionStorage.setItem('eventanilla.demo.profile.v1', id),
+    demoProfiles[profile],
+  );
+  await page.goto('/inicio');
   await expect(page.getByRole('heading', { name: 'Inicio', exact: true })).toBeVisible();
 }
 
@@ -106,11 +118,17 @@ test('root crea cuenta ficticia y la asigna a una sede', async ({ page }) => {
   await page.getByRole('button', { name: 'Guardar sede' }).click();
   await expect(page.locator('.detail-list')).toContainText('Responsable de prueba');
   await page.getByRole('button', { name: 'Salir de la demostración' }).click();
-  await page.getByRole('radio', { name: 'Jefe de ventanilla', exact: true }).check();
-  await page
-    .getByRole('combobox', { name: 'Cuenta de demostración' })
-    .selectOption({ label: 'Responsable de prueba' });
-  await page.getByRole('button', { name: 'Entrar a la demostración' }).click();
+  // Espera a que el cierre de sesión termine antes de activar la cuenta creada.
+  await expect(page.getByRole('heading', { name: 'Acceso institucional' })).toBeVisible();
+  // Reingresa con la cuenta recién creada, como lo haría una sesión demo existente.
+  await page.evaluate(() => {
+    const db = JSON.parse(localStorage.getItem('eventanilla.demo.data.v1') ?? '{}') as {
+      users?: { id: string; email: string }[];
+    };
+    const created = db.users?.find((item) => item.email === 'responsable@ejemplo.invalid');
+    if (created) sessionStorage.setItem('eventanilla.demo.profile.v1', created.id);
+  });
+  await page.goto('/inicio');
   await page.goto('/sedes');
   await expect(page.locator('.branch-card')).toHaveCount(1);
   await expect(page.locator('.branch-card')).toContainText('VUGE Palenque');

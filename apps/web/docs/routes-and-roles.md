@@ -6,7 +6,7 @@ real aplican además los permisos de API indicados abajo.
 
 | Ruta                              | Propósito                                       | Root                  | Departamento          | Ventanilla               |
 | --------------------------------- | ----------------------------------------------- | --------------------- | --------------------- | ------------------------ |
-| `/acceso`                         | Selección de perfil ficticio y restablecimiento | Sí                    | Sí                    | Sí                       |
+| `/acceso`                         | Acceso institucional (correo/CURP y contraseña) | Sí                    | Sí                    | Sí                       |
 | `/inicio`                         | Indicadores mensuales y accesos por tarea       | Dependencia           | Dependencia           | Sedes asignadas          |
 | `/sedes`                          | Directorio                                      | Crear/consultar       | Consultar             | Asignadas                |
 | `/sedes/:sedeId`                  | Información, responsable y oferta               | Configurar            | Configurar            | Contacto y consulta      |
@@ -25,7 +25,7 @@ real aplican además los permisos de API indicados abajo.
 
 ### Diferencias del modo institucional
 
-- `/acceso`: correo/CURP y contraseña, con modo demo separado.
+- `/acceso`: únicamente correo/CURP y contraseña. La demostración ya no se ofrece desde aquí.
 - `branch.read/update`, `offer.manage` y `slot.*` controlan sedes, oferta y horarios.
 - Alta de sedes y de personal: ROOT con `branch.create`/`staff.create`.
 - Catálogo central `/tramites`: exige `procedure.read`; la matriz actual no lo da

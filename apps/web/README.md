@@ -13,7 +13,7 @@ npm ci
 npm run dev
 ```
 
-Abrir **http://127.0.0.1:5173/acceso**. El comando inicia Vite y BFF local (`127.0.0.1:3001`). Usar correo/CURP y contraseña para acceso institucional, o elegir un perfil de demostración. Las cuentas de prueba local se preparan con `scripts/prepare-web-local.mjs`; sus credenciales quedan en `.tools/web-local-access.json` y no se versionan.
+Abrir **http://127.0.0.1:5173/acceso**. El comando inicia Vite y BFF local (`127.0.0.1:3001`). El acceso es institucional: correo o CURP y contraseña; el rol lo determina la cuenta. Las cuentas de prueba local se preparan con `scripts/prepare-web-local.mjs`; sus credenciales quedan en `.tools/web-local-access.json` y no se versionan.
 
 El logo oficial de E-Ventanilla (`public/assets/logos/eventanilla.png`) se incluye en el árbol del proyecto y no requiere preparación adicional. Reemplazó al recurso anterior de la dependencia; el favicon es un recorte cuadrado del mismo logo (`public/assets/logos/favicon.png`).
 
@@ -44,21 +44,12 @@ El BFF conserva el token en servidor y usa cookie HttpOnly con alcance `/bff`.
 La identidad administrativa se recupera al recargar. Reiniciar el BFF requiere nuevo login.
 En modo real los módulos no rellenan datos con la demostración.
 
-## Funciones de la demostración
+## Demostración conservada para pruebas
 
-- Inicio con tres indicadores mensuales y accesos por tarea.
-- Directorio de sedes VUGE/VIM con municipio y responsable.
-- Configuración de trámites por sede conservando asociaciones históricas.
-- Catálogo central con costos iguales para todas las sedes.
-- Horarios, capacidad y validación de superposiciones.
-- Citas con filtros, paginación y simulación explícita de atención/inasistencia/cancelación.
-- Reportes con periodo/sede, filtros desplegables, columnas elegibles, CSV y estadísticas/gráfico bajo demanda.
-- Alta ficticia de jefes por root y asignación desde la sede.
-- Diagnósticos GET reales, municipios públicos y prueba opcional de login/me/logout de API.
-
-Los datos administrativos son **ficticios**, no un catálogo oficial. Guardado local usa `eventanilla.demo.data.v1` en localStorage; el perfil de demo usa sessionStorage. No se guardan tokens reales en esos almacenes. El acceso incluye botón para restablecer todos los datos de ejemplo.
-
-El diagnóstico histórico sigue disponible en demostración. El acceso institucional usa sus propios módulos y obtiene autorización de `admin/me`; seleccionar un perfil demo no modifica roles reales.
+El acceso institucional es la única entrada del panel; la demostración ya no se
+ofrece desde la pantalla de acceso. El modo ficticio permanece en el código para
+las pruebas automatizadas y sesiones existentes (`eventanilla.demo.data.v1` en
+localStorage; el perfil en sessionStorage). No se guardan tokens reales en esos almacenes.
 
 **Interfaz simplificada:** Sedes se organiza en Información, Trámites y Horarios. Formularios agrupan datos, señalan obligatorios y muestran errores junto al campo. El menú usa nombres breves; Configuración concentra opciones técnicas. El distintivo Demostración de navbar explica el entorno sin avisos repetidos.
 

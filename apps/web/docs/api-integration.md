@@ -10,8 +10,9 @@ Contratos: `contracts/admin-api.endpoints.json`; entrega y despliegue:
   `/bff/admin/me`. El rol, los permisos y las sedes se resuelven en API.
   `AdminProvider` mantiene identidad en memoria React; recargar vuelve a consultar
   la cookie HttpOnly. Los módulos reales no usan `DemoProvider` para completar datos.
-- **Demostración:** selector de perfiles y datos ficticios de `DemoProvider`.
-  Sus cambios se guardan exclusivamente en este navegador.
+- **Demostración:** datos ficticios de `DemoProvider` conservados para pruebas
+  automatizadas y sesiones existentes. La pantalla de acceso ya no ofrece perfiles
+  de demostración: solo el acceso institucional.
 
 ## BFF
 

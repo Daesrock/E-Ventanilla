@@ -1,5 +1,5 @@
 /** Espacio administrativo real: reutiliza shell institucional y mantiene la demo aislada. */
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAdminSession, pagePermission } from '../../app/providers/admin-context';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
@@ -13,6 +13,10 @@ export function AdminPanel() {
   const root = `/${location.pathname.split('/')[1] ?? ''}`;
   const permission = pagePermission[root];
   if (!identity) return null;
+  // Configuración concentra la sesión institucional y se reserva a ROOT:
+  // los jefes vuelven al inicio aunque lleguen por URL directa.
+  if (root === '/configuracion' && !identity.permissions.includes('permission.manage'))
+    return <Navigate to="/inicio" replace />;
   if (permission && !identity.permissions.includes(permission))
     return (
       <section className="panel panel-body">

@@ -1371,11 +1371,13 @@ tbody tr:hover {
   font-weight: 650;
 }
 .auth-story h1 {
-  font-size: clamp(39px, 4vw, 62px);
-  letter-spacing: -2px;
-  line-height: 1.13;
-  margin: 21px 0;
+  /* Nombre completo del departamento: tamaño contenido para no fragmentar en exceso. */
+  font-size: clamp(27px, 2.7vw, 40px);
+  letter-spacing: -0.8px;
+  line-height: 1.25;
+  margin: 0 0 21px;
   font-weight: 750;
+  text-wrap: balance;
 }
 .auth-story h1 span {
   color: #bbefda;
@@ -1641,7 +1643,7 @@ tbody tr:hover {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .auth-story h1 {
-    font-size: 43px;
+    font-size: 30px;
   }
 }
 @media (max-width: 800px) {

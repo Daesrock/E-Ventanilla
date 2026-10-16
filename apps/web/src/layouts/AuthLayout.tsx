@@ -11,15 +11,8 @@ export function AuthLayout() {
       <section className="auth-story geometric-surface">
         <ProductMark light />
         <div className="auth-story-content">
-          <span className="auth-eyebrow">SERVICIO PÚBLICO · CHIAPAS</span>
-          <h1>
-            Más cerca de
-            <br />
-            las personas.
-            <br />
-            <span>Más simple.</span>
-          </h1>
-          <p>Un espacio para coordinar nuestras ventanillas y transformar la atención ciudadana.</p>
+          <h1>{brand.department}</h1>
+          <p>Gestión empresarial y ventanillas integrales.</p>
           <div className="auth-illustration" aria-hidden="true">
             <div className="illustration-header">
               <span className="illustration-dots">● ● ●</span>
@@ -49,7 +42,6 @@ export function AuthLayout() {
             </div>
           </div>
         </div>
-        <p className="auth-story-footer">Gestión empresarial y ventanillas integrales</p>
       </section>
       <section className="auth-form-side">
         <InstitutionalLogo className="auth-logo" />

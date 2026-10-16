@@ -23,4 +23,6 @@ export const pagePermission: Record<string, string> = {
   '/usuarios': 'staff.read',
   '/citas': 'appointment.read',
   '/reportes': 'report.read',
+  // Configuración concentra la sesión institucional: reservada a ROOT.
+  '/configuracion': 'permission.manage',
 };
