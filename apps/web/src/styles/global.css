@@ -2392,6 +2392,7 @@ td {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
   padding: 20px;
+  min-width: 0;
   transition:
     transform 0.22s cubic-bezier(0.32, 0.72, 0, 1),
     box-shadow 0.22s ease;
@@ -2410,6 +2411,7 @@ td {
   margin: 9px 0 2px;
   font-size: 16px;
   letter-spacing: -0.2px;
+  overflow-wrap: anywhere;
 }
 .branch-tile-location {
   margin: 0;
@@ -2455,11 +2457,12 @@ td {
 }
 .branch-tile-actions {
   display: flex;
+  flex-direction: column;
   gap: 9px;
   margin-top: auto;
 }
 .branch-tile-actions .button {
-  flex: 1;
+  width: 100%;
 }
 @media (prefers-reduced-motion: reduce) {
   .page-content > *,
