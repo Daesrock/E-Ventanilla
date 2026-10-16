@@ -1,0 +1,213 @@
+{
+  "version": 1,
+  "description": "Endpoints administrativos y aditivos agregados en la rama bry. La autorización se resuelve en la base (rol + permiso + alcance); los permisos listados son los códigos de \"Permission\" que exige cada ruta.",
+  "basePath": "/v1",
+  "auth": {
+    "scheme": "Bearer",
+    "login": "POST /v1/auth/login",
+    "notes": "Misma sesión de la API. Cuenta ciudadana o sin AdministrativeStaff recibe 403 ADMIN_ACCESS_REQUIRED; permiso faltante recibe 403 ADMIN_PERMISSION_REQUIRED; sede fuera de alcance recibe 403 BRANCH_OUT_OF_SCOPE."
+  },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/v1/admin/me",
+      "permission": null,
+      "role": "ROOT | DEPARTMENT_HEAD | COUNTER_HEAD",
+      "purpose": "Identidad administrativa, rol, permisos, perfiles y sedes asignadas"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/staff",
+      "permission": "staff.read",
+      "query": ["q", "page", "pageSize"],
+      "purpose": "Listado de personal con rol, perfiles y sedes"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/admin/staff",
+      "permission": "staff.create",
+      "role": "ROOT",
+      "body": {
+        "required": ["firstName", "paternalLastName", "curp", "email", "password", "municipalityCode", "role"],
+        "optional": ["maternalLastName", "phone", "rfc", "counterStaff", "street", "exteriorNumber", "interiorNumber", "neighborhood", "postalCode", "socialSecurityNumber"],
+        "roleValues": ["DEPARTMENT_HEAD", "COUNTER_HEAD"],
+        "notes": "Alta transaccional User + AdministrativeStaff + perfil. Nunca usa auth/register; el correo queda verificado."
+      },
+      "purpose": "Alta de jefes de departamento y de ventanilla"
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/admin/staff/{id}",
+      "permission": "staff.update",
+      "role": "ROOT",
+      "body": {
+        "optional": ["active", "phone", "street", "exteriorNumber", "interiorNumber", "neighborhood", "postalCode", "socialSecurityNumber", "counterStaff"],
+        "notes": "counterStaff solo aplica a jefes de ventanilla; no se puede retirar si ya hay atenciones registradas."
+      },
+      "purpose": "Vigencia, contacto, domicilio y perfil técnico de ventanilla"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/branches",
+      "permission": "branch.read",
+      "query": ["q"],
+      "purpose": "Sedes con municipio, responsable y fuente según alcance"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/admin/branches",
+      "permission": "branch.create",
+      "role": "ROOT",
+      "body": {
+        "required": ["name", "type", "municipalityCode"],
+        "typeValues": ["VUGE", "VIM"],
+        "optional": ["street", "exteriorNumber", "interiorNumber", "neighborhood", "postalCode", "address", "phone", "email", "officeHours", "latitude", "longitude", "published", "sourceKey", "sourceUrl", "sourceSha256", "sourceCheckedAt"],
+        "notes": "published=true exige sourceKey, sourceUrl https, sourceSha256 (64 hex) y sourceCheckedAt."
+      },
+      "purpose": "Alta de sede"
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/admin/branches/{id}",
+      "permission": "branch.update",
+      "body": {
+        "optional": ["name", "type", "municipalityCode", "street", "exteriorNumber", "interiorNumber", "neighborhood", "postalCode", "address", "phone", "email", "officeHours", "latitude", "longitude", "active", "published", "sourceKey", "sourceUrl", "sourceSha256", "sourceCheckedAt"],
+        "notes": "COUNTER_HEAD solo puede editar domicilio y contacto de sus sedes; nombre, tipo, municipio, vigencia, publicación y fuente quedan bloqueados con fieldErrors."
+      },
+      "purpose": "Actualización de sede"
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/admin/branches/{id}/head",
+      "permission": "branch.update",
+      "role": "ROOT | DEPARTMENT_HEAD",
+      "body": { "optional": ["counterHeadId"], "notes": "counterHeadId=null retira al responsable." },
+      "purpose": "Asignación de jefe de ventanilla"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/branches/{id}/procedures",
+      "permission": "branch.read",
+      "purpose": "Oferta de trámites de la sede, incluidos inactivos y no publicados"
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/admin/branches/{id}/procedures",
+      "permission": "offer.manage",
+      "role": "ROOT | DEPARTMENT_HEAD",
+      "body": { "required": ["items"], "notes": "items: [{ procedureId, active }]. Desactiva, nunca elimina la asociación." },
+      "purpose": "Configuración de la oferta por sede"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/procedures",
+      "permission": "procedure.read",
+      "query": ["q", "active", "published"],
+      "purpose": "Catálogo central completo"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/admin/procedures",
+      "permission": "procedure.create",
+      "role": "ROOT | DEPARTMENT_HEAD",
+      "body": {
+        "required": ["name"],
+        "optional": ["category", "description", "requirements", "cost", "estimatedMinutes", "published", "sourceKey", "sourceUrl", "sourceSha256", "sourceCheckedAt"],
+        "notes": "cost es único para todas las sedes; published=true exige fuente corroborada."
+      },
+      "purpose": "Alta de trámite"
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/admin/procedures/{id}",
+      "permission": "procedure.update",
+      "role": "ROOT | DEPARTMENT_HEAD",
+      "purpose": "Actualización de trámite, costo, vigencia y publicación"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/branches/{branchId}/time-slots",
+      "permission": "slot.read",
+      "query": ["from", "to"],
+      "purpose": "Horarios y cupos de la sede"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/admin/branches/{branchId}/time-slots",
+      "permission": "slot.create",
+      "body": { "required": ["date", "startsAt", "endsAt", "capacity"], "notes": "date AAAA-MM-DD; horas HH:MM; valida superposición con bloques activos." },
+      "purpose": "Creación de bloque de atención"
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/admin/time-slots/{id}",
+      "permission": "slot.update",
+      "body": { "optional": ["startsAt", "endsAt", "capacity", "active"], "notes": "occupied jamás se acepta; capacity >= occupied lo garantizan API y PostgreSQL." },
+      "purpose": "Edición o desactivación de bloque"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/appointments",
+      "permission": "appointment.read",
+      "query": ["branchId", "from", "to", "status", "procedureId", "page", "pageSize"],
+      "purpose": "Citas con paginación real, según alcance"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/admin/appointments/{id}/attendance",
+      "permission": "appointment.update",
+      "body": {
+        "required": ["action"],
+        "actionValues": ["arrive", "start", "end"],
+        "optional": ["counterId (requerido en arrive)", "qrToken", "late"],
+        "notes": "Exige perfil CounterStaff en la cuenta (403 COUNTER_STAFF_REQUIRED). Los estados de la cita siguen pendientes de definición."
+      },
+      "purpose": "Registro de llegada, inicio y fin de atención"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/reports",
+      "permission": "report.read",
+      "query": ["from", "to", "branchId", "municipalityCode", "type", "procedureId", "status", "page", "pageSize"],
+      "purpose": "Métricas del periodo (citas, ciudadanos únicos, asistencia, atención, promedios) y listado paginado"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/reports/export.csv",
+      "permission": "report.read",
+      "query": ["from", "to", "branchId", "municipalityCode", "type", "procedureId", "status", "columns"],
+      "purpose": "CSV completo con todas las filas filtradas y columnas seleccionables"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/catalog/branches/{id}/procedures",
+      "permission": "public",
+      "purpose": "Aditivo público: trámites publicados y activos de una sede publicada"
+    }
+  ],
+  "errors": {
+    "VALIDATION_ERROR": "400 con message y fieldErrors por campo",
+    "ADMIN_ACCESS_REQUIRED": "403 cuenta sin rol administrativo o sin AdministrativeStaff",
+    "ADMIN_PERMISSION_REQUIRED": "403 permiso faltante",
+    "BRANCH_OUT_OF_SCOPE": "403 sede fuera del alcance del jefe de ventanilla",
+    "COUNTER_STAFF_REQUIRED": "403 la cuenta no tiene perfil técnico para registrar atención"
+  },
+  "audit": {
+    "table": "AdministrativeAuditLog",
+    "actions": [
+      "staff.create",
+      "staff.update",
+      "branch.create",
+      "branch.update",
+      "branch.head.assign",
+      "offer.update",
+      "procedure.create",
+      "procedure.update",
+      "slot.create",
+      "slot.update",
+      "appointment.attendance.arrive",
+      "appointment.attendance.start",
+      "appointment.attendance.end"
+    ]
+  }
+}
