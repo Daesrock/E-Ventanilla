@@ -44,7 +44,10 @@ Contratos: `contracts/admin-api.endpoints.json`; entrega y despliegue:
 | Reportes    | `admin/reports`, `admin/reports/export.csv`               | Paginación de pantalla; exportación del conjunto filtrado completo        |
 
 Campos de sede: `municipality: {code,name}`, responsable independiente, contactos nullable.
-Publicar exige sourceKey, URL HTTPS, SHA-256 corroborado y fecha; el formulario solicita estos datos.
+El formulario real agrupa datos generales, contacto, ubicación (mapa OpenStreetMap sin
+API key: clic o marcador + búsqueda de dirección) y publicación. `latitude`/`longitude`
+opcionales se envían juntas o se limpian con null; Android las usa para ordenar sedes
+cercanas. Publicar exige sourceKey, URL HTTPS, SHA-256 corroborado y fecha; el formulario solicita estos datos.
 El acceso ciudadano, registro y recuperación conservan sus contratos existentes.
 
 ## Reportes y atención
@@ -60,6 +63,9 @@ El acceso ciudadano, registro y recuperación conservan sus contratos existentes
 ## Límites actuales
 
 La cuenta real ROOT la aprovisiona el propietario; los accesos locales no existen
-automáticamente en el VPS. El listado de mostradores no permite darlos de alta:
+automáticamente en el VPS. El alta directa de jefes de ventanilla sigue reservada a
+root; el departamento usa la **Alta asistida** (archivo privado +
+`scripts/provision-counter-head.mjs`, verificado localmente) y asigna responsables
+por API desde cada sede. El listado de mostradores no permite darlos de alta:
 para registrar llegada deben existir mostradores activos y un perfil CounterStaff.
 No se agregan endpoints de gestión de permisos, auditoría o transiciones de estado de citas.

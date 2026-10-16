@@ -16,6 +16,7 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { InputField, SelectField } from '../../components/ui/Field';
 import { Badge } from '../../components/ui/Badge';
 import { AdminEditor, Pager, RemoteState, type AdminField } from './AdminUI';
+import { AssistedStaffDialog } from './AssistedStaffDialog';
 import { useAdminQuery } from './admin-hooks';
 import { useToast } from '../../hooks/useToast';
 
@@ -171,10 +172,14 @@ export function AdminStaffPage() {
   const [page, setPage] = useState(1);
   const query = useAdminQuery<Page<AdminStaff>>(`staff?${queryString({ q: search, page })}`);
   const [editor, setEditor] = useState<AdminStaff | 'new' | null>(null);
+  const [assisted, setAssisted] = useState(false);
+  const root = identity?.role.code === 'ROOT';
+  const canCreate = identity?.permissions.includes('staff.create') ?? false;
+  const canUpdate = identity?.permissions.includes('staff.update') ?? false;
   // Presentación según el observador: Root ve todo; el departamento ve su cuenta y
   // los jefes de ventanilla, sin cuentas ROOT (igual que la regla demostrativa).
   const visibleStaff = (query.data?.items ?? []).filter(
-    (item) => identity?.role.code === 'ROOT' || item.role.code !== 'ROOT',
+    (item) => root || item.role.code !== 'ROOT',
   );
   const createFields: AdminField[] = [
     { name: 'firstName', label: 'Nombre', required: true },
@@ -200,10 +205,13 @@ export function AdminStaffPage() {
       label: 'Rol',
       type: 'select',
       required: true,
-      options: [
-        { value: 'DEPARTMENT_HEAD', label: 'Jefe de departamento' },
-        { value: 'COUNTER_HEAD', label: 'Jefe de ventanilla' },
-      ],
+      // El jefe de departamento solo da de alta jefes de ventanilla.
+      options: root
+        ? [
+            { value: 'DEPARTMENT_HEAD', label: 'Jefe de departamento' },
+            { value: 'COUNTER_HEAD', label: 'Jefe de ventanilla' },
+          ]
+        : [{ value: 'COUNTER_HEAD', label: 'Jefe de ventanilla' }],
     },
     { name: 'phone', label: 'Teléfono (10 dígitos)', maxLength: 10 },
   ];
@@ -224,11 +232,17 @@ export function AdminStaffPage() {
     <>
       <PageHeader
         title="Responsables"
-        description="Root crea cuentas; departamento asigna los jefes de ventanilla desde cada sede."
+        description="El jefe de departamento administra cuentas de jefes de ventanilla; root administra cualquiera. La asignación a sedes se hace desde cada sede."
         actions={
-          identity?.role.code === 'ROOT' &&
-          identity.permissions.includes('staff.create') && (
+          canCreate ? (
             <Button onClick={() => setEditor('new')}>Nueva cuenta</Button>
+          ) : (
+            identity?.role.code === 'DEPARTMENT_HEAD' &&
+            identity.permissions.includes('staff.read') && (
+              <Button variant="secondary" onClick={() => setAssisted(true)}>
+                Alta asistida
+              </Button>
+            )
           )
         }
       />
@@ -270,9 +284,8 @@ export function AdminStaffPage() {
                     </td>
                     <td>{item.active ? 'Activa' : 'Inactiva'}</td>
                     <td>
-                      {identity?.role.code === 'ROOT' &&
-                        identity.permissions.includes('staff.update') &&
-                        item.role.code !== 'ROOT' && (
+                      {canUpdate &&
+                        (root ? item.role.code !== 'ROOT' : item.role.code === 'COUNTER_HEAD') && (
                           <button className="table-link" onClick={() => setEditor(item)}>
                             Editar
                           </button>
@@ -305,6 +318,7 @@ export function AdminStaffPage() {
           }}
         />
       )}
+      {assisted && <AssistedStaffDialog onClose={() => setAssisted(false)} />}
     </>
   );
 }

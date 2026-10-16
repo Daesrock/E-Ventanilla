@@ -16,37 +16,11 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { InputField, SelectField } from '../../components/ui/Field';
 import { useToast } from '../../hooks/useToast';
-import { AdminEditor, RemoteState, type AdminField } from './AdminUI';
-import { publicationFields } from './admin-fields';
+import { AdminBranchForm } from './AdminBranchForm';
+import { RemoteState } from './AdminUI';
 import { useAdminQuery, useUnsavedChanges } from './admin-hooks';
 import { AdminSlots } from './AdminOperations';
 
-const contactFields: AdminField[] = [
-  { name: 'address', label: 'Dirección completa', type: 'textarea', nullable: true },
-  { name: 'phone', label: 'Teléfono', nullable: true },
-  { name: 'email', label: 'Correo de contacto', type: 'email', nullable: true },
-  { name: 'officeHours', label: 'Horario de oficina', nullable: true },
-  { name: 'street', label: 'Calle', nullable: true },
-  { name: 'exteriorNumber', label: 'Número exterior', nullable: true },
-  { name: 'interiorNumber', label: 'Número interior', nullable: true },
-  { name: 'neighborhood', label: 'Colonia', nullable: true },
-  { name: 'postalCode', label: 'Código postal', nullable: true, maxLength: 5 },
-  { name: 'latitude', label: 'Latitud', type: 'number', step: '0.000001', nullable: true },
-  { name: 'longitude', label: 'Longitud', type: 'number', step: '0.000001', nullable: true },
-];
-const generalFields: AdminField[] = [
-  { name: 'name', label: 'Nombre de sede', required: true, maxLength: 150 },
-  {
-    name: 'type',
-    label: 'Tipo de sede',
-    required: true,
-    type: 'select',
-    options: [
-      { value: 'VUGE', label: 'VUGE' },
-      { value: 'VIM', label: 'VIM' },
-    ],
-  },
-];
 export function AdminBranches() {
   const { identity } = useAdminSession();
   const query = useAdminQuery<{ items: AdminBranch[] }>('branches');
@@ -135,23 +109,9 @@ export function AdminBranches() {
         <p className="panel-body">No hay sedes para estos filtros dentro de tu alcance.</p>
       )}
       {creating && (
-        <AdminEditor
-          title="Nueva sede"
-          fields={[
-            ...generalFields,
-            {
-              name: 'municipalityCode',
-              label: 'Clave de municipio',
-              required: true,
-              hint: 'Clave oficial de Chiapas: 07 + tres dígitos.',
-              maxLength: 5,
-            },
-            ...contactFields.map((field) => ({ ...field, nullable: field.type === 'number' })),
-          ]}
-          initial={{ type: 'VUGE' }}
-          close={() => setCreating(false)}
-          save={async (body) => {
-            await adminWrite('branches', 'POST', body);
+        <AdminBranchForm
+          onDone={() => {
+            setCreating(false);
             query.reload();
           }}
         />
@@ -247,26 +207,10 @@ export function AdminBranchDetail() {
           {tab === 'tramites' && <AdminBranchOffer key={branch.id} branch={branch} />}
           {tab === 'horarios' && <AdminSlots branchId={branch.id} />}
           {editing && (
-            <AdminEditor
-              title="Editar sede"
-              fields={[
-                ...(manager
-                  ? [
-                      ...generalFields,
-                      {
-                        name: 'municipalityCode',
-                        label: 'Clave de municipio',
-                        required: true,
-                      } as AdminField,
-                    ]
-                  : []),
-                ...contactFields,
-                ...(manager ? publicationFields : []),
-              ]}
-              initial={{ ...branch, municipalityCode: branch.municipality.code }}
-              close={() => setEditing(false)}
-              save={async (body) => {
-                await adminWrite(`branches/${branch.id}`, 'PATCH', body);
+            <AdminBranchForm
+              branch={branch}
+              onDone={() => {
+                setEditing(false);
                 query.reload();
               }}
             />

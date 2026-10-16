@@ -56,6 +56,18 @@ try {
     'Domicilio de prueba actualizado localmente',
   );
   await request(`admin/branches/${branch.id}`, 'PATCH', { address: branch.address });
+  await request(`admin/branches/${branch.id}`, 'PATCH', {
+    latitude: 16.123456,
+    longitude: -92.654321,
+  });
+  const located = (await request('admin/branches')).items.find((item) => item.id === branch.id);
+  assert.equal(located.latitude, 16.123456);
+  assert.equal(located.longitude, -92.654321);
+  await request(`admin/branches/${branch.id}`, 'PATCH', { latitude: null, longitude: null });
+  assert.equal(
+    (await request('admin/branches')).items.find((item) => item.id === branch.id).latitude,
+    null,
+  );
   const staff = await request('admin/staff?pageSize=100');
   const head = staff.items.find((item) => item.email === 'ventanilla@local.example');
   assert.ok(head);

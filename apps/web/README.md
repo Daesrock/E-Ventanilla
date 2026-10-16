@@ -32,10 +32,14 @@ No colocar tokens, contraseñas o `DATABASE_URL` en variables públicas ni archi
 
 ## Modo institucional
 
-- Sedes con responsable, información, oferta de trámites y horarios.
+- Sedes: formulario por secciones con selector de ubicación en mapa (OpenStreetMap).
+  La latitud y longitud se guardan en la API y la app móvil las usa para mostrar la sede.
 - Oferta con búsqueda, filtros, revisión de altas/retiros, descarte y persistencia en BD.
 - Catálogo central: costo decimal o pendiente (null), publicación con fuente corroborada.
-- Personal, citas y reportes con paginación de API; exportación CSV del conjunto completo filtrado.
+- Personal: root crea cuentas directo; el jefe de departamento prepara **altas
+  asistidas** (archivo privado + `scripts/provision-counter-head.mjs`) y asigna
+  responsables desde cada sede sin tocar la API.
+- Citas y reportes con paginación de API; exportación CSV del conjunto completo filtrado.
 - Acciones y navegación según permisos/alcance de `/v1/admin/me`.
 - Atención registra tiempos; no inventa transiciones de estado de cita.
 - Root crea cuentas/sedes; departamento configura y asigna responsables.

@@ -248,8 +248,107 @@ test('departamento no ve cuentas ROOT en Responsables y sí a los jefes de venta
     },
   ];
   let signedIn = false;
+  let staffWrites = 0;
   await page.route('**/bff/**', async (route) => {
-    const path = new URL(route.request().url()).pathname;
+    const request = route.request();
+    const path = new URL(request.url()).pathname;
+    const reply = (body: unknown, status = 200) => route.fulfill({ status, json: body });
+    if (path.endsWith('/auth/login')) {
+      signedIn = true;
+      return reply({ user: {}, expiresAt: '2099-01-01' });
+    }
+    if (path.endsWith('/admin/me')) {
+      if (!signedIn) return reply({ message: 'Sin sesión' }, 401);
+      // Permisos reales de hoy: el departamento no tiene staff.create/update.
+      return reply({
+        user: {
+          id: 'dept-account',
+          firstName: 'Departamento',
+          lastName: 'Local',
+          email: 'depto@local.example',
+        },
+        role: { code: 'DEPARTMENT_HEAD', name: 'Jefe de departamento' },
+        permissions: ['branch.read', 'branch.update', 'staff.read'],
+        scope: { allBranches: true, branches: [{ id, name: 'Sede propia' }] },
+        profiles: { counterStaff: false, counterHead: false, departmentHead: true },
+      });
+    }
+    if (path.endsWith('/catalog/municipalities'))
+      return reply({ municipalities: [{ code: '07101', name: 'Tuxtla Gutiérrez' }] });
+    if (path.endsWith('/admin/staff')) {
+      if (request.method() !== 'GET') staffWrites++;
+      return reply({
+        items: staff,
+        pagination: { page: 1, pageSize: 25, total: 3, totalPages: 1 },
+      });
+    }
+    return reply({ items: [] });
+  });
+  await page.goto('/acceso');
+  await page.getByLabel('Correo o CURP').fill('depto@local.example');
+  await page.getByLabel(/Contraseña/).fill('Pass-de-prueba-42');
+  await page.getByRole('button', { name: 'Ingresar al panel' }).click();
+  await page.getByRole('link', { name: 'Responsables', exact: true }).click();
+  await expect(page.getByText('Ventanilla Local')).toBeVisible();
+  await expect(page.getByText('Departamento Local', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('Titular Root')).toHaveCount(0);
+  // Sin permisos de alta, el departamento no crea por API ni edita cuentas...
+  await expect(page.getByRole('button', { name: 'Nueva cuenta' })).toHaveCount(0);
+  const headRow = page.getByRole('row', { name: /Ventanilla Local/ });
+  await expect(headRow.getByRole('button', { name: 'Editar' })).toHaveCount(0);
+  const deptRow = page.getByRole('row', { name: /Departamento Local/ });
+  await expect(deptRow.getByRole('button', { name: 'Editar' })).toHaveCount(0);
+  // ...pero sí puede preparar un alta asistida sin tocar la API.
+  await page.getByRole('button', { name: 'Alta asistida' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Nombre').fill('Nuevo Jefe');
+  await dialog.getByLabel('Apellido paterno').fill('Pérez');
+  await dialog.getByLabel('CURP').fill('PERE900101HCSXXX01');
+  await dialog.getByLabel('Correo').fill('nuevo.jefe@local.example');
+  await dialog.getByLabel('Contraseña inicial').fill('ClaveTecnica12');
+  await dialog.getByRole('checkbox', { name: 'Sede propia' }).check();
+  const downloadPromise = page.waitForEvent('download');
+  await dialog.getByRole('button', { name: 'Generar archivo de alta' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/^alta-jefe-ventanilla-.*\.json$/);
+  await expect(dialog.getByText(/provision-counter-head\.mjs/)).toBeVisible();
+  expect(staffWrites).toBe(0);
+  await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+});
+
+test('departamento edita la sede y guarda latitud/longitud del mapa', async ({ page }) => {
+  let signedIn = false;
+  let edited: Record<string, unknown> | undefined;
+  const branch = {
+    id,
+    name: 'Sede técnica',
+    type: 'VIM',
+    municipality: { code: '07101', name: 'Tuxtla Gutiérrez' },
+    address: 'Domicilio actual',
+    phone: null,
+    email: null,
+    officeHours: null,
+    street: null,
+    exteriorNumber: null,
+    interiorNumber: null,
+    neighborhood: null,
+    postalCode: null,
+    latitude: null,
+    longitude: null,
+    active: true,
+    published: false,
+    counterHead: null,
+    counterHeadId: null,
+    sourceKey: null,
+    sourceUrl: null,
+    sourceSha256: null,
+    sourceCheckedAt: null,
+  };
+  await page.route('**tile.openstreetmap.org/**', (route) => route.abort());
+  await page.route('**/bff/**', async (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname;
     const reply = (body: unknown, status = 200) => route.fulfill({ status, json: body });
     if (path.endsWith('/auth/login')) {
       signedIn = true;
@@ -265,25 +364,36 @@ test('departamento no ve cuentas ROOT en Responsables y sí a los jefes de venta
           email: 'depto@local.example',
         },
         role: { code: 'DEPARTMENT_HEAD', name: 'Jefe de departamento' },
-        permissions: ['branch.read', 'branch.update', 'slot.read', 'staff.read', 'report.read'],
-        scope: { allBranches: true, branches: [{ id, name: 'Sede propia' }] },
+        permissions: ['branch.read', 'branch.update', 'report.read'],
+        scope: { allBranches: true, branches: [{ id, name: 'Sede técnica' }] },
         profiles: { counterStaff: false, counterHead: false, departmentHead: true },
       });
     }
-    if (path.endsWith('/admin/staff'))
-      return reply({
-        items: staff,
-        pagination: { page: 1, pageSize: 25, total: 3, totalPages: 1 },
-      });
+    if (path.endsWith('/catalog/municipalities'))
+      return reply({ municipalities: [{ code: '07101', name: 'Tuxtla Gutiérrez' }] });
+    if (path.endsWith(`/admin/branches/${id}`) && request.method() === 'PATCH') {
+      edited = request.postDataJSON();
+      return reply({ ...branch, ...edited });
+    }
+    if (path.endsWith('/admin/branches')) return reply({ items: [branch] });
     return reply({ items: [] });
   });
   await page.goto('/acceso');
   await page.getByLabel('Correo o CURP').fill('depto@local.example');
   await page.getByLabel(/Contraseña/).fill('Pass-de-prueba-42');
   await page.getByRole('button', { name: 'Ingresar al panel' }).click();
-  await page.getByRole('link', { name: 'Responsables', exact: true }).click();
-  await expect(page.getByText('Ventanilla Local')).toBeVisible();
-  await expect(page.getByText('Departamento Local', { exact: false }).first()).toBeVisible();
-  await expect(page.getByText('Titular Root')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Nueva cuenta' })).toHaveCount(0);
+  await page.goto(`/sedes/${id}`);
+  await page.getByRole('button', { name: 'Editar información' }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('Ubicación', { exact: true })).toBeVisible();
+  await expect(dialog.getByLabel('Mapa para elegir la ubicación de la sede')).toBeVisible();
+  await dialog.getByLabel('Latitud').fill('16.123456');
+  await dialog.getByLabel('Longitud').fill('-92.654321');
+  await dialog.getByRole('button', { name: 'Guardar sede' }).click();
+  await expect(dialog).toHaveCount(0);
+  expect(edited).toMatchObject({
+    latitude: 16.123456,
+    longitude: -92.654321,
+    address: 'Domicilio actual',
+  });
 });

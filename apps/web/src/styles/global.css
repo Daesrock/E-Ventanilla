@@ -2222,3 +2222,26 @@ td {
 .admin-metric {
   font-size: 1.75rem;
 }
+/* Selector de ubicación: mapa OpenStreetMap dentro del formulario de sede. */
+.location-picker {
+  display: grid;
+  gap: 10px;
+}
+.location-search {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+.location-search .field {
+  flex: 1;
+}
+.location-map {
+  height: 300px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  isolation: isolate;
+}
+.location-pin {
+  background: transparent;
+  border: 0;
+}

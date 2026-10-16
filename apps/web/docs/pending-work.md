@@ -25,6 +25,17 @@ de `main` (`ddcd9df`). Entrega: `contracts/entrega-web-api-2026-10-16.md`.
   el pipeline `prepare-assets`). En Responsables, el jefe de departamento ya no ve
   cuentas ROOT (regla de presentación alineada con la demostración).
 - Horarios: campo de capacidad renombrado a «Cupos del bloque» con ayuda explícita.
+- Sedes: formulario por secciones (datos, contacto, ubicación, publicación) con mapa
+  OpenStreetMap sin API key para fijar latitud/longitud; la API guarda ambas y Android
+  las despliega. Sustituye al editor genérico del panel real.
+- Personal: **Alta asistida** para el jefe de departamento: el panel genera un archivo
+  privado (JSON) y `scripts/provision-counter-head.mjs` lo aplica con Bun 1.4.2 y la
+  conexión autorizada — sin tocar API ni base de datos (verificado localmente: cuenta
+  COUNTER_HEAD, perfiles, sede asignada, auditoría y rechazo de duplicados). La
+  asignación a sedes la hace el propio departamento desde cada sede. **Mejora futura
+  opcional (requiere despliegue de API):** `staff.create`/`staff.update` para
+  DEPARTMENT_HEAD limitado a COUNTER_HEAD, para autoservicio directo; la interfaz ya
+  está condicionada por permisos.
 
 ## Despliegue y validación del responsable
 
