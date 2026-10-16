@@ -33,14 +33,13 @@ de `main` (`ddcd9df`). Entrega: `contracts/entrega-web-api-2026-10-16.md`.
   y tarjetas de sede rediseñadas; respeta `prefers-reduced-motion`.
 - Emblema de la Comisión Estatal de Simplificación Administrativa (`coesmer.png`)
   restaurado como crédito institucional en menú lateral y pie del acceso.
-- Personal: **Alta asistida** para el jefe de departamento: el panel genera un archivo
-  privado (JSON) y `scripts/provision-counter-head.mjs` lo aplica con Bun 1.4.2 y la
-  conexión autorizada — sin tocar API ni base de datos (verificado localmente: cuenta
-  COUNTER_HEAD, perfiles, sede asignada, auditoría y rechazo de duplicados). La
-  asignación a sedes la hace el propio departamento desde cada sede. **Mejora futura
-  opcional (requiere despliegue de API):** `staff.create`/`staff.update` para
-  DEPARTMENT_HEAD limitado a COUNTER_HEAD, para autoservicio directo; la interfaz ya
-  está condicionada por permisos.
+- Personal: root crea las cuentas; el departamento asigna responsables desde cada
+  sede. La **Alta asistida se retiró de la interfaz** (evita confusión en la
+  presentación); `scripts/provision-counter-head.mjs` permanece como herramienta del
+  operador — verificado localmente: cuenta COUNTER_HEAD, perfiles, sede asignada,
+  auditoría y rechazo de duplicados. **Mejora futura opcional (requiere despliegue de
+  API):** `staff.create`/`staff.update` para DEPARTMENT_HEAD limitado a COUNTER_HEAD,
+  para autoservicio directo; la interfaz ya está condicionada por permisos.
 
 ## Despliegue y validación del responsable
 

@@ -16,7 +16,6 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { InputField, SelectField } from '../../components/ui/Field';
 import { Badge } from '../../components/ui/Badge';
 import { AdminEditor, Pager, RemoteState, type AdminField } from './AdminUI';
-import { AssistedStaffDialog } from './AssistedStaffDialog';
 import { useAdminQuery } from './admin-hooks';
 import { useToast } from '../../hooks/useToast';
 
@@ -172,7 +171,6 @@ export function AdminStaffPage() {
   const [page, setPage] = useState(1);
   const query = useAdminQuery<Page<AdminStaff>>(`staff?${queryString({ q: search, page })}`);
   const [editor, setEditor] = useState<AdminStaff | 'new' | null>(null);
-  const [assisted, setAssisted] = useState(false);
   const root = identity?.role.code === 'ROOT';
   const canCreate = identity?.permissions.includes('staff.create') ?? false;
   const canUpdate = identity?.permissions.includes('staff.update') ?? false;
@@ -232,19 +230,8 @@ export function AdminStaffPage() {
     <>
       <PageHeader
         title="Responsables"
-        description="El jefe de departamento administra cuentas de jefes de ventanilla; root administra cualquiera. La asignación a sedes se hace desde cada sede."
-        actions={
-          canCreate ? (
-            <Button onClick={() => setEditor('new')}>Nueva cuenta</Button>
-          ) : (
-            identity?.role.code === 'DEPARTMENT_HEAD' &&
-            identity.permissions.includes('staff.read') && (
-              <Button variant="secondary" onClick={() => setAssisted(true)}>
-                Alta asistida
-              </Button>
-            )
-          )
-        }
+        description="Root crea las cuentas; el jefe de departamento asigna los jefes de ventanilla desde cada sede."
+        actions={canCreate && <Button onClick={() => setEditor('new')}>Nueva cuenta</Button>}
       />
       <div className="filters">
         <InputField
@@ -318,7 +305,6 @@ export function AdminStaffPage() {
           }}
         />
       )}
-      {assisted && <AssistedStaffDialog onClose={() => setAssisted(false)} />}
     </>
   );
 }

@@ -63,9 +63,11 @@ El acceso ciudadano, registro y recuperación conservan sus contratos existentes
 ## Límites actuales
 
 La cuenta real ROOT la aprovisiona el propietario; los accesos locales no existen
-automáticamente en el VPS. El alta directa de jefes de ventanilla sigue reservada a
-root; el departamento usa la **Alta asistida** (archivo privado +
-`scripts/provision-counter-head.mjs`, verificado localmente) y asigna responsables
-por API desde cada sede. El listado de mostradores no permite darlos de alta:
-para registrar llegada deben existir mostradores activos y un perfil CounterStaff.
-No se agregan endpoints de gestión de permisos, auditoría o transiciones de estado de citas.
+automáticamente en el VPS. El alta de cuentas de jefes de ventanilla sigue reservada
+a root; el departamento asigna responsables por API desde cada sede. La **Alta
+asistida se retiró de la interfaz** para no confundir la operación; el script
+`scripts/provision-counter-head.mjs` (verificado localmente) permanece como
+herramienta del operador para casos puntuales. El listado de mostradores no permite
+darlos de alta: para registrar llegada deben existir mostradores activos y un perfil
+CounterStaff. No se agregan endpoints de gestión de permisos, auditoría o
+transiciones de estado de citas.

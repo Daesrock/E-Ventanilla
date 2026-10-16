@@ -138,22 +138,21 @@ En raíz del proyecto: `../../.gitignore` excluye dependencias, secretos y artef
 
 ## Administración institucional conectada
 
-| Archivo                                      | Responsabilidad                                                             |
-| -------------------------------------------- | --------------------------------------------------------------------------- |
-| `src/app/providers/admin-context.ts`         | Contrato de sesión y permisos por página                                    |
-| `src/app/providers/AdminProvider.tsx`        | Identidad real, login, recuperación y cierre de sesión                      |
-| `src/services/api/admin.ts`                  | Tipos y cliente administrativo, paginación y descarga CSV                   |
-| `src/features/admin/AdminPanel.tsx`          | Selección de módulo real con guardas de permisos                            |
-| `src/features/admin/AdminBranches.tsx`       | Sedes, edición, responsables y oferta de trámites con revisión              |
-| `src/features/admin/AdminBranchForm.tsx`     | Formulario de sede por secciones con ubicación y publicación                |
-| `src/features/admin/AssistedStaffDialog.tsx` | Alta asistida: genera archivo privado para el script de aprovisionamiento   |
-| `src/features/admin/LocationPicker.tsx`      | Selector de latitud/longitud con mapa OpenStreetMap y búsqueda de dirección |
-| `src/features/admin/AdminCatalog.tsx`        | Catálogo central real, costo nullable y publicación                         |
-| `src/features/admin/AdminOperations.tsx`     | Horarios, personal, citas/atención y reportes paginados                     |
-| `src/features/admin/AdminUI.tsx`             | Formularios de contrato, errores de campo, consulta y paginación            |
-| `src/features/admin/admin-hooks.tsx`         | Consultas cancelables y aviso de salida con cambios                         |
-| `src/features/admin/admin-fields.ts`         | Campos comunes de fuente y publicación                                      |
-| `tests/e2e/admin.spec.ts`                    | Oferta persistida, permisos móvil y alta de catálogo con errores            |
+| Archivo                                  | Responsabilidad                                                             |
+| ---------------------------------------- | --------------------------------------------------------------------------- |
+| `src/app/providers/admin-context.ts`     | Contrato de sesión y permisos por página                                    |
+| `src/app/providers/AdminProvider.tsx`    | Identidad real, login, recuperación y cierre de sesión                      |
+| `src/services/api/admin.ts`              | Tipos y cliente administrativo, paginación y descarga CSV                   |
+| `src/features/admin/AdminPanel.tsx`      | Selección de módulo real con guardas de permisos                            |
+| `src/features/admin/AdminBranches.tsx`   | Sedes, edición, responsables y oferta de trámites con revisión              |
+| `src/features/admin/AdminBranchForm.tsx` | Formulario de sede por secciones con ubicación y publicación                |
+| `src/features/admin/LocationPicker.tsx`  | Selector de latitud/longitud con mapa OpenStreetMap y búsqueda de dirección |
+| `src/features/admin/AdminCatalog.tsx`    | Catálogo central real, costo nullable y publicación                         |
+| `src/features/admin/AdminOperations.tsx` | Horarios, personal, citas/atención y reportes paginados                     |
+| `src/features/admin/AdminUI.tsx`         | Formularios de contrato, errores de campo, consulta y paginación            |
+| `src/features/admin/admin-hooks.tsx`     | Consultas cancelables y aviso de salida con cambios                         |
+| `src/features/admin/admin-fields.ts`     | Campos comunes de fuente y publicación                                      |
+| `tests/e2e/admin.spec.ts`                | Oferta persistida, permisos móvil y alta de catálogo con errores            |
 
 ## Generados y privados excluidos (reglas)
 

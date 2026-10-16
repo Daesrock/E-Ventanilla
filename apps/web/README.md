@@ -36,9 +36,8 @@ No colocar tokens, contraseñas o `DATABASE_URL` en variables públicas ni archi
   La latitud y longitud se guardan en la API y la app móvil las usa para mostrar la sede.
 - Oferta con búsqueda, filtros, revisión de altas/retiros, descarte y persistencia en BD.
 - Catálogo central: costo decimal o pendiente (null), publicación con fuente corroborada.
-- Personal: root crea cuentas directo; el jefe de departamento prepara **altas
-  asistidas** (archivo privado + `scripts/provision-counter-head.mjs`) y asigna
-  responsables desde cada sede sin tocar la API.
+- Personal: root crea las cuentas; el jefe de departamento asigna responsables
+  desde cada sede.
 - Citas y reportes con paginación de API; exportación CSV del conjunto completo filtrado.
 - Acciones y navegación según permisos/alcance de `/v1/admin/me`.
 - Atención registra tiempos; no inventa transiciones de estado de cita.

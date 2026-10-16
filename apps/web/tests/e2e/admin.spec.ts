@@ -273,8 +273,6 @@ test('departamento no ve cuentas ROOT en Responsables y sí a los jefes de venta
         profiles: { counterStaff: false, counterHead: false, departmentHead: true },
       });
     }
-    if (path.endsWith('/catalog/municipalities'))
-      return reply({ municipalities: [{ code: '07101', name: 'Tuxtla Gutiérrez' }] });
     if (path.endsWith('/admin/staff')) {
       if (request.method() !== 'GET') staffWrites++;
       return reply({
@@ -292,29 +290,14 @@ test('departamento no ve cuentas ROOT en Responsables y sí a los jefes de venta
   await expect(page.getByText('Ventanilla Local')).toBeVisible();
   await expect(page.getByText('Departamento Local', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('Titular Root')).toHaveCount(0);
-  // Sin permisos de alta, el departamento no crea por API ni edita cuentas...
+  // Sin permisos de alta, el departamento solo consulta: no crea ni edita cuentas.
   await expect(page.getByRole('button', { name: 'Nueva cuenta' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Alta asistida' })).toHaveCount(0);
   const headRow = page.getByRole('row', { name: /Ventanilla Local/ });
   await expect(headRow.getByRole('button', { name: 'Editar' })).toHaveCount(0);
   const deptRow = page.getByRole('row', { name: /Departamento Local/ });
   await expect(deptRow.getByRole('button', { name: 'Editar' })).toHaveCount(0);
-  // ...pero sí puede preparar un alta asistida sin tocar la API.
-  await page.getByRole('button', { name: 'Alta asistida' }).click();
-  const dialog = page.getByRole('dialog');
-  await dialog.getByLabel('Nombre').fill('Nuevo Jefe');
-  await dialog.getByLabel('Apellido paterno').fill('Pérez');
-  await dialog.getByLabel('CURP').fill('PERE900101HCSXXX01');
-  await dialog.getByLabel('Correo').fill('nuevo.jefe@local.example');
-  await dialog.getByLabel('Contraseña inicial').fill('ClaveTecnica12');
-  await dialog.getByRole('checkbox', { name: 'Sede propia' }).check();
-  const downloadPromise = page.waitForEvent('download');
-  await dialog.getByRole('button', { name: 'Generar archivo de alta' }).click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/^alta-jefe-ventanilla-.*\.json$/);
-  await expect(dialog.getByText(/provision-counter-head\.mjs/)).toBeVisible();
   expect(staffWrites).toBe(0);
-  await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
-  await expect(dialog).toHaveCount(0);
 });
 
 test('departamento edita la sede y guarda latitud/longitud del mapa', async ({ page }) => {
