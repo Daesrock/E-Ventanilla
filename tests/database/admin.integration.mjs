@@ -1,7 +1,9 @@
 // Solo bases efímeras: localhost:55432 (CI) o el contenedor privado admin-test-db.
 import assert from 'node:assert/strict';
 import { randomBytes, randomUUID } from 'node:crypto';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import { parseEnv } from 'node:util';
 
@@ -31,6 +33,7 @@ const { PublicCatalogService } = await import(
   '../../apps/api/dist/features/catalog/public-catalog.service.js'
 );
 const { SessionService } = await import('../../apps/api/dist/features/sessions/session.service.js');
+const { provisionRoot } = await import('../../apps/api/dist/features/admin/root-provisioning.js');
 const { hashPassword, verifyPassword, tokenDigest } = await import(
   '../../apps/api/dist/core/security/crypto.js'
 );
@@ -133,21 +136,80 @@ try {
     }
   });
   const rootRole = await db.role.findUniqueOrThrow({ where: { code: 'ROOT' } });
-  const owner = await db.user.create({
-    data: {
-      firstName: 'Fixture',
-      lastName: 'Administrador',
-      paternalLastName: 'Administrador',
-      curp: 'BABB000101HCSBBB09',
-      email: 'owner@example.invalid',
-      passwordHash: oldHash,
-      municipality: municipality.name,
-      municipalityCode: municipality.code,
-      roleId: rootRole.id,
-      emailVerifiedAt: new Date(),
-      administrativeStaff: { create: { counterStaff: { create: {} } } },
-    },
+  const rootInput = {
+    firstName: 'Fixture',
+    paternalLastName: 'Administrador',
+    curp: 'BABB000101HCSBBB09',
+    email: 'owner@example.invalid',
+    password: 'ClaveTecnica12',
+    municipalityCode: municipality.code,
+  };
+  await check('ROOT: un fallo de auditoría revierte identidad y perfil completos', async () => {
+    const failing = new Proxy(db, {
+      get(target, key) {
+        if (key === '$transaction')
+          return (action) =>
+            target.$transaction((transaction) =>
+              action(
+                new Proxy(transaction, {
+                  get(tx, property) {
+                    return property === 'administrativeAuditLog'
+                      ? {
+                          create: async () => {
+                            throw new Error('Fallo técnico de auditoría.');
+                          },
+                        }
+                      : Reflect.get(tx, property);
+                  },
+                }),
+              ),
+            );
+        return Reflect.get(target, key);
+      },
+    });
+    await assert.rejects(provisionRoot(failing, rootInput), /técnico/);
+    assert.equal(await db.user.count({ where: { roleId: rootRole.id } }), 0);
+    assert.equal(await db.administrativeStaff.count(), 0);
+    assert.equal(await db.administrativeAuditLog.count(), 0);
   });
+  let owner;
+  await check(
+    'ROOT concurrente: solo una cuenta inicial, con perfil y auditoría sin credenciales',
+    async () => {
+      const attempts = await Promise.allSettled([
+        provisionRoot(db, rootInput),
+        provisionRoot(db, {
+          ...rootInput,
+          curp: 'DABB000101HCSBBB09',
+          email: 'second@example.invalid',
+        }),
+      ]);
+      assert.equal(attempts.filter((r) => r.status === 'fulfilled').length, 1);
+      assert.equal(
+        attempts.filter((r) => r.status === 'rejected' && r.reason.getStatus() === 409).length,
+        1,
+      );
+      owner = await db.user.findUniqueOrThrow({
+        where: { id: attempts.find((r) => r.status === 'fulfilled').value.id },
+      });
+      assert.equal(await db.citizen.count({ where: { userId: owner.id } }), 0);
+      assert.equal(await db.administrativeStaff.count({ where: { userId: owner.id } }), 1);
+      assert.equal(await verifyPassword(rootInput.password, owner.passwordHash), true);
+      const audit = await db.administrativeAuditLog.findFirstOrThrow({
+        where: { action: 'staff.bootstrap' },
+      });
+      assert.equal(audit.actorUserId, owner.id);
+      assert.equal(audit.metadata, null);
+      await assert.rejects(provisionRoot(db, rootInput), (error) => error.getStatus() === 409);
+      assert.equal(
+        (await db.user.findUniqueOrThrow({ where: { id: owner.id } })).passwordHash,
+        owner.passwordHash,
+      );
+      assert.equal(await db.user.count({ where: { roleId: rootRole.id } }), 1);
+    },
+  );
+  // Perfil técnico exclusivamente del fixture que ejercita las atenciones.
+  await db.counterStaff.create({ data: { userId: owner.id } });
   const context = {
     userId: owner.id,
     allBranches: true,
@@ -300,6 +362,25 @@ try {
     items: [{ procedureId: procedure.id, active: true }],
   });
   const counter = await db.serviceCounter.create({ data: { branchId: branch.id, number: 1 } });
+  await check(
+    'mostradores: solo la sede solicitada, orden numérico e inactivos identificados',
+    async () => {
+      await db.serviceCounter.create({ data: { branchId: branch.id, number: 2, active: false } });
+      const other = await db.branch.create({
+        data: { municipalityId: municipality.id, name: 'Fixture aislado ajeno', type: 'VIM' },
+      });
+      await db.serviceCounter.create({ data: { branchId: other.id, number: 3 } });
+      const result = await branches.countersFor(context, branch.id);
+      assert.deepEqual(
+        result.items.map((item) => [item.number, item.active]),
+        [
+          [1, true],
+          [2, false],
+        ],
+      );
+      assert.equal(result.items[0].id, counter.id);
+    },
+  );
   const appointment = await db.appointment.create({
     data: {
       folio: randomUUID(),
@@ -463,6 +544,15 @@ try {
         assert.equal(identity.status, 200);
         assert.equal((await identity.json()).permissions.length, 18);
         assert.equal((await request('admin/branches')).status, 200);
+        const counters = await request(`admin/branches/${branch.id}/counters`);
+        assert.equal(counters.status, 200);
+        assert.deepEqual(
+          (await counters.json()).items.map((item) => [item.number, item.active]),
+          [
+            [1, true],
+            [2, false],
+          ],
+        );
         assert.equal((await request(`catalog/branches/${branch.id}/procedures`)).status, 200);
         const nearby = await request('catalog/branches/nearby', administratorToken, {
           method: 'POST',
@@ -482,6 +572,26 @@ try {
         });
         assert.equal(login.status, 201);
         assert.equal((await login.json()).user.id, citizen.id);
+        // Prueba opcional con el BFF exacto de la rama web, montado fuera del código productivo.
+        if (process.env.EV_TEST_BFF_ENTRY && process.env.EV_TEST_BFF_CHECK) {
+          const { checkBff } = await import(process.env.EV_TEST_BFF_CHECK);
+          await db.user.update({ where: { id: head.id }, data: { active: true } });
+          const other = await db.branch.findFirstOrThrow({ where: { id: { not: branch.id } } });
+          await check(
+            'BFF de bry con API y PostgreSQL reales: sesión, mostradores, permisos y errores',
+            () =>
+              checkBff({
+                entry: process.env.EV_TEST_BFF_ENTRY,
+                apiBaseUrl: base,
+                root: { email: owner.email, password: rootInput.password },
+                citizen: { email: citizen.email, password: 'ClaveAnterior12' },
+                head: { email: head.email, password: 'ClaveTecnica12' },
+                branchId: branch.id,
+                otherBranchId: other.id,
+                slotId: slot.id,
+              }),
+          );
+        }
       } finally {
         server.kill();
         await server.exited;
@@ -515,6 +625,55 @@ try {
           ).rows[0].n,
           migrationNames.length,
         );
+        const directory = mkdtempSync(join(tmpdir(), 'ev-root-integration-'));
+        try {
+          const inputFile = join(directory, 'root.private.json');
+          const connectionFile = join(directory, 'database-url.private');
+          writeFileSync(inputFile, JSON.stringify(rootInput), { mode: 0o600 });
+          writeFileSync(connectionFile, freshUrl, { mode: 0o600 });
+          const run = () =>
+            Bun.spawnSync(
+              [
+                process.execPath,
+                new URL('scripts/provision-root.mjs', root).pathname.replace(/^\/(\w:)/, '$1'),
+                inputFile,
+              ],
+              {
+                env: { ...process.env, DATABASE_URL: undefined, DATABASE_URL_FILE: connectionFile },
+                stdout: 'pipe',
+                stderr: 'pipe',
+                timeout: 15000,
+              },
+            );
+          const created = run();
+          assert.equal(created.exitCode, 0, created.stderr.toString());
+          const output = created.stdout.toString() + created.stderr.toString();
+          assert.ok(output.includes('aprovisionada'));
+          assert.equal(output.includes(rootInput.password), false);
+          assert.equal(output.includes('scrypt$'), false);
+          const before = (await fresh.query('SELECT id,"passwordHash" FROM "User"')).rows;
+          const repeated = run();
+          assert.equal(repeated.exitCode, 1);
+          assert.deepEqual(
+            (await fresh.query('SELECT id,"passwordHash" FROM "User"')).rows,
+            before,
+          );
+          assert.equal(
+            (await fresh.query('SELECT count(*)::int AS n FROM "Citizen"')).rows[0].n,
+            0,
+          );
+          assert.equal(
+            (
+              await fresh.query(
+                'SELECT count(*)::int AS n FROM "AdministrativeAuditLog" WHERE action=\'staff.bootstrap\'',
+              )
+            ).rows[0].n,
+            1,
+          );
+        } finally {
+          assert.ok(directory.startsWith(join(tmpdir(), 'ev-root-integration-')));
+          rmSync(directory, { recursive: true, force: true });
+        }
       } finally {
         await fresh.end();
       }

@@ -5,6 +5,7 @@ RUN bun check-bun.mjs && bun install --frozen-lockfile
 COPY apps/api/ .
 COPY database/ /workspace/database/
 COPY contracts/ /workspace/contracts/
+COPY scripts/provision-root.mjs /workspace/scripts/provision-root.mjs
 COPY apps/android/app/src/main/assets/ /workspace/apps/android/app/src/main/assets/
 # Generar Prisma no necesita una base de datos accesible.
 RUN export DATABASE_URL=postgresql://localhost/eventanilla AUTH_CODE_SECRET=0000000000000000000000000000000000000000000000000000000000000000; bun run build && bun test --timeout 15000 test
