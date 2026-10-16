@@ -6,24 +6,34 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-institutional: #009d86;
-  --color-accent: #ff0164;
-  --color-charcoal: #312d2e;
-  --color-canvas: #f7f4f2;
+  --color-institutional: #149381;
+  --color-accent: #e97ead;
+  --color-charcoal: #333333;
+  --color-canvas: #f4f4f6;
   --font-sans: 'Manrope', 'Segoe UI', sans-serif;
 }
 
-/* Tokens derivados: verde oscuro para texto y controles con contraste suficiente. */
+/*
+ * Tokens derivados. Los tres colores base son los de las plataformas
+ * gubernamentales de Chiapas: #149381, #e97ead y #333333.
+ */
 :root {
-  --green: #009d86;
-  --green-dark: #007261;
-  --pink: #ff0164;
-  --ink: #312d2e;
-  --muted: #777375;
-  --canvas: #f7f4f2;
-  --line: #ebe7e5;
-  --soft-green: #e8f5f1;
-  --soft-pink: #fff0f5;
+  --green: #149381;
+  --green-dark: #0e7568;
+  --pink: #e97ead;
+  --pink-dark: #b04a7d;
+  --ink: #333333;
+  --muted: #6f6f74;
+  --canvas: #f4f4f6;
+  --line: #e7e7ea;
+  --soft-green: #e7f2f0;
+  --soft-pink: #fbeef5;
+  /* Radios y sombras estilo iOS 18. */
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --shadow-card: 0 1px 2px rgb(51 51 51 / 4%), 0 10px 30px -18px rgb(51 51 51 / 18%);
+  --shadow-pop: 0 18px 50px -24px rgb(51 51 51 / 35%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -67,7 +77,7 @@ a {
   touch-action: manipulation;
 }
 :focus-visible {
-  outline: 3px solid #007261;
+  outline: 3px solid var(--green);
   outline-offset: 3px;
 }
 h1,
@@ -181,7 +191,7 @@ svg {
   color: white;
 }
 .product-mark-light small {
-  color: #d8eee8;
+  color: #d9efe9;
 }
 .workspace {
   padding: 14px 10px;
@@ -240,7 +250,7 @@ svg {
   transition: 0.15s ease;
 }
 .nav-link:hover {
-  background: #f8f7f6;
+  background: #f5f5f7;
   color: var(--ink);
 }
 .nav-link-active {
@@ -385,12 +395,12 @@ svg {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 9px;
-  border: 1px solid #e7e1dd;
-  border-radius: 6px;
+  padding: 5px 11px;
+  border: 1px solid #e3e3e7;
+  border-radius: 999px;
   font-size: 9px;
-  color: #827265;
-  background: #fbf8f5;
+  color: #6f6f74;
+  background: #f7f7f9;
 }
 .icon-button {
   display: inline-flex;
@@ -467,20 +477,20 @@ svg {
   white-space: nowrap;
 }
 .button-primary {
-  background: var(--green-dark);
+  background: var(--green);
   color: #fff;
-  box-shadow: 0 3px 7px #00726112;
+  box-shadow: 0 6px 16px -10px rgb(20 147 129 / 65%);
 }
 .button-primary:hover {
-  background: #005f50;
+  background: var(--green-dark);
 }
 .button-secondary {
   background: #fff;
-  border-color: #e1dcda;
-  color: #5e575b;
+  border-color: #dedee2;
+  color: #57575e;
 }
 .button-secondary:hover {
-  background: #f9f7f6;
+  background: #f5f5f7;
 }
 .button-ghost {
   background: transparent;
@@ -490,12 +500,12 @@ svg {
   background: var(--soft-green);
 }
 .button-danger {
-  background: #fff0f5;
-  color: #b50044;
-  border-color: #ffd0e2;
+  background: var(--soft-pink);
+  color: var(--pink-dark);
+  border-color: #f3cfdf;
 }
 .button-danger:hover {
-  background: #ffe0ed;
+  background: #f7ddea;
 }
 .page-header {
   display: flex;
@@ -519,8 +529,8 @@ svg {
 .panel {
   background: #fff;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  box-shadow: 0 2px 4px #312d2e02;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
 .panel-header {
   display: flex;
@@ -558,20 +568,20 @@ svg {
   border-radius: 50%;
 }
 .badge-green {
-  background: #e7f5ee;
-  color: #237555;
+  background: #e3f2ee;
+  color: #0e7568;
 }
 .badge-pink {
-  background: #fff0f5;
-  color: #ac1a56;
+  background: var(--soft-pink);
+  color: var(--pink-dark);
 }
 .badge-amber {
   background: #fff4df;
   color: #8b6420;
 }
 .badge-neutral {
-  background: #f0efee;
-  color: #767074;
+  background: #f0f0f3;
+  color: #6f6f74;
 }
 .stats-grid {
   display: grid;
@@ -644,18 +654,28 @@ svg {
 .field select,
 .field textarea {
   width: 100%;
-  border: 1px solid #e2dcda;
+  border: 1px solid #dedee2;
   background: white;
-  border-radius: 7px;
+  border-radius: 12px;
   color: var(--ink);
   padding: 10px 12px;
   min-height: 40px;
   font-size: 12px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px rgb(20 147 129 / 14%);
 }
 .field input:disabled,
 .field select:disabled {
-  background: #f6f4f3;
-  color: #8b8487;
+  background: #f2f2f4;
+  color: #8b8b92;
 }
 .field small {
   font-size: 10px;
@@ -740,22 +760,22 @@ table {
 th {
   font-size: 9px;
   font-weight: 650;
-  color: #938b8f;
-  background: #faf9f8;
+  color: #8a8a92;
+  background: #f6f6f8;
   padding: 13px 18px;
   border-bottom: 1px solid var(--line);
 }
 td {
   padding: 15px 18px;
-  border-bottom: 1px solid #f1eeec;
+  border-bottom: 1px solid #efeff2;
   font-size: 11px;
-  color: #645d61;
+  color: #5d5d64;
 }
 tbody tr:last-child td {
   border-bottom: 0;
 }
 tbody tr:hover {
-  background: #fcfbfa;
+  background: #fafafc;
 }
 .table-primary {
   font-weight: 650;
@@ -882,9 +902,9 @@ tbody tr:hover {
   z-index: 100;
   padding: 15px 17px;
   max-width: min(450px, calc(100vw - 30px));
-  border-radius: 10px;
+  border-radius: 16px;
   background: #fff;
-  box-shadow: 0 6px 30px #312d2e24;
+  box-shadow: var(--shadow-pop);
   border: 1px solid var(--line);
   font-size: 12px;
 }
@@ -892,7 +912,7 @@ tbody tr:hover {
   color: var(--green-dark);
 }
 .toast-error > svg {
-  color: #b60047;
+  color: var(--pink-dark);
 }
 .toast button {
   border: 0;
@@ -913,10 +933,10 @@ tbody tr:hover {
 .geometric-surface {
   background-color: var(--green-dark);
   background-image:
-    url('/assets/patterns/institutional.svg'), linear-gradient(120deg, #006f5e, #009d86);
+    url('/assets/patterns/institutional.svg'), linear-gradient(120deg, #0b6355, #149381);
 }
 .welcome-banner {
-  border-radius: 13px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   color: #fff;
   display: flex;
@@ -930,7 +950,7 @@ tbody tr:hover {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #007261a8 0%, transparent 80%);
+  background: linear-gradient(90deg, #0e7568a8 0%, transparent 80%);
   pointer-events: none;
 }
 .welcome-copy,
@@ -1133,7 +1153,7 @@ tbody tr:hover {
   background: var(--soft-green);
 }
 .branch-icon-pink {
-  color: #b61956;
+  color: var(--pink-dark);
   background: var(--soft-pink);
 }
 .branch-card-body {
@@ -1187,7 +1207,7 @@ tbody tr:hover {
   align-items: center;
   border-top: 1px solid var(--line);
   padding: 12px 22px;
-  background: #fdfcfb;
+  background: #fafafc;
 }
 .detail-grid {
   display: grid;
@@ -1353,7 +1373,7 @@ tbody tr:hover {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(140deg, #006454aa, #00867118);
+  background: linear-gradient(140deg, #0b6355b8, #14938120);
   pointer-events: none;
 }
 .auth-story > * {
@@ -1367,7 +1387,7 @@ tbody tr:hover {
 .auth-eyebrow {
   font-size: 10px;
   letter-spacing: 2px;
-  color: #d2eae4;
+  color: #d5ece6;
   font-weight: 650;
 }
 .auth-story h1 {
@@ -1380,16 +1400,16 @@ tbody tr:hover {
   text-wrap: balance;
 }
 .auth-story h1 span {
-  color: #bbefda;
+  color: #b6eedd;
 }
 .auth-story-content > p {
-  color: #d8ede7;
+  color: #d9ece7;
   line-height: 1.8;
   max-width: 370px;
   font-size: 13px;
 }
 .auth-story-footer {
-  color: #c7e5dc;
+  color: #cbe9e1;
   font-size: 10px;
 }
 .auth-illustration {
@@ -1873,7 +1893,7 @@ td {
   cursor: pointer;
 }
 .demo-pill:hover {
-  background: #f0eae4;
+  background: #f0f0f4;
 }
 .welcome-compact {
   min-height: 112px;
@@ -1915,8 +1935,8 @@ td {
 .field textarea {
   font-size: 14px;
   min-height: 44px;
-  background: #fcfbfa;
-  border-color: #d8d1cd;
+  background: #f7f7f9;
+  border-color: #dedee2;
 }
 .field input:focus,
 .field select:focus,
@@ -1925,20 +1945,20 @@ td {
 }
 .field input::placeholder,
 .field textarea::placeholder {
-  color: #96908d;
+  color: #8e8e96;
 }
 .field small {
   font-size: 11px;
 }
 .field [aria-invalid='true'] {
-  border-color: #b60047;
+  border-color: var(--pink-dark);
 }
 .field [aria-invalid='true']:focus-visible {
-  outline-color: #b60047;
+  outline-color: var(--pink-dark);
 }
 .field .field-error,
 .required-mark {
-  color: #b60047;
+  color: var(--pink-dark);
 }
 .required-mark {
   font-weight: 700;
@@ -2237,11 +2257,204 @@ td {
 }
 .location-map {
   height: 300px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--line);
   isolation: isolate;
 }
 .location-pin {
   background: transparent;
   border: 0;
+}
+/* Crédito institucional de la Comisión. */
+.coesmer-logo {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+.institution-card .coesmer-logo {
+  width: 100%;
+}
+.auth-coesmer {
+  width: 185px;
+  margin-bottom: 10px;
+  opacity: 0.92;
+}
+
+/*
+ * Estilo iOS 18: radios amplios, sombras suaves, superficies translúcidas y
+ * transiciones breves. No cambia la semántica ni los colores institucionales
+ * (#149381, #e97ead, #333333); solo suaviza la presentación.
+ */
+@keyframes ios-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.page-content > * {
+  animation: ios-page-in 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+.navbar {
+  background: rgb(255 255 255 / 84%);
+  backdrop-filter: blur(18px) saturate(1.7);
+  -webkit-backdrop-filter: blur(18px) saturate(1.7);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.button {
+  border-radius: 13px;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+.button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.button-primary {
+  box-shadow: 0 8px 18px -10px rgb(20 147 129 / 70%);
+}
+.icon-button {
+  border-radius: 50%;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+.icon-button:active {
+  transform: scale(0.94);
+}
+.nav-link {
+  border-radius: 13px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.nav-link:active {
+  transform: scale(0.98);
+}
+.workspace {
+  border-radius: var(--radius-md);
+}
+.workspace-icon {
+  border-radius: 10px;
+}
+.stat-card,
+.branch-card,
+.welcome-banner,
+.toast {
+  border-radius: var(--radius-lg);
+}
+.modal {
+  border-radius: 24px;
+  box-shadow: var(--shadow-pop);
+}
+.modal-backdrop {
+  background: rgb(51 51 51 / 42%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.section-tabs a {
+  border-radius: 999px;
+}
+.search-input input {
+  border-radius: 13px;
+}
+.institution-card {
+  border-radius: var(--radius-md);
+}
+/* Tarjeta de sede del panel real. */
+.branch-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  transition:
+    transform 0.22s cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 0.22s ease;
+}
+.branch-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 44px -24px rgb(51 51 51 / 32%);
+}
+.branch-tile-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.branch-tile h2 {
+  margin: 9px 0 2px;
+  font-size: 16px;
+  letter-spacing: -0.2px;
+}
+.branch-tile-location {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.branch-tile-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+.type-vuge {
+  background: var(--soft-green);
+  color: var(--green-dark);
+}
+.type-vim {
+  background: var(--soft-pink);
+  color: var(--pink-dark);
+}
+.branch-tile-meta {
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.branch-tile-meta div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.branch-tile-meta dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+.branch-tile-meta dd {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 650;
+  text-align: right;
+}
+.branch-tile-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: auto;
+}
+.branch-tile-actions .button {
+  flex: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-content > *,
+  .branch-tile,
+  .button,
+  .icon-button,
+  .nav-link {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
 }

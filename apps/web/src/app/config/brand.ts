@@ -6,5 +6,7 @@ export const brand = {
   shortDepartment: 'Gestión Empresarial y Ventanillas Integrales',
   // Logo oficial E-Ventanilla entregado por el equipo; reemplaza al recurso anterior.
   logo: '/assets/logos/eventanilla.png',
+  // Emblema de la Comisión Estatal de Simplificación Administrativa (crédito institucional).
+  coesmerLogo: '/assets/logos/coesmer.png',
   pattern: '/assets/patterns/institutional.svg',
 } as const;

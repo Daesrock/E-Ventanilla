@@ -39,6 +39,7 @@ En raíz del proyecto: `../../.gitignore` excluye dependencias, secretos y artef
 | Archivo                                         | Responsabilidad                                                         |
 | ----------------------------------------------- | ----------------------------------------------------------------------- |
 | `src/components/branding/InstitutionalLogo.tsx` | Presentación accesible del logo oficial                                 |
+| `src/components/branding/CoesmerLogo.tsx`       | Emblema de la Comisión como crédito institucional                       |
 | `src/components/branding/ProductMark.tsx`       | Identidad del producto, separada del emblema institucional              |
 | `src/components/navigation/Sidebar.tsx`         | Navegación, perfil e identidad en escritorio/móvil                      |
 | `src/components/navigation/Navbar.tsx`          | Título, distintivo de demostración y cierre de demo/sesión API opcional |
@@ -114,7 +115,8 @@ En raíz del proyecto: `../../.gitignore` excluye dependencias, secretos y artef
 | ------------------------------------------ | ----------------------------------------------------------------------------------- |
 | `public/assets/logos/favicon.png`          | Recorte cuadrado del logo oficial para favicon                                      |
 | `public/assets/patterns/institutional.svg` | Patrón decorativo propio de rombos escalonados                                      |
-| `public/assets/logos/README.md`            | Procedencia y vigencia del logo oficial                                             |
+| `public/assets/logos/README.md`            | Procedencia y vigencia de los logos oficiales                                       |
+| `public/assets/logos/coesmer.png`          | Emblema de la Comisión Estatal (crédito institucional en menú y acceso)             |
 | `public/assets/logos/eventanilla.png`      | Logo oficial E-Ventanilla entregado; reemplaza al recurso anterior                  |
 | `tools/check-docs.mjs`                     | Cobertura de inventario y encabezados de responsabilidad                            |
 | `tools/check-api.ts`                       | Comprobación opcional de GET reales mediante BFF efímero, sin cuentas ni escrituras |

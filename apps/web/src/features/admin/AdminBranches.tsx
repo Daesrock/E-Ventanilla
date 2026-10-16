@@ -80,29 +80,39 @@ export function AdminBranches() {
       <RemoteState {...query} retry={query.reload} />
       <div className="admin-card-grid">
         {filtered?.map((branch) => (
-          <section className="panel" key={branch.id}>
-            <div className="panel-body">
+          <article className="branch-tile" key={branch.id}>
+            <header className="branch-tile-head">
+              <div>
+                <span
+                  className={`branch-tile-type ${branch.type === 'VIM' ? 'type-vim' : 'type-vuge'}`}
+                >
+                  {branch.type}
+                </span>
+                <h2>{branch.name}</h2>
+                <p className="branch-tile-location">{branch.municipality.name}</p>
+              </div>
               <Badge tone={branch.active && branch.published ? 'green' : 'amber'}>
                 {!branch.active ? 'Inactiva' : branch.published ? 'Publicada' : 'Borrador'}
               </Badge>
-              <h2 className="mt-3">{branch.name}</h2>
-              <p className="muted">
-                {branch.municipality.name} · {branch.type}
-              </p>
-              <p className="mt-3">
-                Responsable: {branch.counterHead?.name ?? 'Sin asignar'}
-                {branch.counterHead && !branch.counterHead.active ? ' · inactivo' : ''}
-              </p>
-              <div className="form-actions">
-                <Link className="button button-secondary" to={`/sedes/${branch.id}`}>
-                  Administrar sede
-                </Link>
-                <Link className="table-link" to={`/sedes/${branch.id}/tramites`}>
-                  Asignar trámites
-                </Link>
+            </header>
+            <dl className="branch-tile-meta">
+              <div>
+                <dt>Responsable</dt>
+                <dd>
+                  {branch.counterHead?.name ?? 'Sin asignar'}
+                  {branch.counterHead && !branch.counterHead.active ? ' · inactivo' : ''}
+                </dd>
               </div>
+            </dl>
+            <div className="branch-tile-actions">
+              <Link className="button button-primary" to={`/sedes/${branch.id}`}>
+                Administrar sede
+              </Link>
+              <Link className="button button-secondary" to={`/sedes/${branch.id}/tramites`}>
+                Asignar trámites
+              </Link>
             </div>
-          </section>
+          </article>
         ))}
       </div>
       {filtered?.length === 0 && (

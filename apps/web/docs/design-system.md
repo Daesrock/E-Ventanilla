@@ -2,24 +2,35 @@
 
 ## Identidad
 
-Diseño original para una dependencia de Chiapas. El logo oficial de E-Ventanilla fue entregado por el equipo y se usa sin alterar texto, colores o proporciones; reemplazó al recurso anterior de la dependencia y se usa también en la marca del producto y en el favicon.
+Diseño original para una dependencia de Chiapas, con acabado estilo iOS 18 (radios amplios, sombras suaves, superficies translúcidas y transiciones breves). El logo oficial de E-Ventanilla fue entregado por el equipo y se usa sin alterar texto, colores o proporciones; reemplazó al recurso anterior de la dependencia y se usa también en la marca del producto y en el favicon. El emblema de la Comisión Estatal de Simplificación Administrativa aparece como crédito institucional en el menú lateral y en el pie del acceso.
 
 ## Paleta
 
 | Token Tailwind  | Color     | Uso                                       |
 | --------------- | --------- | ----------------------------------------- |
-| `institutional` | `#009D86` | Acentos, gráficos y patrón                |
-| `accent`        | `#FF0164` | Detalles secundarios, series y resaltados |
-| `charcoal`      | `#312D2E` | Texto y títulos                           |
-| `canvas`        | `#F7F4F2` | Fondo general                             |
+| `institutional` | `#149381` | Acentos, gráficos, patrón y acciones      |
+| `accent`        | `#E97EAD` | Detalles secundarios, series y resaltados |
+| `charcoal`      | `#333333` | Texto y títulos                           |
+| `canvas`        | `#F4F4F6` | Fondo general                             |
 
-`#007261` es un derivado oscuro para botones y texto verde sobre blanco. No se usa verde base con texto blanco pequeño cuando comprometa legibilidad. Estados incluyen texto e icono; nunca solo color.
+Los tres primeros son los colores de las plataformas gubernamentales de Chiapas.
+`#0E7568` (verde oscuro) y `#B04A7D` (rosa oscuro) son derivados para texto y
+controles sobre blanco. No se usa color base con texto blanco pequeño cuando
+comprometa legibilidad. Estados incluyen texto e icono; nunca solo color.
+
+Radios y profundidad: `--radius-lg` 20px en paneles y tarjetas, `--radius-md` 14px
+en campos y contenedores, botones de 13px y elementos pill en badges y pestañas.
+Sombras suaves en dos capas (`--shadow-card`, `--shadow-pop`), barra superior con
+`backdrop-filter` y entrada de página con desplazamiento breve. Todo respeta
+`prefers-reduced-motion`.
 
 ## Patrón y logo
 
 - `assets/patterns/institutional.svg`: rombos escalonados propios inspirados en la referencia. Decorativo, sin datos ni contenido esencial. Se usa como background en acceso y bienvenida.
 - `assets/logos/eventanilla.png`: logo oficial E-Ventanilla entregado por el equipo (166×102). Reemplaza al recurso anterior de la dependencia.
+- `assets/logos/coesmer.png`: emblema de la Comisión Estatal de Simplificación Administrativa, restaurado del historial como crédito institucional.
 - `InstitutionalLogo`: rutas, proporción y descripción centralizadas; se muestra cercano a su tamaño nativo para no perder nitidez.
+- `CoesmerLogo`: mismo criterio para el emblema de la Comisión; `ProductMark` usa el logo oficial del producto.
 
 ## Componentes
 

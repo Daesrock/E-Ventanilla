@@ -5,7 +5,7 @@ import { navigation } from '../../app/config/navigation';
 import { useDemo } from '../../app/providers/demo-context';
 import { roleLabels } from '../../features/auth/policy';
 import { ProductMark } from '../branding/ProductMark';
-import { InstitutionalLogo } from '../branding/InstitutionalLogo';
+import { CoesmerLogo } from '../branding/CoesmerLogo';
 import { initials } from '../../utils/format';
 import { useAdminSession, pagePermission } from '../../app/providers/admin-context';
 import { brand } from '../../app/config/brand';
@@ -88,7 +88,8 @@ export function Sidebar({ open, close }: { open: boolean; close: () => void }) {
         </nav>
         <div className="sidebar-bottom">
           <div className="institution-card">
-            <InstitutionalLogo />
+            <CoesmerLogo />
+            <p>COMISIÓN ESTATAL DE SIMPLIFICACIÓN ADMINISTRATIVA</p>
           </div>
           {user && (
             <div className="sidebar-profile">

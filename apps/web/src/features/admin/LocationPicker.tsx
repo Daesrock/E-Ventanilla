@@ -17,7 +17,7 @@ export interface Coordinates {
 const CHIAPAS_CENTER: [number, number] = [16.7508, -93.1162];
 const pinIcon = L.divIcon({
   className: 'location-pin',
-  html: '<svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path fill="#009d86" stroke="#ffffff" stroke-width="1.4" d="M12 2a7.4 7.4 0 0 0-7.4 7.4c0 5.3 6.6 11.9 6.9 12.2a.7.7 0 0 0 1 0c.3-.3 6.9-6.9 6.9-12.2A7.4 7.4 0 0 0 12 2Zm0 10.2a2.8 2.8 0 1 1 0-5.6 2.8 2.8 0 0 1 0 5.6Z"/></svg>',
+  html: '<svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path fill="#149381" stroke="#ffffff" stroke-width="1.4" d="M12 2a7.4 7.4 0 0 0-7.4 7.4c0 5.3 6.6 11.9 6.9 12.2a.7.7 0 0 0 1 0c.3-.3 6.9-6.9 6.9-12.2A7.4 7.4 0 0 0 12 2Zm0 10.2a2.8 2.8 0 1 1 0-5.6 2.8 2.8 0 0 1 0 5.6Z"/></svg>',
   iconSize: [34, 34],
   iconAnchor: [17, 32],
 });

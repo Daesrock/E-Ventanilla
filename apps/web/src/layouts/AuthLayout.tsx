@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { ArrowUpRight, Building2, CalendarCheck2, MapPin } from 'lucide-react';
 import { ProductMark } from '../components/branding/ProductMark';
 import { InstitutionalLogo } from '../components/branding/InstitutionalLogo';
+import { CoesmerLogo } from '../components/branding/CoesmerLogo';
 import { brand } from '../app/config/brand';
 
 export function AuthLayout() {
@@ -47,6 +48,7 @@ export function AuthLayout() {
         <InstitutionalLogo className="auth-logo" />
         <Outlet />
         <footer>
+          <CoesmerLogo className="auth-coesmer" />
           {brand.institution}
           <br />
           <span>Gobierno de Chiapas</span>

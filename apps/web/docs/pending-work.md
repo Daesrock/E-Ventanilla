@@ -28,6 +28,11 @@ de `main` (`ddcd9df`). Entrega: `contracts/entrega-web-api-2026-10-16.md`.
 - Sedes: formulario por secciones (datos, contacto, ubicación, publicación) con mapa
   OpenStreetMap sin API key para fijar latitud/longitud; la API guarda ambas y Android
   las despliega. Sustituye al editor genérico del panel real.
+- Interfaz estilo iOS 18: paleta de plataformas de Chiapas (`#149381`, `#e97ead`,
+  `#333333`), radios amplios, sombras suaves, barra translúcida, transiciones breves
+  y tarjetas de sede rediseñadas; respeta `prefers-reduced-motion`.
+- Emblema de la Comisión Estatal de Simplificación Administrativa (`coesmer.png`)
+  restaurado como crédito institucional en menú lateral y pie del acceso.
 - Personal: **Alta asistida** para el jefe de departamento: el panel genera un archivo
   privado (JSON) y `scripts/provision-counter-head.mjs` lo aplica con Bun 1.4.2 y la
   conexión autorizada — sin tocar API ni base de datos (verificado localmente: cuenta
