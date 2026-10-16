@@ -1,3 +1,5 @@
+import { UseFilters } from '@nestjs/common';
+import { AdminDatabaseErrors } from './admin.database-errors.js';
 /** Rutas administrativas de sedes: CRUD, responsable y oferta de trámites. */
 import {
   Body,
@@ -11,13 +13,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AdminGuard } from './admin.guard.js';
-import { CurrentAdmin, RequirePermission } from './admin.decorators.js';
+import { CurrentAdmin, RequirePermission, RequireRoles } from './admin.decorators.js';
 import { BranchesAdminService } from './branches.admin.service.js';
 import type { AdminContext } from './admin.types.js';
 import { BranchCreateDto, BranchHeadDto, BranchUpdateDto, OfferUpdateDto } from './admin.dto.js';
 
 @Controller('admin/branches')
 @UseGuards(AdminGuard)
+@UseFilters(AdminDatabaseErrors)
 export class BranchesAdminController {
   constructor(private readonly branches: BranchesAdminService) {}
 
@@ -29,6 +32,7 @@ export class BranchesAdminController {
 
   @Post()
   @RequirePermission('branch.create')
+  @RequireRoles('ROOT')
   create(@CurrentAdmin() admin: AdminContext, @Body() body: BranchCreateDto) {
     return this.branches.create(admin, body);
   }
@@ -61,6 +65,7 @@ export class BranchesAdminController {
 
   @Patch(':id/procedures')
   @RequirePermission('offer.manage')
+  @RequireRoles('ROOT', 'DEPARTMENT_HEAD')
   updateOffers(
     @CurrentAdmin() admin: AdminContext,
     @Param('id', new ParseUUIDPipe()) id: string,

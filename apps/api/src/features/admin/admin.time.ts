@@ -37,7 +37,9 @@ export function assertDateRange(from: string, to: string) {
   const start = startOfMexicoDay(from);
   const end = endOfMexicoDay(to);
   if (start > end)
-    throw fieldFailure({ from: 'Revisa el periodo: la fecha inicial debe ser anterior o igual a la final.' });
+    throw fieldFailure({
+      from: 'Revisa el periodo: la fecha inicial debe ser anterior o igual a la final.',
+    });
   return { start, end };
 }
 
@@ -65,9 +67,7 @@ export function dateToTime(value: Date): string {
 
 /** Fecha de PostgreSQL (@db.Date) expresada como Date en UTC. */
 export function dateOnlyToDate(date: string): Date {
-  const parsed = new Date(`${date}T00:00:00Z`);
-  if (Number.isNaN(parsed.getTime())) throw fieldFailure({ date: 'Escribe una fecha válida.' });
-  return parsed;
+  return new Date(`${assertDateOnly(date)}T00:00:00Z`);
 }
 
 export function dateToDateString(value: Date): string {

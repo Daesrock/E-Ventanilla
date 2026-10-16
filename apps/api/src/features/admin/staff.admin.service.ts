@@ -108,7 +108,13 @@ export class StaffAdminService {
         : {}),
     };
     const [rows, total] = await Promise.all([
-      this.db.user.findMany({ where, select: staffSelect, orderBy: { createdAt: 'asc' }, skip, take }),
+      this.db.user.findMany({
+        where,
+        select: staffSelect,
+        orderBy: { createdAt: 'asc' },
+        skip,
+        take,
+      }),
       this.db.user.count({ where }),
     ]);
     return {
@@ -208,19 +214,6 @@ export class StaffAdminService {
         throw fieldFailure({
           counterStaff: 'El perfil técnico de ventanilla solo aplica a jefes de ventanilla.',
         });
-      const hasProfile = !!target.administrativeStaff?.counterStaff;
-      if (data.counterStaff && !hasProfile) {
-        await this.db.counterStaff.create({ data: { userId: id } });
-      } else if (!data.counterStaff && hasProfile) {
-        try {
-          await this.db.counterStaff.delete({ where: { userId: id } });
-        } catch (error) {
-          return conflict(
-            error,
-            'No se puede retirar el perfil técnico: la cuenta ya registró atenciones.',
-          );
-        }
-      }
     }
     const staffData: {
       street?: string | null;
@@ -240,6 +233,22 @@ export class StaffAdminService {
     const fields = providedFields(data);
     try {
       const updated = await this.db.$transaction(async (transaction) => {
+        // Comparte el bloqueo de identidad con la creación de sesiones.
+        await transaction.$queryRaw`SELECT id FROM "User" WHERE id = ${id}::uuid FOR UPDATE`;
+        const profile = await transaction.counterStaff.findUnique({ where: { userId: id } });
+        if (data.counterStaff === true && !profile)
+          await transaction.counterStaff.create({ data: { userId: id } });
+        if (data.counterStaff === false && profile) {
+          const [attendances, assignments] = await Promise.all([
+            transaction.attendance.count({ where: { staffId: id } }),
+            transaction.staffAssignment.count({ where: { staffId: id } }),
+          ]);
+          if (attendances || assignments)
+            throw new ConflictException(
+              'No se puede retirar el perfil técnico: tiene atenciones o asignaciones registradas.',
+            );
+          await transaction.counterStaff.delete({ where: { userId: id } });
+        }
         if (Object.keys(staffData).length)
           await transaction.administrativeStaff.upsert({
             where: { userId: id },
@@ -256,6 +265,7 @@ export class StaffAdminService {
           },
           select: staffSelect,
         });
+        if (data.active === false) await transaction.session.deleteMany({ where: { userId: id } });
         await writeAudit(transaction, {
           actorUserId: admin.userId,
           action: 'staff.update',

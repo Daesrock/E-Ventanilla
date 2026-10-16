@@ -51,7 +51,10 @@ export class SlotsAdminService {
   constructor(private readonly db: DatabaseService) {}
 
   private async assertBranch(branchId: string) {
-    const branch = await this.db.branch.findUnique({ where: { id: branchId }, select: { id: true } });
+    const branch = await this.db.branch.findUnique({
+      where: { id: branchId },
+      select: { id: true },
+    });
     if (!branch) throw new NotFoundException('La sede no existe.');
   }
 
@@ -60,6 +63,8 @@ export class SlotsAdminService {
     await this.assertBranch(branchId);
     const from = optionalDate(query.from, 'from');
     const to = optionalDate(query.to, 'to');
+    if (from && to && from > to)
+      throw fieldFailure({ from: 'La fecha inicial debe ser anterior o igual a la final.' });
     const rows = await this.db.timeSlot.findMany({
       where: {
         branchId,
@@ -79,13 +84,14 @@ export class SlotsAdminService {
   }
 
   private async assertNoOverlap(
+    transaction: Prisma.TransactionClient,
     branchId: string,
     date: string,
     start: number,
     end: number,
     excludeId?: string,
   ) {
-    const slots = await this.db.timeSlot.findMany({
+    const slots = await transaction.timeSlot.findMany({
       where: { branchId, date: dateOnlyToDate(date), active: true },
       select: { id: true, startsAt: true, endsAt: true },
     });
@@ -100,7 +106,9 @@ export class SlotsAdminService {
         ),
     );
     if (clash)
-      throw fieldFailure({ startsAt: 'El horario se superpone con otro bloque activo de la sede.' });
+      throw fieldFailure({
+        startsAt: 'El horario se superpone con otro bloque activo de la sede.',
+      });
   }
 
   async create(admin: AdminContext, branchId: string, data: SlotCreateDto) {
@@ -108,9 +116,12 @@ export class SlotsAdminService {
     await this.assertBranch(branchId);
     const start = timeToMinutes(data.startsAt);
     const end = timeToMinutes(data.endsAt);
-    if (start >= end) throw fieldFailure({ endsAt: 'La hora final debe ser mayor que la inicial.' });
-    await this.assertNoOverlap(branchId, data.date, start, end);
+    if (start >= end)
+      throw fieldFailure({ endsAt: 'La hora final debe ser mayor que la inicial.' });
     const created = await this.db.$transaction(async (transaction) => {
+      // Serializa cambios de horarios de una sede, incluso si aún no hay bloques.
+      await transaction.$queryRaw`SELECT id FROM "Branch" WHERE id = ${branchId}::uuid FOR NO KEY UPDATE`;
+      await this.assertNoOverlap(transaction, branchId, data.date, start, end);
       const row = await transaction.timeSlot.create({
         data: {
           branchId,
@@ -135,30 +146,40 @@ export class SlotsAdminService {
   }
 
   async update(admin: AdminContext, id: string, data: SlotUpdateDto) {
-    const existing = await this.db.timeSlot.findUnique({ where: { id } });
-    if (!existing) throw new NotFoundException('El bloque de horario no existe.');
-    assertBranchScope(admin, existing.branchId);
-    const start = data.startsAt === undefined ? dateToTime(existing.startsAt) : data.startsAt;
-    const end = data.endsAt === undefined ? dateToTime(existing.endsAt) : data.endsAt;
-    if (timeToMinutes(start) >= timeToMinutes(end))
-      throw fieldFailure({ endsAt: 'La hora final debe ser mayor que la inicial.' });
-    const capacity = data.capacity ?? existing.capacity;
-    if (capacity < existing.occupied)
-      throw fieldFailure({
-        capacity: 'La capacidad no puede ser menor que los lugares ya ocupados.',
-      });
-    const active = data.active ?? existing.active;
-    const changedTimes = data.startsAt !== undefined || data.endsAt !== undefined;
-    if (active && (changedTimes || (data.active === true && !existing.active)))
-      await this.assertNoOverlap(
-        existing.branchId,
-        dateToDateString(existing.date),
-        timeToMinutes(start),
-        timeToMinutes(end),
-        id,
-      );
-    const fields = providedFields(data);
+    const reference = await this.db.timeSlot.findUnique({ where: { id } });
+    if (!reference) throw new NotFoundException('El bloque de horario no existe.');
+    assertBranchScope(admin, reference.branchId);
     const updated = await this.db.$transaction(async (transaction) => {
+      await transaction.$queryRaw`SELECT id FROM "Branch" WHERE id = ${reference.branchId}::uuid FOR NO KEY UPDATE`;
+      await transaction.$queryRaw`SELECT id FROM "TimeSlot" WHERE id = ${id}::uuid FOR UPDATE`;
+      const existing = await transaction.timeSlot.findUniqueOrThrow({ where: { id } });
+      const start = data.startsAt === undefined ? dateToTime(existing.startsAt) : data.startsAt;
+      const end = data.endsAt === undefined ? dateToTime(existing.endsAt) : data.endsAt;
+      if (timeToMinutes(start) >= timeToMinutes(end))
+        throw fieldFailure({ endsAt: 'La hora final debe ser mayor que la inicial.' });
+      const capacity = data.capacity ?? existing.capacity;
+      if (capacity < existing.occupied)
+        throw fieldFailure({
+          capacity: 'La capacidad no puede ser menor que los lugares ya ocupados.',
+        });
+      const active = data.active ?? existing.active;
+      const changedTimes = data.startsAt !== undefined || data.endsAt !== undefined;
+      const movesSchedule =
+        start !== dateToTime(existing.startsAt) || end !== dateToTime(existing.endsAt);
+      if (movesSchedule && existing.occupied > 0)
+        throw fieldFailure({
+          startsAt: 'No puedes mover un horario que ya tiene citas reservadas.',
+        });
+      if (active && (changedTimes || (data.active === true && !existing.active)))
+        await this.assertNoOverlap(
+          transaction,
+          existing.branchId,
+          dateToDateString(existing.date),
+          timeToMinutes(start),
+          timeToMinutes(end),
+          id,
+        );
+      const fields = providedFields(data);
       const row = await transaction.timeSlot.update({
         where: { id },
         data: {

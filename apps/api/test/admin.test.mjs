@@ -105,7 +105,7 @@ test('el guard administrativo exige sesión Bearer', async () => {
 test('un permiso ausente bloquea la ruta aunque el rol sea administrativo', async () => {
   const { db } = adminFixture('COUNTER_HEAD', { permissions: ['branch.read'] });
   const guard = new AdminGuard(new AdminAuthService(db), {
-    getAllAndOverride: () => ['staff.create'],
+    getAllAndOverride: (key) => (key === 'admin.permissions' ? ['staff.create'] : undefined),
   });
   const request = { headers: { authorization: `Bearer ${token}` } };
   await assert.rejects(
@@ -122,7 +122,7 @@ test('el permiso presente deja pasar y adjunta el contexto', async () => {
     profiles: { counterHead: true },
   });
   const guard = new AdminGuard(new AdminAuthService(db), {
-    getAllAndOverride: () => ['slot.create'],
+    getAllAndOverride: (key) => (key === 'admin.permissions' ? ['slot.create'] : undefined),
   });
   const request = { headers: { authorization: `Bearer ${token}` } };
   assert.equal(await guard.canActivate(contextMock(request)), true);
@@ -154,8 +154,14 @@ test('las horas se convierten de ida y vuelta sin perder minutos', () => {
   assert.equal(timeToMinutes('09:30'), 570);
   assert.equal(minutesToTime(570), '09:30');
   assert.equal(dateToTime(timeToDate('23:59')), '23:59');
-  assert.throws(() => timeToMinutes('24:00'), (error) => !!fieldErrors(error).startsAt);
-  assert.throws(() => timeToMinutes('9:30'), (error) => !!fieldErrors(error).startsAt);
+  assert.throws(
+    () => timeToMinutes('24:00'),
+    (error) => !!fieldErrors(error).startsAt,
+  );
+  assert.throws(
+    () => timeToMinutes('9:30'),
+    (error) => !!fieldErrors(error).startsAt,
+  );
 });
 
 test('la superposición de bloques respeta intervalos semiabiertos', () => {
@@ -176,17 +182,35 @@ test('el periodo inválido se rechaza y las marcas de Chiapas usan -06:00', () =
 test('los parámetros de consulta se validan con mensajes por campo', () => {
   assert.deepEqual(pageParams({}), { page: 1, pageSize: 25, skip: 0, take: 25 });
   assert.equal(pageParams({ page: '3', pageSize: '10' }).skip, 20);
-  assert.throws(() => pageParams({ pageSize: '500' }), (error) => !!fieldErrors(error).pageSize);
+  assert.throws(
+    () => pageParams({ pageSize: '500' }),
+    (error) => !!fieldErrors(error).pageSize,
+  );
   assert.equal(optionalFlag('true', 'active'), true);
-  assert.throws(() => optionalFlag('si', 'active'), (error) => !!fieldErrors(error).active);
+  assert.throws(
+    () => optionalFlag('si', 'active'),
+    (error) => !!fieldErrors(error).active,
+  );
   assert.equal(optionalUuid(undefined, 'branchId'), undefined);
-  assert.throws(() => optionalUuid('no-uuid', 'branchId'), (error) => !!fieldErrors(error).branchId);
-  assert.throws(() => optionalDate('20-10-2026', 'from'), (error) => !!fieldErrors(error).from);
-  assert.throws(() => optionalDate('2026-02-31', 'from'), (error) => !!fieldErrors(error).from);
+  assert.throws(
+    () => optionalUuid('no-uuid', 'branchId'),
+    (error) => !!fieldErrors(error).branchId,
+  );
+  assert.throws(
+    () => optionalDate('20-10-2026', 'from'),
+    (error) => !!fieldErrors(error).from,
+  );
+  assert.throws(
+    () => optionalDate('2026-02-31', 'from'),
+    (error) => !!fieldErrors(error).from,
+  );
 });
 
 test('la publicación exige fuente corroborada completa', () => {
-  assert.throws(() => assertPublicationSource({}), (error) => !!fieldErrors(error).sourceKey);
+  assert.throws(
+    () => assertPublicationSource({}),
+    (error) => !!fieldErrors(error).sourceKey,
+  );
   assert.doesNotThrow(() =>
     assertPublicationSource({
       sourceKey: 'coesa-2026-10-11',
@@ -241,7 +265,14 @@ test('los horarios rechazan superposición y capacidad menor a la ocupada', asyn
       findMany: async () => [slotRow({ occupied: 4 })],
       findUnique: async () => slotRow({ occupied: 5 }),
     },
-    $transaction: async (action) => action({}),
+    $transaction: async (action) =>
+      action({
+        $queryRaw: async () => [],
+        timeSlot: {
+          findMany: async () => [slotRow({ occupied: 4 })],
+          findUniqueOrThrow: async () => slotRow({ occupied: 5 }),
+        },
+      }),
   };
   const slots = new SlotsAdminService(db);
   await assert.rejects(
@@ -274,7 +305,11 @@ test('la ocupación jamás se edita: solo llegan horas, capacidad y vigencia', a
     },
     $transaction: async (action) =>
       action({
-        timeSlot: { update: async (args) => db.timeSlot.update(args) },
+        $queryRaw: async () => [],
+        timeSlot: {
+          update: async (args) => db.timeSlot.update(args),
+          findUniqueOrThrow: async () => existing,
+        },
         administrativeAuditLog: { create: async () => ({}) },
       }),
   };
@@ -337,7 +372,10 @@ test('el resumen de reportes cuenta ciudadanos únicos y promedia solo tiempos c
       citizenId: 'c1',
       attendance: { arrivedAt: arrived, startedAt: started, endedAt: ended, late: false },
     },
-    { citizenId: 'c1', attendance: { arrivedAt: arrived, startedAt: null, endedAt: null, late: true } },
+    {
+      citizenId: 'c1',
+      attendance: { arrivedAt: arrived, startedAt: null, endedAt: null, late: true },
+    },
     { citizenId: 'c2', attendance: null },
   ]);
   assert.equal(summary.appointments, 3);
@@ -356,10 +394,13 @@ test('el CSV neutraliza fórmulas, escapa comillas y respeta las columnas pedida
   assert.equal(csvCell('=SUM(A1)'), "'=SUM(A1)");
   assert.equal(csvCell('con "comillas"'), '"con ""comillas"""');
   assert.equal(csvCell('a;b'), '"a;b"');
-  const csv = buildCsv(['folio', 'late'], [
-    { folio: '=PELIGRO', late: true },
-    { folio: 'A-1', late: null },
-  ]);
+  const csv = buildCsv(
+    ['folio', 'late'],
+    [
+      { folio: '=PELIGRO', late: true },
+      { folio: 'A-1', late: null },
+    ],
+  );
   const lines = csv.split('\r\n');
   assert.equal(lines[0], `${REPORT_COLUMNS.folio},${REPORT_COLUMNS.late}`);
   assert.equal(lines[1], "'=PELIGRO,Sí");
@@ -369,8 +410,5 @@ test('el CSV neutraliza fórmulas, escapa comillas y respeta las columnas pedida
 test('el catálogo público aditivo respeta sedes publicadas', async () => {
   const db = { branch: { findFirst: async () => null } };
   const catalog = new PublicCatalogService(db);
-  await assert.rejects(
-    () => catalog.branchProcedures(randomUUID()),
-    /no está disponible/,
-  );
+  await assert.rejects(() => catalog.branchProcedures(randomUUID()), /no está disponible/);
 });

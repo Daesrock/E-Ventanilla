@@ -87,7 +87,8 @@ export class ProceduresAdminService {
           category: data.category,
           description: data.description,
           requirements: data.requirements,
-          cost: data.cost === undefined ? undefined : data.cost === null ? null : data.cost.toFixed(2),
+          cost:
+            data.cost === undefined ? undefined : data.cost === null ? null : data.cost.toFixed(2),
           estimatedMinutes: data.estimatedMinutes,
           published: data.published ?? false,
           sourceKey: data.sourceKey,

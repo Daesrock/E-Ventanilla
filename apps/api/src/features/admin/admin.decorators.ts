@@ -3,6 +3,8 @@ import { createParamDecorator, SetMetadata, type ExecutionContext } from '@nestj
 import type { AdminContext } from './admin.types.js';
 
 export const PERMISSIONS_KEY = 'admin.permissions';
+export const ROLES_KEY = 'admin.roles';
+export const RequireRoles = (...codes: string[]) => SetMetadata(ROLES_KEY, codes);
 
 /** Exige que el rol de la cuenta incluya todos los códigos indicados. */
 export const RequirePermission = (...codes: string[]) => SetMetadata(PERMISSIONS_KEY, codes);

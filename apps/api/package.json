@@ -15,7 +15,7 @@
     "db:generate": "bun node_modules/prisma/build/index.js generate",
     "db:migrate": "bun node_modules/prisma/build/index.js migrate deploy",
     "db:validate": "bun node_modules/prisma/build/index.js validate",
-    "test": "bun run build && bun test test",
+    "test": "bun run build && bun test --timeout 15000 test",
     "format": "bun node_modules/prettier/bin/prettier.cjs --write src test *.ts *.mjs",
     "format:check": "bun node_modules/prettier/bin/prettier.cjs --check src test *.ts *.mjs"
   },

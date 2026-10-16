@@ -1,5 +1,16 @@
+import { UseFilters } from '@nestjs/common';
+import { AdminDatabaseErrors } from './admin.database-errors.js';
 /** Rutas administrativas de citas y registro de atención. */
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AdminGuard } from './admin.guard.js';
 import { CurrentAdmin, RequirePermission } from './admin.decorators.js';
 import { AppointmentsAdminService } from './appointments.admin.service.js';
@@ -8,6 +19,7 @@ import { AttendanceDto } from './admin.dto.js';
 
 @Controller('admin/appointments')
 @UseGuards(AdminGuard)
+@UseFilters(AdminDatabaseErrors)
 export class AppointmentsAdminController {
   constructor(private readonly appointments: AppointmentsAdminService) {}
 

@@ -2,7 +2,7 @@
  * Autorización administrativa: identidad, rol, permisos y alcance de sedes se
  * resuelven siempre en la base con la sesión vigente; nunca se confía en el cliente.
  */
-import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from '../../core/persistence/database.service.js';
 import { SessionService } from '../sessions/session.service.js';
 import type { AdminContext } from './admin.types.js';
@@ -16,13 +16,17 @@ export function bearerToken(header?: string) {
 }
 
 export function assertBranchScope(admin: AdminContext, branchId: string) {
-  if (!admin.allBranches && !admin.branchIds.includes(branchId))
+  if (
+    !admin.allBranches &&
+    !admin.branchIds.some((id) => id.toLowerCase() === branchId.toLowerCase())
+  )
     throw new ForbiddenException({
       message: 'La sede no está dentro de tu alcance.',
       code: 'BRANCH_OUT_OF_SCOPE',
     });
 }
 
+@Injectable()
 export class AdminAuthService {
   private readonly sessions: SessionService;
 

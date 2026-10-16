@@ -1,3 +1,5 @@
+import { UseFilters } from '@nestjs/common';
+import { AdminDatabaseErrors } from './admin.database-errors.js';
 /** Rutas administrativas de personal: consulta, alta de jefes y actualización. */
 import {
   Body,
@@ -11,13 +13,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AdminGuard } from './admin.guard.js';
-import { CurrentAdmin, RequirePermission } from './admin.decorators.js';
+import { CurrentAdmin, RequirePermission, RequireRoles } from './admin.decorators.js';
 import { StaffAdminService } from './staff.admin.service.js';
 import type { AdminContext } from './admin.types.js';
 import { StaffCreateDto, StaffUpdateDto } from './admin.dto.js';
 
 @Controller('admin/staff')
 @UseGuards(AdminGuard)
+@UseFilters(AdminDatabaseErrors)
 export class StaffAdminController {
   constructor(private readonly staff: StaffAdminService) {}
 
@@ -29,12 +32,14 @@ export class StaffAdminController {
 
   @Post()
   @RequirePermission('staff.create')
+  @RequireRoles('ROOT')
   create(@CurrentAdmin() admin: AdminContext, @Body() body: StaffCreateDto) {
     return this.staff.create(admin, body);
   }
 
   @Patch(':id')
   @RequirePermission('staff.update')
+  @RequireRoles('ROOT')
   update(
     @CurrentAdmin() admin: AdminContext,
     @Param('id', new ParseUUIDPipe()) id: string,

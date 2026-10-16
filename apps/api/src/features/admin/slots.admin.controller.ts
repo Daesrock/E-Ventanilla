@@ -1,3 +1,5 @@
+import { UseFilters } from '@nestjs/common';
+import { AdminDatabaseErrors } from './admin.database-errors.js';
 /** Rutas administrativas de horarios y cupos por sede. */
 import {
   Body,
@@ -18,6 +20,7 @@ import { SlotCreateDto, SlotUpdateDto } from './admin.dto.js';
 
 @Controller('admin')
 @UseGuards(AdminGuard)
+@UseFilters(AdminDatabaseErrors)
 export class SlotsAdminController {
   constructor(private readonly slots: SlotsAdminService) {}
 

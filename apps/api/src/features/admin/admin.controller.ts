@@ -1,3 +1,5 @@
+import { UseFilters } from '@nestjs/common';
+import { AdminDatabaseErrors } from './admin.database-errors.js';
 /**
  * Identidad administrativa de la sesión: rol, permisos, perfiles y sedes asignadas.
  * No modifica `/v1/auth/me`; los clientes ciudadanos conservan su contrato.
@@ -10,6 +12,7 @@ import type { AdminContext } from './admin.types.js';
 
 @Controller('admin')
 @UseGuards(AdminGuard)
+@UseFilters(AdminDatabaseErrors)
 export class AdminController {
   constructor(private readonly db: DatabaseService) {}
 

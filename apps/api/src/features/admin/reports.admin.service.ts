@@ -10,7 +10,13 @@ import { Prisma } from '../../generated/prisma/client.js';
 import { fieldFailure } from '../../core/validation/validation.js';
 import { assertDateRange, mexicoStamp } from './admin.time.js';
 import { assertBranchScope } from './admin.auth.js';
-import { optionalDate, optionalText, optionalUuid, pageParams, personName } from './admin.shared.js';
+import {
+  optionalDate,
+  optionalText,
+  optionalUuid,
+  pageParams,
+  personName,
+} from './admin.shared.js';
 import type { AdminContext } from './admin.types.js';
 
 const reportRowSelect = {
@@ -48,7 +54,12 @@ type ReportRow = Prisma.AppointmentGetPayload<{ select: typeof reportRowSelect }
 
 export interface ReportLeanRow {
   citizenId: string;
-  attendance: { arrivedAt: Date; startedAt: Date | null; endedAt: Date | null; late: boolean } | null;
+  attendance: {
+    arrivedAt: Date;
+    startedAt: Date | null;
+    endedAt: Date | null;
+    late: boolean;
+  } | null;
 }
 
 function minutesBetween(start: Date, end: Date) {
@@ -78,7 +89,9 @@ export function summarize(rows: ReportLeanRow[]) {
     if (row.attendance.endedAt) completed += 1;
   }
   const average = (values: number[]) =>
-    values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : null;
+    values.length
+      ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length)
+      : null;
   return {
     appointments: rows.length,
     citizens: citizens.size,
@@ -113,7 +126,7 @@ export const DEFAULT_REPORT_COLUMNS = Object.keys(REPORT_COLUMNS) as ReportColum
 
 export function csvCell(value: unknown) {
   const text = value === null || value === undefined ? '' : String(value);
-  const guarded = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+  const guarded = /^(?:[\s\u0000-\u001f]*[=+\-@]|[\t\r\n])/.test(text) ? `'${text}` : text;
   return /[",\n\r;]/.test(guarded) ? `"${guarded.replace(/"/g, '""')}"` : guarded;
 }
 
@@ -227,7 +240,7 @@ export class ReportsAdminService {
       .split(',')
       .map((value) => value.trim())
       .filter(Boolean);
-    if (!requested.length || requested.some((value) => !(value in REPORT_COLUMNS)))
+    if (!requested.length || requested.some((value) => !Object.hasOwn(REPORT_COLUMNS, value)))
       throw fieldFailure({ columns: 'Selecciona columnas válidas del reporte.' });
     return requested as ReportColumn[];
   }

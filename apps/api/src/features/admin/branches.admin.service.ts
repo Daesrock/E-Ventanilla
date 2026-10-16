@@ -11,9 +11,14 @@ import { resolveMunicipality } from '../catalog/municipalities.js';
 import { writeAudit } from './admin.audit.js';
 import { assertBranchScope } from './admin.auth.js';
 import { assertPublicationSource } from './admin.publication.js';
-import { providedFields } from './admin.shared.js';
+import { optionalText, providedFields } from './admin.shared.js';
 import type { AdminContext } from './admin.types.js';
-import type { BranchCreateDto, BranchHeadDto, BranchUpdateDto, OfferUpdateDto } from './admin.dto.js';
+import type {
+  BranchCreateDto,
+  BranchHeadDto,
+  BranchUpdateDto,
+  OfferUpdateDto,
+} from './admin.dto.js';
 
 const branchAdminSelect = {
   id: true,
@@ -90,7 +95,10 @@ function present(row: BranchRow) {
           id: row.counterHead.staff.user.id,
           name: [
             row.counterHead.staff.user.firstName,
-            [row.counterHead.staff.user.paternalLastName, row.counterHead.staff.user.maternalLastName]
+            [
+              row.counterHead.staff.user.paternalLastName,
+              row.counterHead.staff.user.maternalLastName,
+            ]
               .filter(Boolean)
               .join(' ') || row.counterHead.staff.user.lastName,
           ]
@@ -102,7 +110,10 @@ function present(row: BranchRow) {
   };
 }
 
-function assertCoordinates(latitude: number | null | undefined, longitude: number | null | undefined) {
+function assertCoordinates(
+  latitude: number | null | undefined,
+  longitude: number | null | undefined,
+) {
   const provided = latitude !== undefined || longitude !== undefined;
   if (!provided) return undefined;
   if (latitude === undefined || longitude === undefined)
@@ -123,7 +134,7 @@ export class BranchesAdminService {
   constructor(private readonly db: DatabaseService) {}
 
   async list(admin: AdminContext, query: Record<string, unknown>) {
-    const q = typeof query.q === 'string' ? query.q.trim().slice(0, 120) : undefined;
+    const q = optionalText(query.q, 'q');
     const rows = await this.db.branch.findMany({
       where: {
         ...(admin.allBranches ? {} : { id: { in: admin.branchIds } }),
@@ -206,7 +217,10 @@ export class BranchesAdminService {
         });
         throw fieldFailure(
           Object.fromEntries(
-            blocked.map((field) => [field, 'La cuenta de ventanilla no puede modificar este campo.']),
+            blocked.map((field) => [
+              field,
+              'La cuenta de ventanilla no puede modificar este campo.',
+            ]),
           ),
         );
       }
@@ -269,6 +283,10 @@ export class BranchesAdminService {
   }
 
   async assignHead(admin: AdminContext, id: string, data: BranchHeadDto) {
+    if (data.counterHeadId === undefined)
+      throw fieldFailure({
+        counterHeadId: 'Selecciona un responsable o envía null para retirarlo.',
+      });
     if (admin.role.code === 'COUNTER_HEAD')
       throw new ForbiddenException({
         message: 'La cuenta de ventanilla no puede asignar responsables.',
@@ -311,7 +329,10 @@ export class BranchesAdminService {
 
   async offersFor(admin: AdminContext, branchId: string) {
     assertBranchScope(admin, branchId);
-    const branch = await this.db.branch.findUnique({ where: { id: branchId }, select: { id: true } });
+    const branch = await this.db.branch.findUnique({
+      where: { id: branchId },
+      select: { id: true },
+    });
     if (!branch) throw new NotFoundException('La sede no existe.');
     const rows = await this.db.procedure.findMany({
       select: {
@@ -340,7 +361,10 @@ export class BranchesAdminService {
 
   async updateOffers(admin: AdminContext, branchId: string, data: OfferUpdateDto) {
     assertBranchScope(admin, branchId);
-    const branch = await this.db.branch.findUnique({ where: { id: branchId }, select: { id: true } });
+    const branch = await this.db.branch.findUnique({
+      where: { id: branchId },
+      select: { id: true },
+    });
     if (!branch) throw new NotFoundException('La sede no existe.');
     const unique = new Set(data.items.map((item) => item.procedureId));
     if (unique.size !== data.items.length)

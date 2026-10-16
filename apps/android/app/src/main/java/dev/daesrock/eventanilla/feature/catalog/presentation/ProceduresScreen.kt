@@ -2,8 +2,6 @@ package dev.daesrock.eventanilla.feature.catalog.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.outlined.Place
@@ -57,9 +55,9 @@ private fun ProcedureBranchSelector(repository: CatalogRepository, directory: ()
     val state by model.state.collectAsStateWithLifecycle()
     var municipality by rememberSaveable { mutableStateOf<String?>(null) }
     var branchId by rememberSaveable { mutableStateOf<String?>(null) }
-    var chooseBranch by remember { mutableStateOf(false) }
     LaunchedEffect(model) { model.loadOnce("branches") }
     val branches = state.items.filter { municipality == null || it.municipality == municipality }
+    val picker = rememberBranchPickerLocation(branches, repository)
     val selected = branches.find { it.id == branchId }
     MunicipalityFilter(branchMunicipalities(state.items), municipality, {
         municipality = it
@@ -75,32 +73,17 @@ private fun ProcedureBranchSelector(repository: CatalogRepository, directory: ()
         }
         CatalogLoading(state) { model.load("branches") }
         if (!state.loading && state.error == null) {
-            OutlinedButton(onClick = { chooseBranch = true }, enabled = branches.isNotEmpty(), modifier = Modifier.heightIn(min = 48.dp)) {
+            OutlinedButton(onClick = picker.open, enabled = branches.isNotEmpty(), modifier = Modifier.heightIn(min = 48.dp)) {
                 Text(if (selected == null) "Elegir sede" else "Cambiar sede", color = MainActionColor)
             }
         }
         TextButton(onClick = directory, modifier = Modifier.heightIn(min = 48.dp)) { Text("Ver directorio", color = MainActionColor) }
     }
-    if (chooseBranch) {
-        AlertDialog(
-            onDismissRequest = { chooseBranch = false },
-            title = { Text("Elige una sede") },
-            text = {
-                LazyColumn(Modifier.heightIn(max = 320.dp)) {
-                    items(branches, key = { it.id }) { branch ->
-                        TextButton(
-                            onClick = {
-                                branchId = branch.id
-                                chooseBranch = false
-                            },
-                            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-                            shape = androidx.compose.ui.graphics.RectangleShape
-                        ) { Text(branch.name, Modifier.fillMaxWidth()) }
-                    }
-                }
-            },
-            confirmButton = { TextButton(onClick = { chooseBranch = false }) { Text("Cerrar") } }
-        )
+    if (picker.visible) {
+        BranchPickerDialog(branches, picker) { branch ->
+            branchId = branch.id
+            picker.close()
+        }
     }
 }
 

@@ -26,6 +26,7 @@ export const config = {
   resendFrom: environmentSecret('RESEND_FROM').trim(),
   codeSecret: environmentSecret('AUTH_CODE_SECRET'),
   trustedProxyIps: trustedProxyIps(),
+  osrmUrl: process.env.OSRM_BASE_URL || '',
   codeTtl: positiveInteger('AUTH_CODE_TTL_SECONDS', 600),
   codeAttempts: positiveInteger('AUTH_CODE_ATTEMPTS', 5),
   resendSeconds: positiveInteger('AUTH_CODE_RESEND_SECONDS', 60),

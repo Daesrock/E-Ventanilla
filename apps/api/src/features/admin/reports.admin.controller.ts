@@ -1,3 +1,5 @@
+import { UseFilters } from '@nestjs/common';
+import { AdminDatabaseErrors } from './admin.database-errors.js';
 /** Rutas administrativas de reportes y exportación CSV con el mismo alcance. */
 import { Controller, Get, Header, Query, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
@@ -8,6 +10,7 @@ import type { AdminContext } from './admin.types.js';
 
 @Controller('admin/reports')
 @UseGuards(AdminGuard)
+@UseFilters(AdminDatabaseErrors)
 export class ReportsAdminController {
   constructor(private readonly reports: ReportsAdminService) {}
 

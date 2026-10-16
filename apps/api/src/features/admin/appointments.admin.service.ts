@@ -3,14 +3,25 @@
  * inicio y fin sobre `Attendance`. Los estados/transiciones de `Appointment.status`
  * siguen pendientes de definición (ver docs), por eso aquí no se inventan.
  */
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DatabaseService } from '../../core/persistence/database.service.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { fieldFailure } from '../../core/validation/validation.js';
 import { assertDateRange } from './admin.time.js';
 import { writeAudit } from './admin.audit.js';
 import { assertBranchScope } from './admin.auth.js';
-import { optionalDate, optionalText, optionalUuid, pageParams, personName } from './admin.shared.js';
+import {
+  optionalDate,
+  optionalText,
+  optionalUuid,
+  pageParams,
+  personName,
+} from './admin.shared.js';
 import type { AdminContext } from './admin.types.js';
 import type { AttendanceDto } from './admin.dto.js';
 
@@ -24,7 +35,9 @@ const appointmentAdminSelect = {
   // La oferta es la ruta a la sede y al trámite: Appointment no tiene esas relaciones directas.
   slot: {
     select: {
-      branch: { select: { id: true, name: true, municipality: { select: { code: true, name: true } } } },
+      branch: {
+        select: { id: true, name: true, municipality: { select: { code: true, name: true } } },
+      },
     },
   },
   offering: { select: { procedure: { select: { id: true, name: true, cost: true } } } },
@@ -122,124 +135,85 @@ export class AppointmentsAdminService {
   }
 
   async attendance(admin: AdminContext, appointmentId: string, data: AttendanceDto) {
-    const appointment = await this.db.appointment.findUnique({
-      where: { id: appointmentId },
-      include: { attendance: true },
-    });
-    if (!appointment) throw new NotFoundException('La cita no existe.');
-    assertBranchScope(admin, appointment.branchId);
     if (!admin.staffProfiles.counterStaff)
       throw new ForbiddenException({
         message: 'Tu cuenta no tiene perfil técnico de ventanilla para registrar atención.',
         code: 'COUNTER_STAFF_REQUIRED',
       });
-    const now = new Date();
-    if (data.action === 'arrive') {
-      if (appointment.attendance)
-        throw new ConflictException('La cita ya tiene llegada registrada.');
-      if (!data.counterId)
-        throw fieldFailure({ counterId: 'Selecciona el mostrador de atención.' });
-      const counter = await this.db.serviceCounter.findFirst({
-        where: { id: data.counterId, branchId: appointment.branchId, active: true },
-        select: { id: true },
+    return this.db.$transaction(async (transaction) => {
+      // Un solo operador puede cambiar la atención de una cita a la vez.
+      await transaction.$queryRaw`SELECT id FROM "Appointment" WHERE id = ${appointmentId}::uuid FOR UPDATE`;
+      const appointment = await transaction.appointment.findUnique({
+        where: { id: appointmentId },
+        include: { attendance: true },
       });
-      if (!counter) throw fieldFailure({ counterId: 'El mostrador no está disponible en la sede.' });
-      if (data.qrToken !== undefined && data.qrToken !== appointment.qrToken)
-        throw fieldFailure({ qrToken: 'El código QR no corresponde a la cita.' });
-      const created = await this.db.$transaction(async (transaction) => {
-        const attendance = await transaction.attendance.create({
+      if (!appointment) throw new NotFoundException('La cita no existe.');
+      assertBranchScope(admin, appointment.branchId);
+      const now = new Date();
+      let attendance = appointment.attendance;
+      if (data.action === 'arrive') {
+        if (attendance) throw new ConflictException('La cita ya tiene llegada registrada.');
+        if (!data.counterId)
+          throw fieldFailure({ counterId: 'Selecciona el mostrador de atención.' });
+        const counter = await transaction.serviceCounter.findFirst({
+          where: { id: data.counterId, branchId: appointment.branchId, active: true },
+          select: { id: true },
+        });
+        if (!counter)
+          throw fieldFailure({ counterId: 'El mostrador no está disponible en la sede.' });
+        if (data.qrToken !== undefined && data.qrToken !== appointment.qrToken)
+          throw fieldFailure({ qrToken: 'El código QR no corresponde a la cita.' });
+        attendance = await transaction.attendance.create({
           data: {
-            appointmentId: appointment.id,
+            appointmentId,
             branchId: appointment.branchId,
             staffId: admin.userId,
-            counterId: data.counterId!,
+            counterId: data.counterId,
             arrivedAt: now,
             qrValidatedAt: data.qrToken === undefined ? null : now,
             late: data.late ?? false,
           },
         });
-        await writeAudit(transaction, {
-          actorUserId: admin.userId,
-          action: 'appointment.attendance.arrive',
-          resourceType: 'Appointment',
-          resourceId: appointment.id,
-          branchId: appointment.branchId,
-          metadata: { late: attendance.late, qr: data.qrToken !== undefined },
-        });
-        return attendance;
-      });
-      return {
-        appointmentId: appointment.id,
-        folio: appointment.folio,
-        status: appointment.status,
-        attendance: {
-          arrivedAt: created.arrivedAt.toISOString(),
-          qrValidatedAt: created.qrValidatedAt?.toISOString() ?? null,
-          startedAt: null,
-          endedAt: null,
-          late: created.late,
-        },
-      };
-    }
-    const attendance = appointment.attendance;
-    if (!attendance) throw fieldFailure({ action: 'Registra primero la llegada de la cita.' });
-    if (data.action === 'start') {
-      if (attendance.startedAt) throw new ConflictException('La atención ya fue iniciada.');
-      const updated = await this.db.$transaction(async (transaction) => {
-        const row = await transaction.attendance.update({
-          where: { appointmentId: appointment.id },
-          data: { startedAt: now },
-        });
-        await writeAudit(transaction, {
-          actorUserId: admin.userId,
-          action: 'appointment.attendance.start',
-          resourceType: 'Appointment',
-          resourceId: appointment.id,
-          branchId: appointment.branchId,
-        });
-        return row;
-      });
-      return {
-        appointmentId: appointment.id,
-        folio: appointment.folio,
-        status: appointment.status,
-        attendance: {
-          arrivedAt: updated.arrivedAt.toISOString(),
-          qrValidatedAt: updated.qrValidatedAt?.toISOString() ?? null,
-          startedAt: updated.startedAt?.toISOString() ?? null,
-          endedAt: null,
-          late: updated.late,
-        },
-      };
-    }
-    if (!attendance.startedAt)
-      throw fieldFailure({ action: 'Registra primero el inicio de la atención.' });
-    if (attendance.endedAt) throw new ConflictException('La atención ya fue finalizada.');
-    const updated = await this.db.$transaction(async (transaction) => {
-      const row = await transaction.attendance.update({
-        where: { appointmentId: appointment.id },
-        data: { endedAt: now },
-      });
+      } else {
+        if (!attendance) throw fieldFailure({ action: 'Registra primero la llegada de la cita.' });
+        if (data.action === 'start') {
+          if (attendance.startedAt) throw new ConflictException('La atención ya fue iniciada.');
+          attendance = await transaction.attendance.update({
+            where: { appointmentId },
+            data: { startedAt: now },
+          });
+        } else {
+          if (!attendance.startedAt)
+            throw fieldFailure({ action: 'Registra primero el inicio de la atención.' });
+          if (attendance.endedAt) throw new ConflictException('La atención ya fue finalizada.');
+          attendance = await transaction.attendance.update({
+            where: { appointmentId },
+            data: { endedAt: now },
+          });
+        }
+      }
       await writeAudit(transaction, {
         actorUserId: admin.userId,
-        action: 'appointment.attendance.end',
+        action: `appointment.attendance.${data.action}`,
         resourceType: 'Appointment',
-        resourceId: appointment.id,
+        resourceId: appointmentId,
         branchId: appointment.branchId,
+        ...(data.action === 'arrive'
+          ? { metadata: { late: attendance.late, qr: data.qrToken !== undefined } }
+          : {}),
       });
-      return row;
+      return {
+        appointmentId,
+        folio: appointment.folio,
+        status: appointment.status,
+        attendance: {
+          arrivedAt: attendance.arrivedAt.toISOString(),
+          qrValidatedAt: attendance.qrValidatedAt?.toISOString() ?? null,
+          startedAt: attendance.startedAt?.toISOString() ?? null,
+          endedAt: attendance.endedAt?.toISOString() ?? null,
+          late: attendance.late,
+        },
+      };
     });
-    return {
-      appointmentId: appointment.id,
-      folio: appointment.folio,
-      status: appointment.status,
-      attendance: {
-        arrivedAt: updated.arrivedAt.toISOString(),
-        qrValidatedAt: updated.qrValidatedAt?.toISOString() ?? null,
-        startedAt: updated.startedAt?.toISOString() ?? null,
-        endedAt: updated.endedAt?.toISOString() ?? null,
-        late: updated.late,
-      },
-    };
   }
 }

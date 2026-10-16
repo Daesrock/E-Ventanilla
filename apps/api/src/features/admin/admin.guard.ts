@@ -5,7 +5,7 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { bearerToken, AdminAuthService } from './admin.auth.js';
-import { PERMISSIONS_KEY } from './admin.decorators.js';
+import { PERMISSIONS_KEY, ROLES_KEY } from './admin.decorators.js';
 import type { AdminContext } from './admin.types.js';
 
 @Injectable()
@@ -26,7 +26,14 @@ export class AdminGuard implements CanActivate {
         context.getHandler(),
         context.getClass(),
       ]) ?? [];
-    if (required.some((code) => !admin.permissions.has(code)))
+    const roles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (
+      (roles?.length && !roles.includes(admin.role.code)) ||
+      required.some((code) => !admin.permissions.has(code))
+    )
       throw new ForbiddenException({
         message: 'No cuentas con permiso para esta operación administrativa.',
         code: 'ADMIN_PERMISSION_REQUIRED',

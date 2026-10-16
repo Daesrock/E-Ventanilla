@@ -13,7 +13,10 @@ export function optionalText(value: unknown, field: string, max = 120): string |
 
 export function optionalUuid(value: unknown, field: string): string | undefined {
   if (value === undefined) return undefined;
-  if (typeof value !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value))
+  if (
+    typeof value !== 'string' ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
+  )
     throw fieldFailure({ [field]: 'El identificador no es válido.' });
   return value;
 }
